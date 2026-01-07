@@ -1615,7 +1615,8 @@
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
                 expires = "; expires=" + date.toUTCString();
             }
-            document.cookie = name + "=" + value + expires + "; path=/; SameSite=Lax";
+            // Προσθήκη SameSite και Secure για καλύτερη συμβατότητα με PWA
+            document.cookie = name + "=" + value + expires + "; path=/; SameSite=Lax" + (window.location.protocol === 'https:' ? "; Secure" : "");
         }
 
         function deleteCookie(name) {
@@ -1624,22 +1625,23 @@
 
         // ========== ΚΕΝΤΡΙΚΕΣ ΜΕΤΑΒΛΗΤΕΣ ==========
         let isAdmin = false;
+        
+        // ΧΡΗΣΗ COOKIES ΓΙΑ ΕΠΙΣΚΕΠΤΕΣ - ΣΥΜΒΑΤΟ ΜΕ PWA
         let userSessionId = getCookie('userSessionId') || 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         if (!getCookie('userSessionId')) {
             setCookie('userSessionId', userSessionId, 365);
         }
         
-        // Φόρτωση πόντων από cookies για συμβατότητα με όλους browsers
         let userClicks = parseInt(getCookie('userClicks')) || 0;
         const REQUIRED_CLICKS = 10;
-        
-        // Για συνολικά στατιστικά χρησιμοποιούμε localStorage (για διαχειριστή)
+
+        // ΧΡΗΣΗ localStorage ΜΟΝΟ ΓΙΑ ΣΥΝΟΛΙΚΑ ΣΤΑΤΙΣΤΙΚΑ (για διαχειριστή)
         let totalClicks = parseInt(localStorage.getItem('totalClicks')) || 0;
         let totalParticipants = parseInt(localStorage.getItem('totalParticipants')) || 0;
         let participants = JSON.parse(localStorage.getItem('participants')) || [];
         let winners = JSON.parse(localStorage.getItem('winners')) || [];
         let businessInquiries = JSON.parse(localStorage.getItem('businessInquiries')) || [];
-        const TARGET_CLICKS = 100000; // Αλλαγή από 10000 σε 100000
+        const TARGET_CLICKS = 100000;
         const ADMIN_CREDENTIALS = { username: "ap.fragos@gmail.com", password: "Mariza_2020" };
         const WHEEL_COLORS = ['#FF6B6B', '#4ECDC4', '#FFD166', '#9D4EDD', '#06D6A0', '#FF9E6D'];
         let isSpinning = false;
@@ -1697,9 +1699,9 @@
                     ball.style.border = 'none';
                     ball.style.outline = 'none';
                     
-                    // Κλικ event για το μπαλάκι - ΚΑΤΕΥΘΕΙΑΝ
+                    // Κλικ event για το μπαλάκι
                     ball.addEventListener('mousedown', function(e) {
-                        e.preventDefault(); // Αποφυγή default behavior
+                        e.preventDefault();
                     });
                     
                     ball.addEventListener('click', function(e) {
@@ -1747,7 +1749,6 @@
         }
 
         function createBallClickEffect(ball) {
-            // Δημιουργία μπαλονιού +1 για το floating ball
             const rect = ball.getBoundingClientRect();
             const x = rect.left + rect.width / 2;
             const y = rect.top + rect.height / 2;
@@ -1763,14 +1764,12 @@
             
             document.body.appendChild(bubble);
             
-            // Αφαίρεση μετά το animation
             setTimeout(() => {
                 if (bubble.parentNode) {
                     bubble.parentNode.removeChild(bubble);
                 }
             }, 1500);
             
-            // Εφέ στο μπαλάκι χωρίς πλαίσιο
             ball.style.transform = 'scale(1.5)';
             setTimeout(() => {
                 ball.style.transform = 'scale(1)';
@@ -1784,15 +1783,11 @@
                 return;
             }
             
-            // Άνοιγμα διαφημίσεων αμέσως
             openAds();
-            
-            // Create click effect
             createClickEffect(event);
         }
 
         function openAds() {
-            // Εκτέλεση script διαφήμισης ΑΜΕΣΑ
             if (!adScriptLoaded) {
                 const script = document.createElement('script');
                 script.src = 'https://quge5.com/88/tag.min.js';
@@ -1803,29 +1798,25 @@
                 adScriptLoaded = true;
             }
             
-            // Αύξηση μετρητή κλικ
             clickCounter++;
             
-            // Εμφάνιση προσωρινού μηνύματος για κάθε κλικ
             showTemporaryAdMessage(clickCounter);
             
-            // Κάθε 2 κλικ = 1 πόντος
             if (clickCounter % 2 === 0) {
                 userClicks++;
                 totalClicks++;
                 
-                // Εμφάνιση ιπτάμενου σφαιριδίου "+1"
                 createPointBubble(event);
                 
-                // Αποθήκευση σε cookies για συμβατότητα
+                // ✅ ΑΠΟΘΗΚΕΥΣΗ ΣΕ COOKIES ΓΙΑ ΣΥΜΒΑΤΟΤΗΤΑ ΜΕ PWA
                 setCookie('userClicks', userClicks, 365);
+                
+                // Αποθήκευση συνολικών κλικ σε localStorage (μόνο για στατιστικά διαχειριστή)
                 localStorage.setItem('totalClicks', totalClicks);
                 
-                // Ανανέωση στατιστικών
                 updateStatistics();
                 updateParticipationForm();
                 
-                // Εμφάνιση μηνύματος
                 showAdMessage();
                 
                 if (userClicks === REQUIRED_CLICKS) {
@@ -1840,7 +1831,6 @@
             bubble.className = 'point-bubble';
             bubble.textContent = '+1';
             
-            // Θέση σφαιριδίου
             const x = event.clientX || window.innerWidth / 2;
             const y = event.clientY || window.innerHeight / 2;
             
@@ -1849,7 +1839,6 @@
             
             document.body.appendChild(bubble);
             
-            // Αφαίρεση μετά το animation
             setTimeout(() => {
                 if (bubble.parentNode) {
                     bubble.parentNode.removeChild(bubble);
@@ -1921,7 +1910,6 @@
                     return;
                 }
                 
-                // Email validation
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(businessEmail)) {
                     showBusinessMessage('error', 'Παρακαλώ εισάγετε έγκυρο email');
@@ -1947,7 +1935,6 @@
                     loadBusinessInquiries();
                 }
                 
-                // Κλείσιμο φόρμας μετά από 2 δευτερόλεπτα
                 setTimeout(() => {
                     document.getElementById('businessModal').style.display = 'none';
                     document.getElementById('businessForm').reset();
@@ -2007,7 +1994,6 @@
             `).join('');
         }
 
-        // Συνάρτηση διαγραφής αιτήματος επιχειρηματία
         function deleteBusinessInquiry(inquiryId) {
             if (!isAdmin) {
                 showMessage('error', 'Μόνο ο διαχειριστής μπορεί να διαγράψει αιτήματα!');
@@ -2025,7 +2011,6 @@
             }
         }
 
-        // Συνάρτηση σημείωσης ως επικοινωνήσαμε
         function markInquiryAsContacted(inquiryId) {
             if (!isAdmin) {
                 showMessage('error', 'Μόνο ο διαχειριστής μπορεί να αλλάξει την κατάσταση!');
@@ -2076,7 +2061,6 @@
 
         // ========== PWA FUNCTIONALITY ==========
         function setupPWA() {
-            // Δημιουργία δυναμικού manifest για καλύτερη συμβατότητα
             const manifest = {
                 "name": "Παίξε & Κέρδισε",
                 "short_name": "Π&Κ",
@@ -2102,13 +2086,11 @@
                 ]
             };
 
-            // Προσθήκη manifest link
             const manifestLink = document.createElement('link');
             manifestLink.rel = 'manifest';
             manifestLink.href = 'data:application/json,' + encodeURIComponent(JSON.stringify(manifest));
             document.head.appendChild(manifestLink);
 
-            // Listen for beforeinstallprompt event
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
@@ -2120,19 +2102,16 @@
                 }, 5000);
             });
 
-            // Listen for app installed event
             window.addEventListener('appinstalled', (evt) => {
                 console.log('PWA installed successfully');
                 pwaInstallShown = true;
                 hideInstallPrompt();
             });
 
-            // Check if already installed
             if (isPWAInstalled()) {
                 pwaInstallShown = true;
             }
 
-            // Setup PWA prompt buttons
             document.getElementById('pwaInstallBtn').addEventListener('click', installPWA);
             document.getElementById('pwaLaterBtn').addEventListener('click', hideInstallPrompt);
             document.getElementById('pwaCloseBtn').addEventListener('click', hideInstallPrompt);
@@ -2215,7 +2194,6 @@
             document.getElementById('totalParticipants').textContent = participants.length.toLocaleString();
             document.getElementById('totalWinners').textContent = winners.length;
             
-            // Απενεργοποίηση του τροχού αν δεν έχουμε φτάσει τον στόχο
             const spinButton = document.getElementById('spinWheel');
             if (totalClicks >= TARGET_CLICKS) {
                 spinButton.disabled = !isAdmin;
@@ -2288,7 +2266,7 @@
             localStorage.setItem('participants', JSON.stringify(participants));
             localStorage.setItem('totalParticipants', totalParticipants);
             
-            // Μηδενισμός πόντων μετά την υποβολή
+            // ✅ Μηδενισμός πόντων μετά την υποβολή - ΑΠΟΘΗΚΕΥΣΗ ΣΕ COOKIES
             userClicks = 0;
             clickCounter = 0;
             setCookie('userClicks', 0, 365);
@@ -2506,28 +2484,31 @@
                     totalParticipants = 0;
                     participants = [];
                     winners = [];
-                    businessInquiries = []; // Διαγραφή και των αιτημάτων επιχειρηματιών
-                    userClicks = 0;
-                    clickCounter = 0;
+                    businessInquiries = [];
                     
-                    // Καθαρισμός cookies και localStorage
+                    // ✅ ΜΗΔΕΝΙΣΜΟΣ COOKIES ΓΙΑ ΤΟΥΣ ΕΠΙΣΚΕΠΤΕΣ
                     deleteCookie('userClicks');
                     deleteCookie('userSessionId');
+                    
                     localStorage.removeItem('totalClicks');
                     localStorage.removeItem('totalParticipants');
                     localStorage.removeItem('participants');
                     localStorage.removeItem('winners');
-                    localStorage.removeItem('businessInquiries'); // Διαγραφή και των αιτημάτων
+                    localStorage.removeItem('businessInquiries');
                     
                     // Νέα session ID
                     userSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                     setCookie('userSessionId', userSessionId, 365);
                     
+                    // Επαναφορά μεταβλητών
+                    userClicks = 0;
+                    clickCounter = 0;
+                    
                     updateDisplay();
                     generateWheel();
                     loadWinners();
                     loadAdminParticipants();
-                    loadBusinessInquiries(); // Ανανέωση λίστας αιτημάτων
+                    loadBusinessInquiries();
                     showMessage('success', '✅ Όλα τα στατιστικά και αιτήματα μηδενίστηκαν!');
                 }
             });
