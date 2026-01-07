@@ -1350,18 +1350,22 @@
                     <div>ΠΡΟΣΩΠΙΚΑ ΚΛΙΚ:</div>
                     <div class="click-display" id="userClicks">0 / 10</div>
                     <div id="clickStatus" style="color: var(--primary); font-weight: bold; font-size: clamp(0.85rem, 2.8vw, 0.95rem);"></div>
+                    <!-- NEW: Display ad views counter -->
+                    <div style="margin-top: 5px; color: var(--warning); font-size: clamp(0.75rem, 2.2vw, 0.8rem);">
+                        📊 <strong>Διαφημίσεις που έχουν φορτωθεί:</strong> <span id="adViewsCounter">0 / 3</span>
+                    </div>
                 </div>
 
                 <!-- Ad Button with Embedded Script -->
                 <button id="adClickBtn">
                     <span>🔥 ΚΛΙΚ ΓΙΑ ΔΙΑΦΗΜΙΣΗ 🔥</span>
                     <small style="opacity: 0.9; font-size: clamp(0.75rem, 2.2vw, 0.85rem);">
-                        Κάθε κλικ = Νέα ευκαιρία νίκης!
+                        3 διαφημίσεις = 1 πόντος!
                     </small>
                 </button>
 
                 <div style="text-align: center; margin-top: 10px; color: #666; font-size: clamp(0.75rem, 2.2vw, 0.8rem); line-height: 1.3;">
-                    ⚡ <strong>2 κλικ</strong> = 1 πόντος<br>
+                    ⚡ <strong>3 κλικ</strong> = 1 πόντος<br>
                     🔄 <strong>10 πόντοι</strong> = 1 συμμετοχή
                 </div>
             </div>
@@ -1582,7 +1586,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>🎯 2 ΚΛΙΚ = 1 ΠΟΝΤΟΣ • 10 ΠΟΝΤΟΙ = 1 ΣΥΜΜΕΤΟΧΗ • 📧 ΕΠΙΚΟΙΝΩΝΙΑ ΥΠΟΧΡΕΩΤΙΚΗ • 🏆 2 ΝΙΚΗΤΕΣ ΜΕ ΔΩΡΟΕΠΙΤΑΓΕΣ</p>
+            <p>🎯 3 ΚΛΙΚ = 1 ΠΟΝΤΟΣ • 10 ΠΟΝΤΟΙ = 1 ΣΥΜΜΕΤΟΧΗ • 📧 ΕΠΙΚΟΙΝΩΝΙΑ ΥΠΟΧΡΕΩΤΙΚΗ • 🏆 2 ΝΙΚΗΤΕΣ ΜΕ ΔΩΡΟΕΠΙΤΑΓΕΣ</p>
             <p>💰 Το χρηματικό ποσό των δωροεπιταγών θα ανακοινωθεί μόλις φτάσουμε τον στόχο των 100.000 κλικ!</p>
             <p>🎡 Η κλήρωση θα γίνει μόλις ολοκληρωθεί ο στόχος των 100.000 κλικ!</p>
         </div>
@@ -1615,7 +1619,6 @@
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
                 expires = "; expires=" + date.toUTCString();
             }
-            // Προσθήκη SameSite και Secure για καλύτερη συμβατότητα με PWA
             document.cookie = name + "=" + value + expires + "; path=/; SameSite=Lax" + (window.location.protocol === 'https:' ? "; Secure" : "");
         }
 
@@ -1632,8 +1635,12 @@
             setCookie('userSessionId', userSessionId, 365);
         }
         
+        // Οι πόντοι του χρήστη (3 διαφημίσεις = 1 πόντος)
         let userClicks = parseInt(getCookie('userClicks')) || 0;
-        const REQUIRED_CLICKS = 10;
+        // Μετρητής για διαφημίσεις (χρειάζονται 3 για 1 πόντο)
+        let adViewsCounter = parseInt(getCookie('adViewsCounter')) || 0;
+        const ADS_PER_POINT = 3; // 3 διαφημίσεις = 1 πόντος
+        const REQUIRED_CLICKS = 10; // Πόντοι που χρειάζονται για συμμετοχή
 
         // ΧΡΗΣΗ localStorage ΜΟΝΟ ΓΙΑ ΣΥΝΟΛΙΚΑ ΣΤΑΤΙΣΤΙΚΑ (για διαχειριστή)
         let totalClicks = parseInt(localStorage.getItem('totalClicks')) || 0;
@@ -1645,9 +1652,9 @@
         const ADMIN_CREDENTIALS = { username: "ap.fragos@gmail.com", password: "Mariza_2020" };
         const WHEEL_COLORS = ['#FF6B6B', '#4ECDC4', '#FFD166', '#9D4EDD', '#06D6A0', '#FF9E6D'];
         let isSpinning = false;
-        let clickCounter = 0; // Μετρητής για κάθε 2 κλικ
         let adScriptLoaded = false;
         let floatingBalls = [];
+        let adViewsToday = 0; // Μετρητής διαφημίσεων για τη σημερινή ημέρα
 
         // ========== PWA VARIABLES ==========
         let deferredPrompt = null;
@@ -1666,10 +1673,11 @@
         });
 
         function initSystem() {
-            // Οι πόντοι έχουν ήδη φορτωθεί από cookies
+            // Φόρτωση δεδομένων από cookies
             updateStatistics();
             updateParticipationForm();
             loadParticipants();
+            updateAdViewsCounterDisplay();
         }
 
         // ========== FLOATING BALLS ==========
@@ -1708,7 +1716,7 @@
                         e.stopPropagation();
                         e.preventDefault();
                         
-                        // Κλικ στο μπαλάκι - ανοίγει script
+                        // Κλικ στο μπαλάκι - ανοίγει διαφήμιση
                         openAdFromBall(this);
                         
                         // Εφέ χωρίς πλαίσιο
@@ -1728,16 +1736,8 @@
         }
 
         function openAdFromBall(ball) {
-            // Εκτέλεση script διαφήμισης
-            if (!adScriptLoaded) {
-                const script = document.createElement('script');
-                script.src = 'https://quge5.com/88/tag.min.js';
-                script.setAttribute('data-zone', '198679');
-                script.async = true;
-                script.setAttribute('data-cfasync', 'false');
-                document.body.appendChild(script);
-                adScriptLoaded = true;
-            }
+            // Άνοιγμα διαφήμισης
+            openAdPopup();
             
             // Create +1 bubble effect
             createBallClickEffect(ball);
@@ -1776,18 +1776,78 @@
             }, 300);
         }
 
-        // ========== AD SCRIPT LOADING FUNCTION ==========
+        // ========== AD SYSTEM - ΝΕΟ ΣΥΣΤΗΜΑ ==========
         function loadAdScript() {
             if (userClicks >= REQUIRED_CLICKS) {
                 showMessage('info', '✅ Έχετε ήδη 10 πόντους! Μπορείτε να συμμετάσχετε.');
                 return;
             }
             
-            openAds();
-            createClickEffect(event);
+            // Άνοιγμα διαφήμισης
+            openAdPopup();
         }
 
-        function openAds() {
+        function openAdPopup() {
+            // Αύξηση μετρητή διαφημίσεων
+            adViewsCounter++;
+            adViewsToday++;
+            
+            // Ενημέρωση display
+            updateAdViewsCounterDisplay();
+            
+            // Εμφάνιση προσωρινού μηνύματος
+            showAdMessage(adViewsCounter);
+            
+            // Κάθε 3 διαφημίσεις = 1 πόντος
+            if (adViewsCounter % ADS_PER_POINT === 0) {
+                userClicks++;
+                totalClicks++;
+                
+                // Εμφάνιση ιπτάμενου σφαιριδίου "+1"
+                createPointBubble();
+                
+                // ✅ ΑΠΟΘΗΚΕΥΣΗ ΣΕ COOKIES ΓΙΑ ΣΥΜΒΑΤΟΤΗΤΑ ΜΕ PWA
+                setCookie('userClicks', userClicks, 365);
+                setCookie('adViewsCounter', adViewsCounter, 365);
+                
+                // Αποθήκευση συνολικών κλικ σε localStorage (μόνο για στατιστικά διαχειριστή)
+                localStorage.setItem('totalClicks', totalClicks);
+                
+                // Ανανέωση στατιστικών
+                updateStatistics();
+                updateParticipationForm();
+                
+                // Εμφάνιση μηνύματος επιτυχίας
+                showMessage('success', '🎉 +1 ΠΟΝΤΟΣ! 3 διαφημίσεις = 1 πόντος!');
+                
+                if (userClicks === REQUIRED_CLICKS) {
+                    triggerConfetti();
+                    showMessage('success', '🎉 ΕΠΙΤΥΧΙΑ! Έχετε 10 πόντους και μπορείτε να συμμετάσχετε!');
+                }
+            } else {
+                // Εμφάνιση μηνύματος για διαφήμιση
+                showTemporaryMessage(`📺 Διαφήμιση ${adViewsCounter}/${ADS_PER_POINT}`);
+            }
+            
+            // Άνοιγμα πραγματικής διαφήμισης
+            openRealAd();
+        }
+
+        function openRealAd() {
+            // Δημιουργία popup window για διαφήμιση
+            const popupWidth = 800;
+            const popupHeight = 600;
+            const left = (window.screen.width - popupWidth) / 2;
+            const top = (window.screen.height - popupHeight) / 2;
+            
+            // Άνοιγμα popup με διαφήμιση
+            const popup = window.open(
+                'https://quge5.com/88/tag.min.js?data-zone=198679', 
+                'AdPopup',
+                `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`
+            );
+            
+            // Προσπάθεια να εμφανιστεί το ad script
             if (!adScriptLoaded) {
                 const script = document.createElement('script');
                 script.src = 'https://quge5.com/88/tag.min.js';
@@ -1798,41 +1858,26 @@
                 adScriptLoaded = true;
             }
             
-            clickCounter++;
-            
-            showTemporaryAdMessage(clickCounter);
-            
-            if (clickCounter % 2 === 0) {
-                userClicks++;
-                totalClicks++;
-                
-                createPointBubble(event);
-                
-                // ✅ ΑΠΟΘΗΚΕΥΣΗ ΣΕ COOKIES ΓΙΑ ΣΥΜΒΑΤΟΤΗΤΑ ΜΕ PWA
-                setCookie('userClicks', userClicks, 365);
-                
-                // Αποθήκευση συνολικών κλικ σε localStorage (μόνο για στατιστικά διαχειριστή)
-                localStorage.setItem('totalClicks', totalClicks);
-                
-                updateStatistics();
-                updateParticipationForm();
-                
-                showAdMessage();
-                
-                if (userClicks === REQUIRED_CLICKS) {
-                    triggerConfetti();
-                    showMessage('success', '🎉 ΕΠΙΤΥΧΙΑ! Έχετε 10 πόντους και μπορείτε να συμμετάσχετε!');
-                }
+            // Κλείσιμο popup μετά από 5 δευτερόλεπτα
+            if (popup) {
+                setTimeout(() => {
+                    try {
+                        popup.close();
+                    } catch (e) {
+                        console.log('Popup already closed');
+                    }
+                }, 5000);
             }
         }
 
-        function createPointBubble(event) {
+        function createPointBubble() {
             const bubble = document.createElement('div');
             bubble.className = 'point-bubble';
             bubble.textContent = '+1';
             
-            const x = event.clientX || window.innerWidth / 2;
-            const y = event.clientY || window.innerHeight / 2;
+            // Τυχαία θέση στην οθόνη
+            const x = window.innerWidth / 2;
+            const y = window.innerHeight / 2;
             
             bubble.style.left = x + 'px';
             bubble.style.top = y + 'px';
@@ -1846,29 +1891,31 @@
             }, 1500);
         }
 
-        function showTemporaryAdMessage(count) {
+        function updateAdViewsCounterDisplay() {
+            const counterElement = document.getElementById('adViewsCounter');
+            if (counterElement) {
+                const remaining = ADS_PER_POINT - (adViewsCounter % ADS_PER_POINT);
+                counterElement.textContent = `${adViewsCounter % ADS_PER_POINT || ADS_PER_POINT} / ${ADS_PER_POINT}`;
+                
+                // Εμφάνιση πόσων διαφημίσεων απομένουν
+                const clickStatus = document.getElementById('clickStatus');
+                if (remaining !== 0 && userClicks < REQUIRED_CLICKS) {
+                    clickStatus.textContent = `Απομένουν ${remaining} διαφημίσεις για τον επόμενο πόντο`;
+                }
+            }
+        }
+
+        function showAdMessage(counter) {
             const messages = [
-                `🔥 Κλικ ${count}: Συνέχισε!`,
-                '🎯 Κοντά στην νίκη!',
-                '💰 Άλλο ένα κλικ!',
-                '⚡ Δυνατότητα νίκης!',
+                `📺 Διαφήμιση ${counter % ADS_PER_POINT || ADS_PER_POINT}/${ADS_PER_POINT}`,
+                '🎯 Κοντά στον επόμενο πόντο!',
+                '💰 Παρακολούθησες διαφήμιση!',
+                '⚡ Συνέχισε για περισσότερους πόντους!',
                 '🚀 Πετάμε ψηλά!'
             ];
             
             const randomMessage = messages[Math.floor(Math.random() * messages.length)];
             showTemporaryMessage(randomMessage);
-        }
-
-        function showAdMessage() {
-            const messages = [
-                '📢 +1 ΠΟΝΤΟΣ! 2 κλικ = 1 πόντος!',
-                '🎯 Συγχαρητήρια! Κέρδισες 1 πόντο!',
-                '💰 Ενας πόντος πλησιάζει την νίκη!',
-                '🔥 Συνέχισε! Η συμμετοχή σου πλησιάζει!'
-            ];
-            
-            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            showMessage('info', randomMessage);
         }
 
         function showTemporaryMessage(text) {
@@ -1885,7 +1932,7 @@
             setTimeout(() => {
                 tempDiv.style.animation = 'fadeOut 0.5s ease';
                 setTimeout(() => tempDiv.remove(), 500);
-            }, 500);
+            }, 1000);
         }
 
         // ========== BUSINESS CONTACT FORM ==========
@@ -2186,8 +2233,8 @@
                 clickStatus.style.color = 'var(--success)';
             } else {
                 const clicksNeeded = REQUIRED_CLICKS - userClicks;
-                const actualClicksNeeded = clicksNeeded * 2 - (clickCounter % 2);
-                clickStatus.textContent = `ΑΠΑΙΤΟΥΝΤΑΙ ${clicksNeeded} ΠΟΝΤΟΙ ΑΚΟΜΑ (${actualClicksNeeded} κλικ)`;
+                const adsNeeded = clicksNeeded * ADS_PER_POINT - (adViewsCounter % ADS_PER_POINT);
+                clickStatus.textContent = `ΑΠΑΙΤΟΥΝΤΑΙ ${clicksNeeded} ΠΟΝΤΟΙ ΑΚΟΜΑ (${adsNeeded} διαφημίσεις)`;
                 clickStatus.style.color = 'var(--primary)';
             }
             
@@ -2202,6 +2249,36 @@
                 spinButton.disabled = true;
                 spinButton.innerHTML = '⏳ ΠΕΡΙΜΕΝΕ ΤΟΝ ΣΤΟΧΟ (100.000 κλικ)';
             }
+            
+            // Αποθήκευση στατιστικών για διαχειριστή
+            if (isAdmin) {
+                saveAdminStatistics();
+            }
+        }
+
+        function saveAdminStatistics() {
+            // Αποθήκευση συνολικών στατιστικών για διαχειριστή
+            const stats = {
+                totalClicks: totalClicks,
+                totalParticipants: participants.length,
+                totalWinners: winners.length,
+                uniqueVisitorsToday: getUniqueVisitorsToday(),
+                adViewsToday: adViewsToday,
+                conversionRate: participants.length > 0 ? ((userClicks / (adViewsCounter || 1)) * 100).toFixed(2) + '%' : '0%',
+                lastUpdated: new Date().toLocaleString('el-GR')
+            };
+            
+            localStorage.setItem('adminStats', JSON.stringify(stats));
+        }
+
+        function getUniqueVisitorsToday() {
+            // Απλοποιημένη μέθοδος για μοναδικούς επισκέπτες
+            const today = new Date().toDateString();
+            const todaySessions = participants.filter(p => {
+                const participantDate = new Date(p.timestamp).toDateString();
+                return participantDate === today;
+            });
+            return todaySessions.length;
         }
 
         // ========== ΚΛΙΚ ΣΕ ΔΙΑΦΗΜΙΣΗ ==========
@@ -2223,7 +2300,7 @@
             e.preventDefault();
             
             if (userClicks < REQUIRED_CLICKS) {
-                showMessage('error', `Χρειάζεστε ${REQUIRED_CLICKS - userClicks} επιπλέον πόντους (${(REQUIRED_CLICKS - userClicks) * 2 - (clickCounter % 2)} κλικ)!`);
+                showMessage('error', `Χρειάζεστε ${REQUIRED_CLICKS - userClicks} επιπλέον πόντους (${(REQUIRED_CLICKS - userClicks) * ADS_PER_POINT - (adViewsCounter % ADS_PER_POINT)} διαφημίσεις)!`);
                 return;
             }
             
@@ -2245,6 +2322,7 @@
                 nickname: nickname,
                 email: email,
                 clicks: userClicks,
+                adViews: adViewsCounter,
                 entries: 1,
                 timestamp: new Date().toLocaleString('el-GR'),
                 date: new Date().toISOString().split('T')[0],
@@ -2255,6 +2333,7 @@
             if (existingIndex !== -1) {
                 participants[existingIndex].entries += 1;
                 participants[existingIndex].clicks += userClicks;
+                participants[existingIndex].adViews += adViewsCounter;
                 participants[existingIndex].timestamp = new Date().toLocaleString('el-GR');
                 showMessage('success', `Η ${participants[existingIndex].nickname} έχει πλέον ${participants[existingIndex].entries} συμμετοχές!`);
             } else {
@@ -2268,8 +2347,9 @@
             
             // ✅ Μηδενισμός πόντων μετά την υποβολή - ΑΠΟΘΗΚΕΥΣΗ ΣΕ COOKIES
             userClicks = 0;
-            clickCounter = 0;
+            adViewsCounter = 0;
             setCookie('userClicks', 0, 365);
+            setCookie('adViewsCounter', 0, 365);
             
             updateStatistics();
             updateParticipationForm();
@@ -2427,6 +2507,7 @@
                     document.getElementById('spinWheel').disabled = false;
                     loadAdminParticipants();
                     loadBusinessInquiries();
+                    showAdminStats();
                     showMessage('success', '✅ Συνδεθήκατε ως διαχειριστής!');
                 } else {
                     showMessage('error', '❌ Λάθος στοιχεία πρόσβασης');
@@ -2473,6 +2554,7 @@
                 if (!isAdmin) return;
                 updateDisplay();
                 loadBusinessInquiries();
+                showAdminStats();
                 showMessage('success', '✅ Τα στατιστικά ανανεώθηκαν!');
             });
             
@@ -2488,6 +2570,7 @@
                     
                     // ✅ ΜΗΔΕΝΙΣΜΟΣ COOKIES ΓΙΑ ΤΟΥΣ ΕΠΙΣΚΕΠΤΕΣ
                     deleteCookie('userClicks');
+                    deleteCookie('adViewsCounter');
                     deleteCookie('userSessionId');
                     
                     localStorage.removeItem('totalClicks');
@@ -2495,6 +2578,7 @@
                     localStorage.removeItem('participants');
                     localStorage.removeItem('winners');
                     localStorage.removeItem('businessInquiries');
+                    localStorage.removeItem('adminStats');
                     
                     // Νέα session ID
                     userSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -2502,7 +2586,8 @@
                     
                     // Επαναφορά μεταβλητών
                     userClicks = 0;
-                    clickCounter = 0;
+                    adViewsCounter = 0;
+                    adViewsToday = 0;
                     
                     updateDisplay();
                     generateWheel();
@@ -2547,6 +2632,52 @@
             });
         }
 
+        function showAdminStats() {
+            // Εμφάνιση προχωρημένων στατιστικών για διαχειριστή
+            const stats = {
+                totalClicks: totalClicks,
+                totalParticipants: participants.length,
+                totalWinners: winners.length,
+                uniqueVisitorsToday: getUniqueVisitorsToday(),
+                adViewsToday: adViewsToday,
+                conversionRate: participants.length > 0 ? ((userClicks / (adViewsCounter || 1)) * 100).toFixed(2) + '%' : '0%',
+                averageClicksPerParticipant: participants.length > 0 ? (totalClicks / participants.length).toFixed(1) : '0',
+                completionPercentage: ((totalClicks / TARGET_CLICKS) * 100).toFixed(1) + '%',
+                lastUpdated: new Date().toLocaleString('el-GR')
+            };
+            
+            // Προσθήκη στατιστικών στον πίνακα διαχειριστή
+            const statsHTML = `
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-top: 10px;">
+                    <h5 style="color: var(--dark); margin-bottom: 8px; text-align: center;">📊 ΣΤΑΤΙΣΤΙΚΑ ΣΥΣΤΗΜΑΤΟΣ</h5>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8rem;">
+                        <div>👥 Μοναδικοί σήμερα:</div>
+                        <div><strong>${stats.uniqueVisitorsToday}</strong></div>
+                        <div>📺 Διαφημίσεις σήμερα:</div>
+                        <div><strong>${stats.adViewsToday}</strong></div>
+                        <div>📈 Ποσοστό Μετατροπής:</div>
+                        <div><strong>${stats.conversionRate}</strong></div>
+                        <div>🎯 Μέσος όρος κλικ/συμμ.:</div>
+                        <div><strong>${stats.averageClicksPerParticipant}</strong></div>
+                        <div>⏱️ Τελευταία ενημέρωση:</div>
+                        <div><strong>${stats.lastUpdated}</strong></div>
+                    </div>
+                </div>
+            `;
+            
+            // Εισαγωγή των στατιστικών στον πίνακα διαχειριστή
+            const adminControls = document.getElementById('adminControls');
+            const existingStats = document.getElementById('adminStatsDisplay');
+            if (existingStats) {
+                existingStats.innerHTML = statsHTML;
+            } else {
+                const statsDiv = document.createElement('div');
+                statsDiv.id = 'adminStatsDisplay';
+                statsDiv.innerHTML = statsHTML;
+                adminControls.insertBefore(statsDiv, adminControls.firstChild.nextSibling);
+            }
+        }
+
         function loadAdminParticipants() {
             const container = document.getElementById('adminParticipantsList');
             
@@ -2555,15 +2686,24 @@
                 return;
             }
             
-            container.innerHTML = participants.map(p => `
+            // Ταξινόμηση κατά ημερομηνία (πρόσφατα πρώτα)
+            const sortedParticipants = [...participants].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            container.innerHTML = sortedParticipants.map(p => `
                 <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 8px; margin-bottom: 6px; border-radius: 6px; border-left: 4px solid var(--secondary);">
                     <div style="flex-grow: 1;">
                         <strong style="color: var(--dark); font-size: 0.9rem;">${escapeHtml(p.nickname)}</strong><br>
                         <span style="color: #666; font-size: 0.8rem;">${p.email}</span>
+                        <div style="font-size: 0.7rem; color: #999; margin-top: 2px;">
+                            📅 ${p.timestamp}
+                        </div>
                     </div>
                     <div style="text-align: right;">
                         <div style="color: var(--primary); font-size: 0.85rem; font-weight: bold;">
                             ${p.entries} συμμ.
+                        </div>
+                        <div style="color: var(--warning); font-size: 0.75rem;">
+                            ${p.clicks} πόντοι
                         </div>
                         <button class="delete-participant" data-email="${p.email}" 
                                 style="background: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; margin-top: 3px;">
@@ -2591,6 +2731,9 @@
                             <strong style="color:var(--dark);font-size:1.1rem;">${escapeHtml(p.nickname)}</strong>
                             <div style="color:#666;font-size:0.8rem;margin-top:4px;">
                                 ${p.entries} συμμετοχ${p.entries === 1 ? 'ή' : 'ές'} • ${p.clicks} πόντοι
+                            </div>
+                            <div style="color:#999;font-size:0.7rem;margin-top:2px;">
+                                📅 ${p.timestamp}
                             </div>
                         </div>
                     </div>
@@ -2654,25 +2797,6 @@
             return div.innerHTML;
         }
 
-        function createClickEffect(event) {
-            const effect = document.createElement('div');
-            effect.style.cssText = `
-                position: fixed; width: 20px; height: 20px;
-                background: var(--accent); border-radius: 50%;
-                left: ${event.clientX}px; top: ${event.clientY}px;
-                pointer-events: none; z-index: 9999;
-                box-shadow: 0 0 10px var(--warning);
-            `;
-            document.body.appendChild(effect);
-            
-            effect.animate([
-                { transform: 'scale(0.5)', opacity: 1 },
-                { transform: 'scale(3)', opacity: 0 }
-            ], { duration: 500 });
-            
-            setTimeout(() => effect.remove(), 500);
-        }
-
         function triggerConfetti() {
             const colors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#9D4EDD'];
             for (let i = 0; i < 40; i++) {
@@ -2710,8 +2834,10 @@
             updateStatistics();
             updateParticipationForm();
             loadParticipants();
+            updateAdViewsCounterDisplay();
             if (isAdmin) {
                 loadAdminParticipants();
+                showAdminStats();
             }
         }
 
@@ -2721,7 +2847,27 @@
             localStorage.setItem('winners', JSON.stringify(winners));
             localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
             localStorage.setItem('totalClicks', totalClicks);
+            setCookie('userClicks', userClicks, 365);
+            setCookie('adViewsCounter', adViewsCounter, 365);
+            
+            if (isAdmin) {
+                saveAdminStatistics();
+            }
         }, 30000);
+
+        // Επαναφορά μετρητή διαφημίσεων για τη νέα μέρα
+        function resetDailyCounter() {
+            const today = new Date().toDateString();
+            const lastReset = getCookie('lastResetDate');
+            
+            if (lastReset !== today) {
+                adViewsToday = 0;
+                setCookie('lastResetDate', today, 365);
+            }
+        }
+
+        // Εκτέλεση επαναφοράς κάθε φορά που φορτώνεται η σελίδα
+        resetDailyCounter();
     </script>
 </body>
 </html>
