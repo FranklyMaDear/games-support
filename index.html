@@ -1995,8 +1995,52 @@
                     <div style="margin-top: 5px; font-size: 0.8rem; color: #555;">
                         <strong>Προϊόν:</strong> ${escapeHtml(inquiry.productForContest.substring(0, 100))}${inquiry.productForContest.length > 100 ? '...' : ''}
                     </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 5px; margin-top: 8px;">
+                        <button onclick="markInquiryAsContacted(${inquiry.id})" 
+                                style="background: #4ecdc4; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">
+                            Επικοινωνήσαμε
+                        </button>
+                        <button onclick="deleteBusinessInquiry(${inquiry.id})" 
+                                style="background: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">
+                            Διαγραφή
+                        </button>
+                    </div>
                 </div>
             `).join('');
+        }
+
+        // Συνάρτηση διαγραφής αιτήματος επιχειρηματία
+        function deleteBusinessInquiry(inquiryId) {
+            if (!isAdmin) {
+                showMessage('error', 'Μόνο ο διαχειριστής μπορεί να διαγράψει αιτήματα!');
+                return;
+            }
+            
+            if (confirm('⚠️ Είστε σίγουρος ότι θέλετε να διαγράψετε αυτό το αίτημα;')) {
+                const index = businessInquiries.findIndex(i => i.id === inquiryId);
+                if (index !== -1) {
+                    businessInquiries.splice(index, 1);
+                    localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
+                    loadBusinessInquiries();
+                    showMessage('success', '✅ Το αίτημα διαγράφηκε επιτυχώς!');
+                }
+            }
+        }
+
+        // Συνάρτηση σημείωσης ως επικοινωνήσαμε
+        function markInquiryAsContacted(inquiryId) {
+            if (!isAdmin) {
+                showMessage('error', 'Μόνο ο διαχειριστής μπορεί να αλλάξει την κατάσταση!');
+                return;
+            }
+            
+            const inquiry = businessInquiries.find(i => i.id === inquiryId);
+            if (inquiry) {
+                inquiry.status = 'contacted';
+                localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
+                loadBusinessInquiries();
+                showMessage('success', '✅ Το αίτημα σημειώθηκε ως "Επικοινωνήσαμε"!');
+            }
         }
 
         function getAdTypeText(type) {
@@ -2464,6 +2508,7 @@
                     totalParticipants = 0;
                     participants = [];
                     winners = [];
+                    businessInquiries = []; // Διαγραφή και των αιτημάτων επιχειρηματιών
                     userClicks = 0;
                     clickCounter = 0;
                     
@@ -2474,6 +2519,7 @@
                     localStorage.removeItem('totalParticipants');
                     localStorage.removeItem('participants');
                     localStorage.removeItem('winners');
+                    localStorage.removeItem('businessInquiries'); // Διαγραφή και των αιτημάτων
                     
                     // Νέα session ID
                     userSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -2483,7 +2529,8 @@
                     generateWheel();
                     loadWinners();
                     loadAdminParticipants();
-                    showMessage('success', '✅ Όλα τα στατιστικά μηδενίστηκαν!');
+                    loadBusinessInquiries(); // Ανανέωση λίστας αιτημάτων
+                    showMessage('success', '✅ Όλα τα στατιστικά και αιτήματα μηδενίστηκαν!');
                 }
             });
             
@@ -2676,6 +2723,9 @@
                 showMessage('success', `Η κατάσταση πληρωμής για ${winner.nickname} άλλαξε`);
             }
         };
+
+        window.deleteBusinessInquiry = deleteBusinessInquiry;
+        window.markInquiryAsContacted = markInquiryAsContacted;
 
         function updateDisplay() {
             updateStatistics();
