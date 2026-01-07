@@ -1829,7 +1829,7 @@
                 showTemporaryMessage(`📺 Διαφήμιση ${adViewsCounter}/${ADS_PER_POINT}`);
             }
             
-            // Άνοιγμα πραγματικής διαφήμισης
+            // Άνοιγμα πραγματικής διαφήμισης - ΜΟΝΟ ΤΟ SCRIPT
             openRealAd();
         }
 
@@ -1840,33 +1840,73 @@
             const left = (window.screen.width - popupWidth) / 2;
             const top = (window.screen.height - popupHeight) / 2;
             
-            // Άνοιγμα popup με το ΝΕΟ ad script
+            // Άνοιγμα popup και φόρτωση ΜΟΝΟ του script
             const popup = window.open(
-                'https://quge5.com/88/tag.min.js?data-zone=199912', 
+                'about:blank', 
                 'AdPopup',
                 `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`
             );
             
-            // Προσπάθεια να εμφανιστεί το ad script
-            if (!adScriptLoaded) {
-                const script = document.createElement('script');
-                script.src = 'https://quge5.com/88/tag.min.js';
-                script.setAttribute('data-zone', '199912');
-                script.async = true;
-                script.setAttribute('data-cfasync', 'false');
-                document.body.appendChild(script);
-                adScriptLoaded = true;
-            }
-            
-            // Κλείσιμο popup μετά από 5 δευτερόλεπτα
             if (popup) {
+                // Δημιουργία ενός απλού HTML που περιέχει ΜΟΝΟ το script
+                const htmlContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Advertisement</title>
+                        <script src="https://quge5.com/88/tag.min.js" data-zone="199912" async data-cfasync="false"></script>
+                        <style>
+                            body { margin: 0; padding: 0; background: #f5f5f5; }
+                            .loading { 
+                                text-align: center; 
+                                padding: 50px; 
+                                font-family: Arial, sans-serif; 
+                                color: #666; 
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="loading">
+                            <h3>🔄 Loading Advertisement...</h3>
+                            <p>Please wait while the ad loads</p>
+                        </div>
+                        <script>
+                            // Auto close after 6 seconds
+                            setTimeout(function() {
+                                try {
+                                    window.close();
+                                } catch(e) {
+                                    // If can't close, just leave it
+                                }
+                            }, 6000);
+                        </script>
+                    </body>
+                    </html>
+                `;
+                
+                popup.document.open();
+                popup.document.write(htmlContent);
+                popup.document.close();
+                
+                // Προσθήκη script και στην κύρια σελίδα
+                if (!adScriptLoaded) {
+                    const script = document.createElement('script');
+                    script.src = 'https://quge5.com/88/tag.min.js';
+                    script.setAttribute('data-zone', '199912');
+                    script.async = true;
+                    script.setAttribute('data-cfasync', 'false');
+                    document.body.appendChild(script);
+                    adScriptLoaded = true;
+                }
+                
+                // Κλείσιμο popup μετά από 6 δευτερόλεπτα
                 setTimeout(() => {
                     try {
                         popup.close();
                     } catch (e) {
                         console.log('Popup already closed');
                     }
-                }, 5000);
+                }, 6000);
             }
         }
 
