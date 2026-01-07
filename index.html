@@ -1840,9 +1840,9 @@
             const left = (window.screen.width - popupWidth) / 2;
             const top = (window.screen.height - popupHeight) / 2;
             
-            // Άνοιγμα popup με διαφήμιση
+            // Άνοιγμα popup με το ΝΕΟ ad script
             const popup = window.open(
-                'https://quge5.com/88/tag.min.js?data-zone=198679', 
+                'https://quge5.com/88/tag.min.js?data-zone=199912', 
                 'AdPopup',
                 `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`
             );
@@ -1851,7 +1851,7 @@
             if (!adScriptLoaded) {
                 const script = document.createElement('script');
                 script.src = 'https://quge5.com/88/tag.min.js';
-                script.setAttribute('data-zone', '198679');
+                script.setAttribute('data-zone', '199912');
                 script.async = true;
                 script.setAttribute('data-cfasync', 'false');
                 document.body.appendChild(script);
@@ -2265,6 +2265,8 @@
                 uniqueVisitorsToday: getUniqueVisitorsToday(),
                 adViewsToday: adViewsToday,
                 conversionRate: participants.length > 0 ? ((userClicks / (adViewsCounter || 1)) * 100).toFixed(2) + '%' : '0%',
+                averageClicksPerParticipant: participants.length > 0 ? (totalClicks / participants.length).toFixed(1) : '0',
+                completionPercentage: ((totalClicks / TARGET_CLICKS) * 100).toFixed(1) + '%',
                 lastUpdated: new Date().toLocaleString('el-GR')
             };
             
