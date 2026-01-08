@@ -366,40 +366,10 @@
             transform: translateY(-2px);
         }
 
-        /* Progress Section */
-        .progress-section {
-            background: linear-gradient(135deg, var(--light) 0%, #ffffff 100%);
-            border-radius: 15px;
-            padding: 18px;
-            margin-bottom: 20px;
-            border: 3px solid var(--secondary);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--dark);
-            font-size: clamp(0.9rem, 3vw, 1rem);
-        }
-
-        .progress-bar {
-            height: 22px;
-            background-color: #E0E0E0;
-            border-radius: 11px;
-            overflow: hidden;
-            margin-bottom: 12px;
-            border: 2px solid var(--accent);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--success), var(--secondary));
-            width: 0%;
-            transition: width 0.5s ease;
-        }
+        /* ΑΦΑΙΡΕΣΗ PROGRESS SECTION - ΣΥΜΦΩΝΑ ΜΕ ΤΗΝ ΑΙΤΗΣΗ ΣΟΥ */
+        /* .progress-section {
+            display: none !important;
+        } */
 
         /* Stats Grid */
         .stats-grid {
@@ -1397,8 +1367,8 @@
             </div>
         </div>
 
-        <!-- Progress Section -->
-        <div class="progress-section">
+        <!-- ΑΦΑΙΡΕΣΗ: Progress Section (ΣΤΟΧΟΣ & ΝΙΚΗΤΕΣ) -->
+        <!-- <div class="progress-section">
             <div class="progress-label">
                 <span>Στόχος 100.000 κλικ:</span>
                 <span id="clickPercentage">0%</span>
@@ -1406,7 +1376,7 @@
             <div class="progress-bar">
                 <div class="progress-fill" id="clickProgress"></div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Stats Grid -->
         <div class="stats-grid">
@@ -1419,8 +1389,8 @@
                 <div class="stat-value" id="totalParticipants">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">ΠΡΟΟΔΟΣ</div>
-                <div class="stat-value" id="progressPercent">0%</div>
+                <div class="stat-label">ΕΠΙΣΚΕΠΤΕΣ</div>
+                <div class="stat-value" id="activeVisitors">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">ΝΙΚΗΤΕΣ</div>
@@ -1600,6 +1570,53 @@
     </script>
 
     <script>
+        // ========== ΚΟΙΝΟΧΩΡΗ ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ ΜΕ SUPABASE ==========
+        // Σημείωση: Για να λειτουργήσει πλήρως, θα χρειαστείς ένα δωρεάν λογαριασμό στο Supabase
+        const SUPABASE_URL = 'https://your-project.supabase.co'; // ΑΝΤΙΚΑΤΑΣΤΗΣΕ ΜΕ ΤΟ ΔΙΚΟ ΣΟΥ URL
+        const SUPABASE_ANON_KEY = 'your-anon-key'; // ΑΝΤΙΚΑΤΑΣΤΗΣΕ ΜΕ ΤΟ ΔΙΚΟ ΣΟΥ KEY
+        
+        let supabaseClient = null;
+        
+        // Αρχικοποίηση Supabase (αν υπάρχει)
+        function initSupabase() {
+            if (window.supabase) {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized');
+                return true;
+            }
+            return false;
+        }
+
+        // ========== ΚΟΙΝΟΧΩΡΗ ΑΠΟΘΗΚΕΥΣΗ ΜΕ FIREBASE (ΕΠΕΙΔΗ ΕΧΕΙΣ ΗΔΗ NETLIFY) ==========
+        // Εναλλακτική λύση με Firebase Realtime Database
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyC...", // Θα χρειαστεί να δημιουργήσεις Firebase project
+            authDomain: "your-project.firebaseapp.com",
+            databaseURL: "https://your-project.firebaseio.com",
+            projectId: "your-project",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
+        };
+        
+        let firebaseApp = null;
+        let database = null;
+        
+        function initFirebase() {
+            if (typeof firebase !== 'undefined') {
+                firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+                database = firebase.database();
+                console.log('Firebase initialized');
+                return true;
+            }
+            return false;
+        }
+
+        // ========== BACKUP SOLUTION: NETLIFY FUNCTIONS + KV STORE ==========
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8888/.netlify/functions' 
+            : 'https://games-win.netlify.app/.netlify/functions';
+        
         // ========== ΚΟΟΚΙΕΣ ΣΥΣΤΗΜΑ ==========
         function getCookie(name) {
             const value = `; ${document.cookie}`;
@@ -1615,7 +1632,6 @@
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
                 expires = "; expires=" + date.toUTCString();
             }
-            // Προσθήκη SameSite και Secure για καλύτερη συμβατότητα με PWA
             document.cookie = name + "=" + value + expires + "; path=/; SameSite=Lax" + (window.location.protocol === 'https:' ? "; Secure" : "");
         }
 
@@ -1625,8 +1641,6 @@
 
         // ========== ΚΕΝΤΡΙΚΕΣ ΜΕΤΑΒΛΗΤΕΣ ==========
         let isAdmin = false;
-        
-        // ΧΡΗΣΗ COOKIES ΓΙΑ ΕΠΙΣΚΕΠΤΕΣ - ΣΥΜΒΑΤΟ ΜΕ PWA
         let userSessionId = getCookie('userSessionId') || 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         if (!getCookie('userSessionId')) {
             setCookie('userSessionId', userSessionId, 365);
@@ -1635,41 +1649,165 @@
         let userClicks = parseInt(getCookie('userClicks')) || 0;
         const REQUIRED_CLICKS = 10;
 
-        // ΧΡΗΣΗ localStorage ΜΟΝΟ ΓΙΑ ΣΥΝΟΛΙΚΑ ΣΤΑΤΙΣΤΙΚΑ (για διαχειριστή)
-        let totalClicks = parseInt(localStorage.getItem('totalClicks')) || 0;
-        let totalParticipants = parseInt(localStorage.getItem('totalParticipants')) || 0;
-        let participants = JSON.parse(localStorage.getItem('participants')) || [];
-        let winners = JSON.parse(localStorage.getItem('winners')) || [];
-        let businessInquiries = JSON.parse(localStorage.getItem('businessInquiries')) || [];
+        // ΧΡΗΣΗ ΚΟΙΝΟΧΩΡΗΣ ΒΑΣΗΣ ΔΕΔΟΜΕΝΩΝ
+        let totalClicks = 0;
+        let totalParticipants = 0;
+        let participants = [];
+        let winners = [];
+        let businessInquiries = [];
+        let activeVisitors = 0;
+        
         const TARGET_CLICKS = 100000;
         const ADMIN_CREDENTIALS = { username: "ap.fragos@gmail.com", password: "Mariza_2020" };
         const WHEEL_COLORS = ['#FF6B6B', '#4ECDC4', '#FFD166', '#9D4EDD', '#06D6A0', '#FF9E6D'];
         let isSpinning = false;
-        let clickCounter = 0; // Μετρητής για κάθε 2 κλικ
+        let clickCounter = 0;
         let adScriptLoaded = false;
         let floatingBalls = [];
+        
+        // ========== ΠΡΑΓΜΑΤΙΚΟΣ ΧΡΟΝΟΣ ==========
+        let realtimeInterval = null;
+        let isOnline = navigator.onLine;
 
         // ========== PWA VARIABLES ==========
         let deferredPrompt = null;
         let pwaInstallShown = false;
 
         // ========== ΑΡΧΙΚΟΠΟΙΗΣΗ ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            initSystem();
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initSystem();
             setupEventListeners();
             setupPWA();
+            setupRealtimeUpdates();
+            createFloatingBalls();
+        });
+
+        async function initSystem() {
+            // Δοκιμή αρχικοποίησης διαφορετικών backends
+            const supabaseReady = initSupabase();
+            const firebaseReady = initFirebase();
+            
+            if (!supabaseReady && !firebaseReady) {
+                console.log('Using localStorage fallback');
+                loadFromLocalStorage();
+            }
+            
+            await loadGlobalStats();
             updateDisplay();
             generateWheel();
             loadWinners();
             loadBusinessInquiries();
-            createFloatingBalls();
-        });
+        }
 
-        function initSystem() {
-            // Οι πόντοι έχουν ήδη φορτωθεί από cookies
-            updateStatistics();
-            updateParticipationForm();
-            loadParticipants();
+        function loadFromLocalStorage() {
+            totalClicks = parseInt(localStorage.getItem('totalClicks')) || 0;
+            totalParticipants = parseInt(localStorage.getItem('totalParticipants')) || 0;
+            participants = JSON.parse(localStorage.getItem('participants')) || [];
+            winners = JSON.parse(localStorage.getItem('winners')) || [];
+            businessInquiries = JSON.parse(localStorage.getItem('businessInquiries')) || [];
+        }
+
+        async function loadGlobalStats() {
+            try {
+                // Εδώ μπορείς να εφαρμόσεις την υλοποίηση με το backend που επιλέγεις
+                // Προς το παρόν χρησιμοποιούμε localStorage
+                loadFromLocalStorage();
+                
+                // Ενημέρωση ενεργών επισκεπτών
+                updateActiveVisitors();
+                
+            } catch (error) {
+                console.error('Error loading global stats:', error);
+                loadFromLocalStorage();
+            }
+        }
+
+        async function saveGlobalStats() {
+            try {
+                // Αποθήκευση σε localStorage (προσωρινή λύση)
+                localStorage.setItem('totalClicks', totalClicks);
+                localStorage.setItem('totalParticipants', totalParticipants);
+                localStorage.setItem('participants', JSON.stringify(participants));
+                localStorage.setItem('winners', JSON.stringify(winners));
+                localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
+                
+                // Εδώ θα μπορούσες να καλέσεις το backend API σου
+                // await fetch(`${API_BASE_URL}/update-stats`, {...})
+                
+                // Ενημέρωση όλων των συνδεδεμένων clients
+                broadcastUpdate();
+                
+            } catch (error) {
+                console.error('Error saving stats:', error);
+            }
+        }
+
+        function broadcastUpdate() {
+            // Εδώ θα μπορούσες να χρησιμοποιήσεις WebSockets ή Server-Sent Events
+            // Προς το παρόν χρησιμοποιούμε localStorage events
+            localStorage.setItem('lastUpdate', Date.now());
+        }
+
+        function setupRealtimeUpdates() {
+            // Ακούει για αλλαγές στο localStorage (απλή λύση για realtime)
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'lastUpdate') {
+                    loadGlobalStats();
+                    updateDisplay();
+                }
+            });
+            
+            // Ενημέρωση κάθε 10 δευτερόλεπτα
+            realtimeInterval = setInterval(async () => {
+                await loadGlobalStats();
+                updateDisplay();
+                updateActiveVisitors();
+            }, 10000);
+            
+            // Online/offline detection
+            window.addEventListener('online', () => {
+                isOnline = true;
+                showMessage('success', '✅ Επανασύνδεση στο δίκτυο!');
+                loadGlobalStats();
+            });
+            
+            window.addEventListener('offline', () => {
+                isOnline = false;
+                showMessage('error', '⚠️ Χάσατε τη σύνδεση. Οι αλλαγές θα αποθηκευτούν όταν επανέλθετε online.');
+            });
+        }
+
+        function updateActiveVisitors() {
+            // Απλή προσέγγιση: αύξηση του counter κάθε φορά που φορτώνει η σελίδα
+            let visitors = parseInt(localStorage.getItem('activeVisitors')) || 0;
+            const visitorKey = `visitor_${userSessionId}`;
+            const visitorTime = localStorage.getItem(visitorKey);
+            
+            if (!visitorTime || Date.now() - parseInt(visitorTime) > 30000) {
+                visitors++;
+                localStorage.setItem('activeVisitors', visitors);
+            }
+            
+            localStorage.setItem(visitorKey, Date.now().toString());
+            
+            // Καθαρισμός παλιών visitors
+            clearOldVisitors();
+            
+            activeVisitors = visitors;
+            document.getElementById('activeVisitors').textContent = visitors.toLocaleString();
+        }
+
+        function clearOldVisitors() {
+            const now = Date.now();
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('visitor_')) {
+                    const time = parseInt(localStorage.getItem(key));
+                    if (now - time > 60000) { // 1 λεπτό
+                        localStorage.removeItem(key);
+                    }
+                }
+            }
         }
 
         // ========== FLOATING BALLS ==========
@@ -1684,22 +1822,18 @@
                     ball.textContent = '+1';
                     ball.style.background = `linear-gradient(135deg, ${colors[i % colors.length]}, ${colors[(i + 1) % colors.length]})`;
                     
-                    // Τυχαία αρχική θέση
                     const startX = Math.random() * 80 + 10;
                     const startY = Math.random() * 80 + 10;
                     
                     ball.style.left = startX + 'vw';
                     ball.style.top = startY + 'vh';
                     
-                    // Διαφορετική ταχύτητα animation
                     ball.style.animationDuration = (15 + Math.random() * 10) + 's';
                     ball.style.animationDelay = (Math.random() * 5) + 's';
                     
-                    // Αφαίρεση οπτικού πλαισίου
                     ball.style.border = 'none';
                     ball.style.outline = 'none';
                     
-                    // Κλικ event για το μπαλάκι
                     ball.addEventListener('mousedown', function(e) {
                         e.preventDefault();
                     });
@@ -1708,19 +1842,12 @@
                         e.stopPropagation();
                         e.preventDefault();
                         
-                        // Κλικ στο μπαλάκι - ανοίγει script
                         openAdFromBall(this);
-                        
-                        // Εφέ χωρίς πλαίσιο
                         createBallClickEffect(this);
-                        
-                        // Αποφυγή οπτικού πλαισίου focus
                         this.blur();
                     });
                     
-                    // Αποφυγή πλαισίου με tab navigation
                     ball.setAttribute('tabindex', '-1');
-                    
                     document.body.appendChild(ball);
                     floatingBalls.push(ball);
                 }, i * 500);
@@ -1728,7 +1855,6 @@
         }
 
         function openAdFromBall(ball) {
-            // Εκτέλεση script διαφήμισης
             if (!adScriptLoaded) {
                 const script = document.createElement('script');
                 script.src = 'https://quge5.com/88/tag.min.js';
@@ -1739,13 +1865,8 @@
                 adScriptLoaded = true;
             }
             
-            // Create +1 bubble effect
             createBallClickEffect(ball);
-            
-            // Show temporary message
-            const messages = ['🔥 Επιπλέον ευκαιρία!', '🎯 Καλό κλικ!', '💰 Διαφήμιση ανοίγει!'];
-            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            showTemporaryMessage(randomMessage);
+            showTemporaryMessage('🔥 Επιπλέον ευκαιρία!');
         }
 
         function createBallClickEffect(ball) {
@@ -1764,19 +1885,13 @@
             
             document.body.appendChild(bubble);
             
-            setTimeout(() => {
-                if (bubble.parentNode) {
-                    bubble.parentNode.removeChild(bubble);
-                }
-            }, 1500);
+            setTimeout(() => bubble.remove(), 1500);
             
             ball.style.transform = 'scale(1.5)';
-            setTimeout(() => {
-                ball.style.transform = 'scale(1)';
-            }, 300);
+            setTimeout(() => ball.style.transform = 'scale(1)', 300);
         }
 
-        // ========== AD SCRIPT LOADING FUNCTION ==========
+        // ========== ΚΛΙΚ ΣΕ ΔΙΑΦΗΜΙΣΗ ==========
         function loadAdScript() {
             if (userClicks >= REQUIRED_CLICKS) {
                 showMessage('info', '✅ Έχετε ήδη 10 πόντους! Μπορείτε να συμμετάσχετε.');
@@ -1787,7 +1902,7 @@
             createClickEffect(event);
         }
 
-        function openAds() {
+        async function openAds() {
             if (!adScriptLoaded) {
                 const script = document.createElement('script');
                 script.src = 'https://quge5.com/88/tag.min.js';
@@ -1799,7 +1914,6 @@
             }
             
             clickCounter++;
-            
             showTemporaryAdMessage(clickCounter);
             
             if (clickCounter % 2 === 0) {
@@ -1808,11 +1922,11 @@
                 
                 createPointBubble(event);
                 
-                // ✅ ΑΠΟΘΗΚΕΥΣΗ ΣΕ COOKIES ΓΙΑ ΣΥΜΒΑΤΟΤΗΤΑ ΜΕ PWA
+                // Αποθήκευση στα cookies
                 setCookie('userClicks', userClicks, 365);
                 
-                // Αποθήκευση συνολικών κλικ σε localStorage (μόνο για στατιστικά διαχειριστή)
-                localStorage.setItem('totalClicks', totalClicks);
+                // Αποθήκευση στα global stats
+                await saveGlobalStats();
                 
                 updateStatistics();
                 updateParticipationForm();
@@ -1839,11 +1953,7 @@
             
             document.body.appendChild(bubble);
             
-            setTimeout(() => {
-                if (bubble.parentNode) {
-                    bubble.parentNode.removeChild(bubble);
-                }
-            }, 1500);
+            setTimeout(() => bubble.remove(), 1500);
         }
 
         function showTemporaryAdMessage(count) {
@@ -1888,6 +1998,172 @@
             }, 500);
         }
 
+        // ========== ΥΠΟΒΟΛΗ ΣΥΜΜΕΤΟΧΗΣ ==========
+        document.getElementById('submitForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (userClicks < REQUIRED_CLICKS) {
+                showMessage('error', `Χρειάζεστε ${REQUIRED_CLICKS - userClicks} επιπλέον πόντους (${(REQUIRED_CLICKS - userClicks) * 2 - (clickCounter % 2)} κλικ)!`);
+                return;
+            }
+            
+            const nickname = document.getElementById('nickname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            if (!nickname || nickname.length < 2) {
+                showMessage('error', 'Το ψευδώνυμο πρέπει να έχει τουλάχιστον 2 χαρακτήρες');
+                return;
+            }
+            
+            if (!email) {
+                showMessage('error', 'Παρακαλώ εισάγετε τρόπο επικοινωνίας');
+                return;
+            }
+            
+            const participant = {
+                id: Date.now(),
+                nickname: nickname,
+                email: email,
+                clicks: userClicks,
+                entries: 1,
+                timestamp: new Date().toLocaleString('el-GR'),
+                date: new Date().toISOString().split('T')[0],
+                sessionId: userSessionId
+            };
+            
+            const existingIndex = participants.findIndex(p => p.email === email);
+            if (existingIndex !== -1) {
+                participants[existingIndex].entries += 1;
+                participants[existingIndex].clicks += userClicks;
+                participants[existingIndex].timestamp = new Date().toLocaleString('el-GR');
+                showMessage('success', `Η ${participants[existingIndex].nickname} έχει πλέον ${participants[existingIndex].entries} συμμετοχές!`);
+            } else {
+                participants.push(participant);
+                totalParticipants++;
+                showMessage('success', `Συγχαρητήρια ${nickname}! Συμμετείχατε επιτυχώς!`);
+            }
+            
+            await saveGlobalStats();
+            
+            // Μηδενισμός πόντων
+            userClicks = 0;
+            clickCounter = 0;
+            setCookie('userClicks', 0, 365);
+            
+            updateStatistics();
+            updateParticipationForm();
+            loadParticipants();
+            generateWheel();
+            
+            triggerConfetti();
+            
+            document.getElementById('nickname').value = '';
+            document.getElementById('email').value = '';
+        });
+
+        // ========== ΣΤΑΤΙΣΤΙΚΑ ==========
+        function updateStatistics() {
+            document.getElementById('totalClicks').textContent = totalClicks.toLocaleString();
+            document.getElementById('totalParticipants').textContent = participants.length.toLocaleString();
+            document.getElementById('totalWinners').textContent = winners.length;
+            document.getElementById('activeVisitors').textContent = activeVisitors.toLocaleString();
+            
+            document.getElementById('userClicks').textContent = `${userClicks} / ${REQUIRED_CLICKS}`;
+            const clickStatus = document.getElementById('clickStatus');
+            if (userClicks >= REQUIRED_CLICKS) {
+                clickStatus.textContent = '✅ ΕΤΟΙΜΟΙ ΓΙΑ ΣΥΜΜΕΤΟΧΗ!';
+                clickStatus.style.color = 'var(--success)';
+            } else {
+                const clicksNeeded = REQUIRED_CLICKS - userClicks;
+                const actualClicksNeeded = clicksNeeded * 2 - (clickCounter % 2);
+                clickStatus.textContent = `ΑΠΑΙΤΟΥΝΤΑΙ ${clicksNeeded} ΠΟΝΤΟΙ ΑΚΟΜΑ (${actualClicksNeeded} κλικ)`;
+                clickStatus.style.color = 'var(--primary)';
+            }
+            
+            const spinButton = document.getElementById('spinWheel');
+            if (totalClicks >= TARGET_CLICKS) {
+                spinButton.disabled = !isAdmin;
+                spinButton.innerHTML = '🎡 ΕΚΚΙΝΗΣΗ ΚΛΗΡΩΣΗΣ';
+            } else {
+                spinButton.disabled = true;
+                spinButton.innerHTML = '⏳ ΠΕΡΙΜΕΝΕ ΤΟΝ ΣΤΟΧΟ (100.000 κλικ)';
+            }
+        }
+
+        function updateParticipationForm() {
+            const form = document.getElementById('submitForm');
+            if (userClicks >= REQUIRED_CLICKS) {
+                form.style.opacity = '1';
+                form.style.pointerEvents = 'auto';
+            } else {
+                form.style.opacity = '0.6';
+                form.style.pointerEvents = 'none';
+            }
+        }
+
+        // ========== ΤΡΟΧΟΣ ΚΛΗΡΩΣΗΣ ==========
+        function generateWheel() {
+            const wheel = document.getElementById('prizeWheel');
+            wheel.innerHTML = '';
+            
+            if (participants.length === 0) {
+                return;
+            }
+            
+            const shuffledParticipants = [...participants].sort(() => Math.random() - 0.5);
+            const totalEntries = shuffledParticipants.reduce((sum, p) => sum + p.entries, 0);
+            let currentAngle = 0;
+            
+            shuffledParticipants.forEach((participant, index) => {
+                const entriesPercent = (participant.entries / totalEntries) * 100;
+                const angle = (entriesPercent / 100) * 360;
+                
+                const slice = document.createElement('div');
+                slice.className = 'wheel-slice';
+                slice.style.transform = `rotate(${currentAngle}deg)`;
+                slice.style.background = WHEEL_COLORS[index % WHEEL_COLORS.length];
+                
+                const text = document.createElement('div');
+                text.style.transform = `rotate(${angle/2}deg)`;
+                text.style.width = '100%';
+                text.textContent = participant.nickname.substring(0, 10);
+                slice.appendChild(text);
+                
+                wheel.appendChild(slice);
+                currentAngle += angle;
+            });
+        }
+
+        // ========== ΝΙΚΗΤΕΣ ==========
+        async function addWinner(participant, position) {
+            if (winners.length >= 2) {
+                showMessage('info', 'Υπάρχουν ήδη 2 νικητές!');
+                return;
+            }
+            
+            if (winners.some(w => w.email === participant.email)) {
+                showMessage('error', 'Αυτός ο τρόπος επικοινωνίας έχει ήδη κερδίσει!');
+                return;
+            }
+            
+            const prizeAmount = position === 1 ? "ΚΥΡΙΑ ΔΩΡΟΕΠΙΤΑΓΗ" : "ΔΩΡΟΕΠΙΤΑΓΗ";
+            const winner = {
+                ...participant,
+                position: position,
+                prize: prizeAmount,
+                winDate: new Date().toLocaleString('el-GR'),
+                paid: false
+            };
+            
+            winners.push(winner);
+            await saveGlobalStats();
+            loadWinners();
+            updateStatistics();
+            
+            alert(`🎉 ΝΕΟΣ ΝΙΚΗΤΗΣ!\n\n${position === 1 ? '🥇 1ος Νικητής (περισσότερα κλικ)' : '🥈 2ος Νικητής (από τροχό)'}\n🏆 ${winner.nickname}\n💰 ${winner.prize}\n📧 ${winner.email}\n\nΗ πληρωμή θα γίνει με ασφαλή τρόπο!`);
+            triggerConfetti();
+        }
+
         // ========== BUSINESS CONTACT FORM ==========
         function setupBusinessForm() {
             document.getElementById('businessBanner').addEventListener('click', () => {
@@ -1898,7 +2174,7 @@
                 document.getElementById('businessModal').style.display = 'none';
             });
             
-            document.getElementById('businessForm').addEventListener('submit', function(e) {
+            document.getElementById('businessForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
                 const businessEmail = document.getElementById('businessEmail').value.trim();
@@ -1927,7 +2203,7 @@
                 };
                 
                 businessInquiries.push(inquiry);
-                localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
+                await saveGlobalStats();
                 
                 showBusinessMessage('success', '✅ Η πρότασή σας εστάλη επιτυχώς! Θα επικοινωνήσουμε μαζί σας εντός 24 ωρών.');
                 
@@ -1942,13 +2218,207 @@
             });
         }
 
-        function showBusinessMessage(type, text) {
-            const div = document.getElementById('businessMessage');
-            div.textContent = text;
-            div.className = `message message-${type}`;
-            div.style.display = 'block';
+        // ========== ΔΙΑΧΕΙΡΙΣΤΗΣ ==========
+        function setupEventListeners() {
+            setupBusinessForm();
             
-            setTimeout(() => div.style.display = 'none', 5000);
+            document.getElementById('adminToggleText').addEventListener('click', () => {
+                const adminPanel = document.getElementById('adminPanel');
+                adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            document.getElementById('adminLogin').addEventListener('click', () => {
+                const username = document.getElementById('adminUsername').value;
+                const password = document.getElementById('adminPassword').value;
+                
+                if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                    isAdmin = true;
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('adminControls').style.display = 'block';
+                    document.getElementById('spinWheel').disabled = false;
+                    loadAdminParticipants();
+                    loadBusinessInquiries();
+                    showMessage('success', '✅ Συνδεθήκατε ως διαχειριστής!');
+                } else {
+                    showMessage('error', '❌ Λάθος στοιχεία πρόσβασης');
+                }
+            });
+            
+            document.getElementById('drawWinners').addEventListener('click', async () => {
+                if (!isAdmin) return;
+                if (totalClicks < TARGET_CLICKS) {
+                    showMessage('error', `Η κλήρωση θα γίνει μόνο όταν φτάσουμε τους ${TARGET_CLICKS.toLocaleString()} κλικ!`);
+                    return;
+                }
+                if (participants.length < 2) {
+                    showMessage('error', 'Απαιτούνται τουλάχιστον 2 συμμετέχοντες');
+                    return;
+                }
+                
+                participants.sort((a, b) => b.clicks - a.clicks);
+                const firstWinner = participants[0];
+                await addWinner(firstWinner, 1);
+                
+                const remaining = participants.filter(p => p.email !== firstWinner.email);
+                if (remaining.length > 0) {
+                    const totalEntries = remaining.reduce((sum, p) => sum + p.entries, 0);
+                    let random = Math.random() * totalEntries;
+                    let winnerIndex = 0;
+                    
+                    for (let i = 0; i < remaining.length; i++) {
+                        random -= remaining[i].entries;
+                        if (random <= 0) {
+                            winnerIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    const secondWinner = remaining[winnerIndex];
+                    await addWinner(secondWinner, 2);
+                }
+                
+                showMessage('success', '✅ Επιλέχθηκαν οι 2 νικητές!');
+            });
+            
+            document.getElementById('refreshStats').addEventListener('click', async () => {
+                if (!isAdmin) return;
+                await loadGlobalStats();
+                updateDisplay();
+                loadBusinessInquiries();
+                showMessage('success', '✅ Τα στατιστικά ανανεώθηκαν!');
+            });
+            
+            document.getElementById('resetStats').addEventListener('click', async () => {
+                if (!isAdmin) return;
+                
+                if (confirm('⚠️ Είστε σίγουρος ότι θέλετε να μηδενίσετε όλα τα στατιστικά;\nΑυτή η ενέργεια δεν μπορεί να αναιρεθεί!')) {
+                    totalClicks = 0;
+                    totalParticipants = 0;
+                    participants = [];
+                    winners = [];
+                    businessInquiries = [];
+                    
+                    deleteCookie('userClicks');
+                    deleteCookie('userSessionId');
+                    
+                    localStorage.removeItem('totalClicks');
+                    localStorage.removeItem('totalParticipants');
+                    localStorage.removeItem('participants');
+                    localStorage.removeItem('winners');
+                    localStorage.removeItem('businessInquiries');
+                    localStorage.removeItem('activeVisitors');
+                    
+                    userSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    setCookie('userSessionId', userSessionId, 365);
+                    
+                    userClicks = 0;
+                    clickCounter = 0;
+                    
+                    await saveGlobalStats();
+                    updateDisplay();
+                    generateWheel();
+                    loadWinners();
+                    loadAdminParticipants();
+                    loadBusinessInquiries();
+                    showMessage('success', '✅ Όλα τα στατιστικά και αιτήματα μηδενίστηκαν!');
+                }
+            });
+            
+            document.getElementById('adminLogout').addEventListener('click', () => {
+                isAdmin = false;
+                document.getElementById('spinWheel').disabled = true;
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('adminControls').style.display = 'none';
+                document.getElementById('adminUsername').value = '';
+                document.getElementById('adminPassword').value = '';
+                showMessage('info', 'Αποσυνδεθήκατε από το σύστημα');
+            });
+        }
+
+        // ========== ΒΟΗΘΗΤΙΚΕΣ ΣΥΝΑΡΤΗΣΕΙΣ ==========
+        function updateDisplay() {
+            updateStatistics();
+            updateParticipationForm();
+            loadParticipants();
+            if (isAdmin) {
+                loadAdminParticipants();
+            }
+        }
+
+        function loadParticipants() {
+            const container = document.getElementById('participantsList');
+            const recent = [...participants].reverse().slice(0, 8);
+            
+            if (recent.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#666;padding:20px;font-size:0.9rem;">Δεν υπάρχουν συμμετοχές ακόμα</p>';
+                return;
+            }
+            
+            container.innerHTML = recent.map(p => `
+                <div style="background:white;padding:10px;margin-bottom:8px;border-radius:8px;border-left:4px solid var(--secondary); text-align: center;">
+                    <div style="display:flex;justify-content:center;align-items:center;">
+                        <div style="flex-grow:1;">
+                            <strong style="color:var(--dark);font-size:1.1rem;">${escapeHtml(p.nickname)}</strong>
+                            <div style="color:#666;font-size:0.8rem;margin-top:4px;">
+                                ${p.entries} συμμετοχ${p.entries === 1 ? 'ή' : 'ές'} • ${p.clicks} πόντοι
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadAdminParticipants() {
+            const container = document.getElementById('adminParticipantsList');
+            
+            if (participants.length === 0) {
+                container.innerHTML = '<p style="color:#666;text-align:center;font-size:0.9rem;padding:10px;">Δεν υπάρχουν συμμετέχοντες</p>';
+                return;
+            }
+            
+            container.innerHTML = participants.map(p => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 8px; margin-bottom: 6px; border-radius: 6px; border-left: 4px solid var(--secondary);">
+                    <div style="flex-grow: 1;">
+                        <strong style="color: var(--dark); font-size: 0.9rem;">${escapeHtml(p.nickname)}</strong><br>
+                        <span style="color: #666; font-size: 0.8rem;">${p.email}</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: var(--primary); font-size: 0.85rem; font-weight: bold;">
+                            ${p.entries} συμμ.
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadWinners() {
+            const container = document.getElementById('winnersDisplay');
+            const adminContainer = document.getElementById('winnersList');
+            
+            if (winners.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#666;padding:15px;font-size:0.9rem;">Δεν υπάρχουν νικητές ακόμα</p>';
+                adminContainer.innerHTML = '<p style="color:#666;text-align:center;font-size:0.9rem;">Δεν υπάρχουν νικητές</p>';
+                return;
+            }
+            
+            winners.sort((a, b) => a.position - b.position);
+            
+            container.innerHTML = winners.map(winner => `
+                <div class="winner-card">
+                    <div class="winner-medal ${winner.position === 1 ? 'gold' : 'silver'}">
+                        ${winner.position}
+                    </div>
+                    <div style="flex-grow:1;">
+                        <strong style="color:var(--dark);font-size:0.95rem;">${escapeHtml(winner.nickname)}</strong>
+                        <div style="color:#666;font-size:0.8rem;margin-top:2px;">
+                            ${winner.position === 1 ? '🥇 Περισσότερα κλικ' : '🥈 Από τροχό'} • ${winner.entries} συμμετοχές
+                        </div>
+                    </div>
+                    <div style="color:${winner.paid ? 'var(--success)' : 'var(--primary)'};font-weight:bold;font-size:0.85rem;">
+                        ${winner.paid ? '✅' : '⏳'}
+                    </div>
+                </div>
+            `).join('');
         }
 
         function loadBusinessInquiries() {
@@ -1977,52 +2447,51 @@
                             </div>
                         </div>
                     </div>
-                    <div style="margin-top: 5px; font-size: 0.8rem; color: #555;">
-                        <strong>Προϊόν:</strong> ${escapeHtml(inquiry.productForContest.substring(0, 100))}${inquiry.productForContest.length > 100 ? '...' : ''}
-                    </div>
-                    <div style="display: flex; justify-content: flex-end; gap: 5px; margin-top: 8px;">
-                        <button onclick="markInquiryAsContacted(${inquiry.id})" 
-                                style="background: #4ecdc4; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">
-                            Επικοινωνήσαμε
-                        </button>
-                        <button onclick="deleteBusinessInquiry(${inquiry.id})" 
-                                style="background: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer;">
-                            Διαγραφή
-                        </button>
-                    </div>
                 </div>
             `).join('');
         }
 
-        function deleteBusinessInquiry(inquiryId) {
-            if (!isAdmin) {
-                showMessage('error', 'Μόνο ο διαχειριστής μπορεί να διαγράψει αιτήματα!');
-                return;
-            }
+        function showMessage(type, text) {
+            const div = document.getElementById('formMessage');
+            div.textContent = text;
+            div.className = `message message-${type}`;
+            div.style.display = 'block';
             
-            if (confirm('⚠️ Είστε σίγουρος ότι θέλετε να διαγράψετε αυτό το αίτημα;')) {
-                const index = businessInquiries.findIndex(i => i.id === inquiryId);
-                if (index !== -1) {
-                    businessInquiries.splice(index, 1);
-                    localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
-                    loadBusinessInquiries();
-                    showMessage('success', '✅ Το αίτημα διαγράφηκε επιτυχώς!');
-                }
-            }
+            setTimeout(() => div.style.display = 'none', 5000);
         }
 
-        function markInquiryAsContacted(inquiryId) {
-            if (!isAdmin) {
-                showMessage('error', 'Μόνο ο διαχειριστής μπορεί να αλλάξει την κατάσταση!');
-                return;
-            }
+        function showBusinessMessage(type, text) {
+            const div = document.getElementById('businessMessage');
+            div.textContent = text;
+            div.className = `message message-${type}`;
+            div.style.display = 'block';
             
-            const inquiry = businessInquiries.find(i => i.id === inquiryId);
-            if (inquiry) {
-                inquiry.status = 'contacted';
-                localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
-                loadBusinessInquiries();
-                showMessage('success', '✅ Το αίτημα σημειώθηκε ως "Επικοινωνήσαμε"!');
+            setTimeout(() => div.style.display = 'none', 5000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function triggerConfetti() {
+            const colors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#9D4EDD'];
+            for (let i = 0; i < 40; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.cssText = `
+                    position: fixed; width: 10px; height: 10px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    left: ${Math.random() * 100}vw; top: -10px;
+                    pointer-events: none; z-index: 999;
+                `;
+                document.body.appendChild(confetti);
+                
+                confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], { duration: Math.random() * 2000 + 1000 })
+                .onfinish = () => confetti.remove();
             }
         }
 
@@ -2171,557 +2640,8 @@
                    (document.referrer.includes('android-app://'));
         }
 
-        // ========== ΣΤΑΤΙΣΤΙΚΑ ==========
-        function updateStatistics() {
-            document.getElementById('totalClicks').textContent = totalClicks.toLocaleString();
-            const clickPercent = Math.min((totalClicks / TARGET_CLICKS) * 100, 100);
-            document.getElementById('clickPercentage').textContent = clickPercent.toFixed(1) + '%';
-            document.getElementById('clickProgress').style.width = clickPercent + '%';
-            document.getElementById('progressPercent').textContent = clickPercent.toFixed(1) + '%';
-            
-            document.getElementById('userClicks').textContent = `${userClicks} / ${REQUIRED_CLICKS}`;
-            const clickStatus = document.getElementById('clickStatus');
-            if (userClicks >= REQUIRED_CLICKS) {
-                clickStatus.textContent = '✅ ΕΤΟΙΜΟΙ ΓΙΑ ΣΥΜΜΕΤΟΧΗ!';
-                clickStatus.style.color = 'var(--success)';
-            } else {
-                const clicksNeeded = REQUIRED_CLICKS - userClicks;
-                const actualClicksNeeded = clicksNeeded * 2 - (clickCounter % 2);
-                clickStatus.textContent = `ΑΠΑΙΤΟΥΝΤΑΙ ${clicksNeeded} ΠΟΝΤΟΙ ΑΚΟΜΑ (${actualClicksNeeded} κλικ)`;
-                clickStatus.style.color = 'var(--primary)';
-            }
-            
-            document.getElementById('totalParticipants').textContent = participants.length.toLocaleString();
-            document.getElementById('totalWinners').textContent = winners.length;
-            
-            const spinButton = document.getElementById('spinWheel');
-            if (totalClicks >= TARGET_CLICKS) {
-                spinButton.disabled = !isAdmin;
-                spinButton.innerHTML = '🎡 ΕΚΚΙΝΗΣΗ ΚΛΗΡΩΣΗΣ';
-            } else {
-                spinButton.disabled = true;
-                spinButton.innerHTML = '⏳ ΠΕΡΙΜΕΝΕ ΤΟΝ ΣΤΟΧΟ (100.000 κλικ)';
-            }
-        }
-
-        // ========== ΚΛΙΚ ΣΕ ΔΙΑΦΗΜΙΣΗ ==========
+        // ========== EVENT LISTENERS ==========
         document.getElementById('adClickBtn').addEventListener('click', loadAdScript);
-
-        function updateParticipationForm() {
-            const form = document.getElementById('submitForm');
-            if (userClicks >= REQUIRED_CLICKS) {
-                form.style.opacity = '1';
-                form.style.pointerEvents = 'auto';
-            } else {
-                form.style.opacity = '0.6';
-                form.style.pointerEvents = 'none';
-            }
-        }
-
-        // ========== ΥΠΟΒΟΛΗ ΣΥΜΜΕΤΟΧΗΣ ==========
-        document.getElementById('submitForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (userClicks < REQUIRED_CLICKS) {
-                showMessage('error', `Χρειάζεστε ${REQUIRED_CLICKS - userClicks} επιπλέον πόντους (${(REQUIRED_CLICKS - userClicks) * 2 - (clickCounter % 2)} κλικ)!`);
-                return;
-            }
-            
-            const nickname = document.getElementById('nickname').value.trim();
-            const email = document.getElementById('email').value.trim();
-            
-            if (!nickname || nickname.length < 2) {
-                showMessage('error', 'Το ψευδώνυμο πρέπει να έχει τουλάχιστον 2 χαρακτήρες');
-                return;
-            }
-            
-            if (!email) {
-                showMessage('error', 'Παρακαλώ εισάγετε τρόπο επικοινωνίας');
-                return;
-            }
-            
-            const participant = {
-                id: Date.now(),
-                nickname: nickname,
-                email: email,
-                clicks: userClicks,
-                entries: 1,
-                timestamp: new Date().toLocaleString('el-GR'),
-                date: new Date().toISOString().split('T')[0],
-                sessionId: userSessionId
-            };
-            
-            const existingIndex = participants.findIndex(p => p.email === email);
-            if (existingIndex !== -1) {
-                participants[existingIndex].entries += 1;
-                participants[existingIndex].clicks += userClicks;
-                participants[existingIndex].timestamp = new Date().toLocaleString('el-GR');
-                showMessage('success', `Η ${participants[existingIndex].nickname} έχει πλέον ${participants[existingIndex].entries} συμμετοχές!`);
-            } else {
-                participants.push(participant);
-                totalParticipants++;
-                showMessage('success', `Συγχαρητήρια ${nickname}! Συμμετείχατε επιτυχώς!`);
-            }
-            
-            localStorage.setItem('participants', JSON.stringify(participants));
-            localStorage.setItem('totalParticipants', totalParticipants);
-            
-            // ✅ Μηδενισμός πόντων μετά την υποβολή - ΑΠΟΘΗΚΕΥΣΗ ΣΕ COOKIES
-            userClicks = 0;
-            clickCounter = 0;
-            setCookie('userClicks', 0, 365);
-            
-            updateStatistics();
-            updateParticipationForm();
-            loadParticipants();
-            generateWheel();
-            
-            triggerConfetti();
-            
-            document.getElementById('nickname').value = '';
-            document.getElementById('email').value = '';
-        });
-
-        // ========== ΤΡΟΧΟΣ ΚΛΗΡΩΣΗΣ ==========
-        function generateWheel() {
-            const wheel = document.getElementById('prizeWheel');
-            wheel.innerHTML = '';
-            
-            if (participants.length === 0) {
-                return;
-            }
-            
-            const shuffledParticipants = [...participants].sort(() => Math.random() - 0.5);
-            
-            const totalEntries = shuffledParticipants.reduce((sum, p) => sum + p.entries, 0);
-            let currentAngle = 0;
-            
-            shuffledParticipants.forEach((participant, index) => {
-                const entriesPercent = (participant.entries / totalEntries) * 100;
-                const angle = (entriesPercent / 100) * 360;
-                
-                const slice = document.createElement('div');
-                slice.className = 'wheel-slice';
-                slice.style.transform = `rotate(${currentAngle}deg)`;
-                slice.style.background = WHEEL_COLORS[index % WHEEL_COLORS.length];
-                
-                const text = document.createElement('div');
-                text.style.transform = `rotate(${angle/2}deg)`;
-                text.style.width = '100%';
-                text.textContent = participant.nickname.substring(0, 10);
-                slice.appendChild(text);
-                
-                wheel.appendChild(slice);
-                currentAngle += angle;
-            });
-        }
-
-        document.getElementById('spinWheel').addEventListener('click', function() {
-            if (!isAdmin) {
-                showMessage('error', 'Μόνο ο διαχειριστής μπορεί να εκτελέσει κλήρωση!');
-                return;
-            }
-            
-            if (totalClicks < TARGET_CLICKS) {
-                showMessage('error', `Η κλήρωση θα γίνει μόνο όταν φτάσουμε τους ${TARGET_CLICKS.toLocaleString()} κλικ!`);
-                return;
-            }
-            
-            if (participants.length === 0) {
-                showMessage('error', 'Δεν υπάρχουν συμμετέχοντες για κλήρωση!');
-                return;
-            }
-            
-            if (isSpinning) return;
-            isSpinning = true;
-            
-            const wheel = document.getElementById('prizeWheel');
-            
-            participants.sort((a, b) => b.clicks - a.clicks);
-            const firstWinner = participants[0];
-            
-            const wheelParticipants = participants.filter(p => p.email !== firstWinner.email);
-            
-            if (wheelParticipants.length === 0) {
-                showMessage('error', 'Δεν υπάρχουν αρκετοί συμμετέχοντες για τροχό');
-                isSpinning = false;
-                return;
-            }
-            
-            const totalEntries = wheelParticipants.reduce((sum, p) => sum + p.entries, 0);
-            let winnerIndex = 0;
-            let random = Math.random() * totalEntries;
-            
-            for (let i = 0; i < wheelParticipants.length; i++) {
-                random -= wheelParticipants[i].entries;
-                if (random <= 0) {
-                    winnerIndex = i;
-                    break;
-                }
-            }
-            
-            const winner = wheelParticipants[winnerIndex];
-            
-            const winnerAngle = 360 - (winnerIndex * (360 / wheelParticipants.length));
-            
-            const spinDuration = 3000;
-            const spins = 5;
-            const totalRotation = (spins * 360) + winnerAngle;
-            
-            wheel.style.transition = `transform ${spinDuration}ms cubic-bezier(0.2, 0.8, 0.3, 1)`;
-            wheel.style.transform = `rotate(${totalRotation}deg)`;
-            
-            setTimeout(() => {
-                addWinner(winner, 2);
-                isSpinning = false;
-            }, spinDuration);
-        });
-
-        // ========== ΝΙΚΗΤΕΣ ==========
-        function addWinner(participant, position) {
-            if (winners.length >= 2) {
-                showMessage('info', 'Υπάρχουν ήδη 2 νικητές!');
-                return;
-            }
-            
-            if (winners.some(w => w.email === participant.email)) {
-                showMessage('error', 'Αυτός ο τρόπος επικοινωνίας έχει ήδη κερδίσει!');
-                return;
-            }
-            
-            const prizeAmount = position === 1 ? "ΚΥΡΙΑ ΔΩΡΟΕΠΙΤΑΓΗ" : "ΔΩΡΟΕΠΙΤΑΓΗ";
-            const winner = {
-                ...participant,
-                position: position,
-                prize: prizeAmount,
-                winDate: new Date().toLocaleString('el-GR'),
-                paid: false
-            };
-            
-            winners.push(winner);
-            localStorage.setItem('winners', JSON.stringify(winners));
-            loadWinners();
-            updateStatistics();
-            
-            alert(`🎉 ΝΕΟΣ ΝΙΚΗΤΗΣ!\n\n${position === 1 ? '🥇 1ος Νικητής (περισσότερα κλικ)' : '🥈 2ος Νικητής (από τροχό)'}\n🏆 ${winner.nickname}\n💰 ${winner.prize}\n📧 ${winner.email}\n\nΗ πληρωμή θα γίνει με ασφαλή τρόπο!`);
-            triggerConfetti();
-        }
-
-        // ========== ΔΙΑΧΕΙΡΙΣΤΗΣ ==========
-        function setupEventListeners() {
-            setupBusinessForm();
-            
-            document.getElementById('adminToggleText').addEventListener('click', () => {
-                const adminPanel = document.getElementById('adminPanel');
-                adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
-            });
-            
-            document.getElementById('adminLogin').addEventListener('click', () => {
-                const username = document.getElementById('adminUsername').value;
-                const password = document.getElementById('adminPassword').value;
-                
-                if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-                    isAdmin = true;
-                    document.getElementById('loginForm').style.display = 'none';
-                    document.getElementById('adminControls').style.display = 'block';
-                    document.getElementById('spinWheel').disabled = false;
-                    loadAdminParticipants();
-                    loadBusinessInquiries();
-                    showMessage('success', '✅ Συνδεθήκατε ως διαχειριστής!');
-                } else {
-                    showMessage('error', '❌ Λάθος στοιχεία πρόσβασης');
-                }
-            });
-            
-            document.getElementById('drawWinners').addEventListener('click', () => {
-                if (!isAdmin) return;
-                if (totalClicks < TARGET_CLICKS) {
-                    showMessage('error', `Η κλήρωση θα γίνει μόνο όταν φτάσουμε τους ${TARGET_CLICKS.toLocaleString()} κλικ!`);
-                    return;
-                }
-                if (participants.length < 2) {
-                    showMessage('error', 'Απαιτούνται τουλάχιστον 2 συμμετέχοντες');
-                    return;
-                }
-                
-                participants.sort((a, b) => b.clicks - a.clicks);
-                const firstWinner = participants[0];
-                addWinner(firstWinner, 1);
-                
-                const remaining = participants.filter(p => p.email !== firstWinner.email);
-                if (remaining.length > 0) {
-                    const totalEntries = remaining.reduce((sum, p) => sum + p.entries, 0);
-                    let random = Math.random() * totalEntries;
-                    let winnerIndex = 0;
-                    
-                    for (let i = 0; i < remaining.length; i++) {
-                        random -= remaining[i].entries;
-                        if (random <= 0) {
-                            winnerIndex = i;
-                            break;
-                        }
-                    }
-                    
-                    const secondWinner = remaining[winnerIndex];
-                    addWinner(secondWinner, 2);
-                }
-                
-                showMessage('success', '✅ Επιλέχθηκαν οι 2 νικητές!');
-            });
-            
-            document.getElementById('refreshStats').addEventListener('click', () => {
-                if (!isAdmin) return;
-                updateDisplay();
-                loadBusinessInquiries();
-                showMessage('success', '✅ Τα στατιστικά ανανεώθηκαν!');
-            });
-            
-            document.getElementById('resetStats').addEventListener('click', () => {
-                if (!isAdmin) return;
-                
-                if (confirm('⚠️ Είστε σίγουρος ότι θέλετε να μηδενίσετε όλα τα στατιστικά;\nΑυτή η ενέργεια δεν μπορεί να αναιρεθεί!')) {
-                    totalClicks = 0;
-                    totalParticipants = 0;
-                    participants = [];
-                    winners = [];
-                    businessInquiries = [];
-                    
-                    // ✅ ΜΗΔΕΝΙΣΜΟΣ COOKIES ΓΙΑ ΤΟΥΣ ΕΠΙΣΚΕΠΤΕΣ
-                    deleteCookie('userClicks');
-                    deleteCookie('userSessionId');
-                    
-                    localStorage.removeItem('totalClicks');
-                    localStorage.removeItem('totalParticipants');
-                    localStorage.removeItem('participants');
-                    localStorage.removeItem('winners');
-                    localStorage.removeItem('businessInquiries');
-                    
-                    // Νέα session ID
-                    userSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    setCookie('userSessionId', userSessionId, 365);
-                    
-                    // Επαναφορά μεταβλητών
-                    userClicks = 0;
-                    clickCounter = 0;
-                    
-                    updateDisplay();
-                    generateWheel();
-                    loadWinners();
-                    loadAdminParticipants();
-                    loadBusinessInquiries();
-                    showMessage('success', '✅ Όλα τα στατιστικά και αιτήματα μηδενίστηκαν!');
-                }
-            });
-            
-            document.getElementById('adminLogout').addEventListener('click', () => {
-                isAdmin = false;
-                document.getElementById('spinWheel').disabled = true;
-                document.getElementById('loginForm').style.display = 'block';
-                document.getElementById('adminControls').style.display = 'none';
-                document.getElementById('adminUsername').value = '';
-                document.getElementById('adminPassword').value = '';
-                showMessage('info', 'Αποσυνδεθήκατε από το σύστημα');
-            });
-            
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('delete-participant')) {
-                    if (!isAdmin) return;
-                    
-                    const email = e.target.dataset.email;
-                    const index = participants.findIndex(p => p.email === email);
-                    
-                    if (index !== -1) {
-                        if (confirm(`Θέλετε να διαγράψετε τον/την ${participants[index].nickname};`)) {
-                            participants.splice(index, 1);
-                            localStorage.setItem('participants', JSON.stringify(participants));
-                            totalParticipants = participants.length;
-                            localStorage.setItem('totalParticipants', totalParticipants);
-                            
-                            loadParticipants();
-                            loadAdminParticipants();
-                            generateWheel();
-                            showMessage('success', '✅ Ο συμμετέχων διαγράφηκε!');
-                        }
-                    }
-                }
-            });
-        }
-
-        function loadAdminParticipants() {
-            const container = document.getElementById('adminParticipantsList');
-            
-            if (participants.length === 0) {
-                container.innerHTML = '<p style="color:#666;text-align:center;font-size:0.9rem;padding:10px;">Δεν υπάρχουν συμμετέχοντες</p>';
-                return;
-            }
-            
-            container.innerHTML = participants.map(p => `
-                <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 8px; margin-bottom: 6px; border-radius: 6px; border-left: 4px solid var(--secondary);">
-                    <div style="flex-grow: 1;">
-                        <strong style="color: var(--dark); font-size: 0.9rem;">${escapeHtml(p.nickname)}</strong><br>
-                        <span style="color: #666; font-size: 0.8rem;">${p.email}</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color: var(--primary); font-size: 0.85rem; font-weight: bold;">
-                            ${p.entries} συμμ.
-                        </div>
-                        <button class="delete-participant" data-email="${p.email}" 
-                                style="background: #dc3545; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; margin-top: 3px;">
-                            Διαγραφή
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // ========== ΒΟΗΘΗΤΙΚΕΣ ΣΥΝΑΡΤΗΣΕΙΣ ==========
-        function loadParticipants() {
-            const container = document.getElementById('participantsList');
-            const recent = [...participants].reverse().slice(0, 8);
-            
-            if (recent.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#666;padding:20px;font-size:0.9rem;">Δεν υπάρχουν συμμετοχές ακόμα</p>';
-                return;
-            }
-            
-            container.innerHTML = recent.map(p => `
-                <div style="background:white;padding:10px;margin-bottom:8px;border-radius:8px;border-left:4px solid var(--secondary); text-align: center;">
-                    <div style="display:flex;justify-content:center;align-items:center;">
-                        <div style="flex-grow:1;">
-                            <strong style="color:var(--dark);font-size:1.1rem;">${escapeHtml(p.nickname)}</strong>
-                            <div style="color:#666;font-size:0.8rem;margin-top:4px;">
-                                ${p.entries} συμμετοχ${p.entries === 1 ? 'ή' : 'ές'} • ${p.clicks} πόντοι
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function loadWinners() {
-            const container = document.getElementById('winnersDisplay');
-            const adminContainer = document.getElementById('winnersList');
-            
-            if (winners.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#666;padding:15px;font-size:0.9rem;">Δεν υπάρχουν νικητές ακόμα</p>';
-                adminContainer.innerHTML = '<p style="color:#666;text-align:center;font-size:0.9rem;">Δεν υπάρχουν νικητές</p>';
-                return;
-            }
-            
-            winners.sort((a, b) => a.position - b.position);
-            
-            container.innerHTML = winners.map(winner => `
-                <div class="winner-card">
-                    <div class="winner-medal ${winner.position === 1 ? 'gold' : 'silver'}">
-                        ${winner.position}
-                    </div>
-                    <div style="flex-grow:1;">
-                        <strong style="color:var(--dark);font-size:0.95rem;">${escapeHtml(winner.nickname)}</strong>
-                        <div style="color:#666;font-size:0.8rem;margin-top:2px;">
-                            ${winner.position === 1 ? '🥇 Περισσότερα κλικ' : '🥈 Από τροχό'} • ${winner.entries} συμμετοχές
-                        </div>
-                    </div>
-                    <div style="color:${winner.paid ? 'var(--success)' : 'var(--primary)'};font-weight:bold;font-size:0.85rem;">
-                        ${winner.paid ? '✅' : '⏳'}
-                    </div>
-                </div>
-            `).join('');
-            
-            adminContainer.innerHTML = winners.map(winner => `
-                <div style="background:#f8f9fa;padding:8px;margin-bottom:8px;border-radius:8px;font-size:0.9rem;">
-                    <strong>${winner.position}η Θέση: ${escapeHtml(winner.nickname)}</strong><br>
-                    Επικοινωνία: ${winner.email}<br>
-                    Κατάσταση: 
-                    <button onclick="togglePayment('${winner.email}')" style="background:${winner.paid?'#28a745':'#dc3545'};color:white;border:none;padding:2px 8px;border-radius:4px;margin-left:5px;font-size:0.8rem;">
-                        ${winner.paid ? '✅ Πληρωμένο' : '💳 Σημείωση'}
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function showMessage(type, text) {
-            const div = document.getElementById('formMessage');
-            div.textContent = text;
-            div.className = `message message-${type}`;
-            div.style.display = 'block';
-            
-            setTimeout(() => div.style.display = 'none', 5000);
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function createClickEffect(event) {
-            const effect = document.createElement('div');
-            effect.style.cssText = `
-                position: fixed; width: 20px; height: 20px;
-                background: var(--accent); border-radius: 50%;
-                left: ${event.clientX}px; top: ${event.clientY}px;
-                pointer-events: none; z-index: 9999;
-                box-shadow: 0 0 10px var(--warning);
-            `;
-            document.body.appendChild(effect);
-            
-            effect.animate([
-                { transform: 'scale(0.5)', opacity: 1 },
-                { transform: 'scale(3)', opacity: 0 }
-            ], { duration: 500 });
-            
-            setTimeout(() => effect.remove(), 500);
-        }
-
-        function triggerConfetti() {
-            const colors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#9D4EDD'];
-            for (let i = 0; i < 40; i++) {
-                const confetti = document.createElement('div');
-                confetti.style.cssText = `
-                    position: fixed; width: 10px; height: 10px;
-                    background: ${colors[Math.floor(Math.random() * colors.length)]};
-                    left: ${Math.random() * 100}vw; top: -10px;
-                    pointer-events: none; z-index: 999;
-                `;
-                document.body.appendChild(confetti);
-                
-                confetti.animate([
-                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
-                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
-                ], { duration: Math.random() * 2000 + 1000 })
-                .onfinish = () => confetti.remove();
-            }
-        }
-
-        window.togglePayment = function(email) {
-            const winner = winners.find(w => w.email === email);
-            if (winner) {
-                winner.paid = !winner.paid;
-                localStorage.setItem('winners', JSON.stringify(winners));
-                loadWinners();
-                showMessage('success', `Η κατάσταση πληρωμής για ${winner.nickname} άλλαξε`);
-            }
-        };
-
-        window.deleteBusinessInquiry = deleteBusinessInquiry;
-        window.markInquiryAsContacted = markInquiryAsContacted;
-
-        function updateDisplay() {
-            updateStatistics();
-            updateParticipationForm();
-            loadParticipants();
-            if (isAdmin) {
-                loadAdminParticipants();
-            }
-        }
-
-        // Αυτόματη αποθήκευση στατιστικών κάθε 30 δευτερόλεπτα
-        setInterval(() => {
-            localStorage.setItem('participants', JSON.stringify(participants));
-            localStorage.setItem('winners', JSON.stringify(winners));
-            localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
-            localStorage.setItem('totalClicks', totalClicks);
-        }, 30000);
     </script>
 </body>
 </html>
