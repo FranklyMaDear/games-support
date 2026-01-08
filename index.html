@@ -1558,6 +1558,10 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+
     <!-- Service Worker for PWA -->
     <script>
         if ('serviceWorker' in navigator) {
@@ -1570,35 +1574,17 @@
     </script>
 
     <script>
-        // ========== ΚΟΙΝΟΧΩΡΗ ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ ΜΕ SUPABASE ==========
-        // Σημείωση: Για να λειτουργήσει πλήρως, θα χρειαστείς ένα δωρεάν λογαριασμό στο Supabase
-        const SUPABASE_URL = 'https://your-project.supabase.co'; // ΑΝΤΙΚΑΤΑΣΤΗΣΕ ΜΕ ΤΟ ΔΙΚΟ ΣΟΥ URL
-        const SUPABASE_ANON_KEY = 'your-anon-key'; // ΑΝΤΙΚΑΤΑΣΤΗΣΕ ΜΕ ΤΟ ΔΙΚΟ ΣΟΥ KEY
-        
-        let supabaseClient = null;
-        
-        // Αρχικοποίηση Supabase (αν υπάρχει)
-        function initSupabase() {
-            if (window.supabase) {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('Supabase initialized');
-                return true;
-            }
-            return false;
-        }
-
-        // ========== ΚΟΙΝΟΧΩΡΗ ΑΠΟΘΗΚΕΥΣΗ ΜΕ FIREBASE (ΕΠΕΙΔΗ ΕΧΕΙΣ ΗΔΗ NETLIFY) ==========
-        // Εναλλακτική λύση με Firebase Realtime Database
+        // ========== FIREBASE CONFIGURATION ==========
         const FIREBASE_CONFIG = {
-            apiKey: "AIzaSyC...", // Θα χρειαστεί να δημιουργήσεις Firebase project
-            authDomain: "your-project.firebaseapp.com",
-            databaseURL: "https://your-project.firebaseio.com",
-            projectId: "your-project",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
+            apiKey: "AIzaSyCuFNQStTSnmSCIEt94PXBbbyftNIzhcMk",
+            authDomain: "games-win-31961.firebaseapp.com",
+            databaseURL: "https://games-win-31961-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "games-win-31961",
+            storageBucket: "games-win-31961.firebasestorage.app",
+            messagingSenderId: "729570484840",
+            appId: "1:729570484840:web:7651134355015b4b46d1dd"
         };
-        
+
         let firebaseApp = null;
         let database = null;
         
@@ -1606,17 +1592,15 @@
             if (typeof firebase !== 'undefined') {
                 firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
                 database = firebase.database();
-                console.log('Firebase initialized');
+                console.log('Firebase initialized successfully');
                 return true;
             }
             return false;
         }
 
-        // ========== BACKUP SOLUTION: NETLIFY FUNCTIONS + KV STORE ==========
-        const API_BASE_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:8888/.netlify/functions' 
-            : 'https://games-win.netlify.app/.netlify/functions';
-        
+        // ========== ΚΟΙΝΟΧΩΡΗ ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ ΜΕ FIREBASE ==========
+        const firebaseReady = initFirebase();
+
         // ========== ΚΟΟΚΙΕΣ ΣΥΣΤΗΜΑ ==========
         function getCookie(name) {
             const value = `; ${document.cookie}`;
@@ -1683,16 +1667,13 @@
         });
 
         async function initSystem() {
-            // Δοκιμή αρχικοποίησης διαφορετικών backends
-            const supabaseReady = initSupabase();
-            const firebaseReady = initFirebase();
-            
-            if (!supabaseReady && !firebaseReady) {
+            if (firebaseReady) {
+                await loadGlobalStats();
+            } else {
                 console.log('Using localStorage fallback');
                 loadFromLocalStorage();
             }
             
-            await loadGlobalStats();
             updateDisplay();
             generateWheel();
             loadWinners();
@@ -1709,9 +1690,22 @@
 
         async function loadGlobalStats() {
             try {
-                // Εδώ μπορείς να εφαρμόσεις την υλοποίηση με το backend που επιλέγεις
-                // Προς το παρόν χρησιμοποιούμε localStorage
-                loadFromLocalStorage();
+                if (firebaseReady && database) {
+                    // Φόρτωση δεδομένων από Firebase
+                    const statsRef = database.ref('stats');
+                    const snapshot = await statsRef.once('value');
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        totalClicks = data.totalClicks || 0;
+                        totalParticipants = data.totalParticipants || 0;
+                        participants = data.participants || [];
+                        winners = data.winners || [];
+                        businessInquiries = data.businessInquiries || [];
+                        activeVisitors = data.activeVisitors || 0;
+                    }
+                } else {
+                    loadFromLocalStorage();
+                }
                 
                 // Ενημέρωση ενεργών επισκεπτών
                 updateActiveVisitors();
@@ -1724,15 +1718,27 @@
 
         async function saveGlobalStats() {
             try {
-                // Αποθήκευση σε localStorage (προσωρινή λύση)
-                localStorage.setItem('totalClicks', totalClicks);
-                localStorage.setItem('totalParticipants', totalParticipants);
-                localStorage.setItem('participants', JSON.stringify(participants));
-                localStorage.setItem('winners', JSON.stringify(winners));
-                localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
-                
-                // Εδώ θα μπορούσες να καλέσεις το backend API σου
-                // await fetch(`${API_BASE_URL}/update-stats`, {...})
+                if (firebaseReady && database) {
+                    // Αποθήκευση σε Firebase
+                    const statsRef = database.ref('stats');
+                    await statsRef.set({
+                        totalClicks: totalClicks,
+                        totalParticipants: totalParticipants,
+                        participants: participants,
+                        winners: winners,
+                        businessInquiries: businessInquiries,
+                        activeVisitors: activeVisitors,
+                        lastUpdated: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    console.log('Stats saved to Firebase');
+                } else {
+                    // Αποθήκευση σε localStorage (fallback)
+                    localStorage.setItem('totalClicks', totalClicks);
+                    localStorage.setItem('totalParticipants', totalParticipants);
+                    localStorage.setItem('participants', JSON.stringify(participants));
+                    localStorage.setItem('winners', JSON.stringify(winners));
+                    localStorage.setItem('businessInquiries', JSON.stringify(businessInquiries));
+                }
                 
                 // Ενημέρωση όλων των συνδεδεμένων clients
                 broadcastUpdate();
@@ -1743,25 +1749,70 @@
         }
 
         function broadcastUpdate() {
-            // Εδώ θα μπορούσες να χρησιμοποιήσεις WebSockets ή Server-Sent Events
-            // Προς το παρόν χρησιμοποιούμε localStorage events
-            localStorage.setItem('lastUpdate', Date.now());
+            // Στάλθηκε ειδοποίηση για ενημέρωση
+            if (firebaseReady && database) {
+                const updatesRef = database.ref('updates');
+                updatesRef.set({ timestamp: Date.now() });
+            } else {
+                localStorage.setItem('lastUpdate', Date.now());
+            }
         }
 
         function setupRealtimeUpdates() {
-            // Ακούει για αλλαγές στο localStorage (απλή λύση για realtime)
-            window.addEventListener('storage', function(e) {
-                if (e.key === 'lastUpdate') {
-                    loadGlobalStats();
-                    updateDisplay();
-                }
-            });
+            if (firebaseReady && database) {
+                // Firebase realtime updates
+                const statsRef = database.ref('stats');
+                statsRef.on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        totalClicks = data.totalClicks || 0;
+                        totalParticipants = data.totalParticipants || 0;
+                        participants = data.participants || [];
+                        winners = data.winners || [];
+                        businessInquiries = data.businessInquiries || [];
+                        activeVisitors = data.activeVisitors || 0;
+                        updateDisplay();
+                    }
+                });
+                
+                // Ενημέρωση active visitors
+                const visitorsRef = database.ref('visitors');
+                visitorsRef.child(userSessionId).set({
+                    lastSeen: Date.now(),
+                    userAgent: navigator.userAgent
+                });
+                
+                // Καθαρισμός παλιών visitors
+                visitorsRef.once('value').then((snapshot) => {
+                    const now = Date.now();
+                    snapshot.forEach((child) => {
+                        const data = child.val();
+                        if (now - data.lastSeen > 60000) { // 1 λεπτό
+                            visitorsRef.child(child.key).remove();
+                        }
+                    });
+                    
+                    // Μετρήστε active visitors
+                    visitorsRef.once('value').then((visitorsSnapshot) => {
+                        activeVisitors = visitorsSnapshot.numChildren();
+                        document.getElementById('activeVisitors').textContent = activeVisitors.toLocaleString();
+                    });
+                });
+                
+            } else {
+                // Απλή προσέγγιση με localStorage
+                window.addEventListener('storage', function(e) {
+                    if (e.key === 'lastUpdate') {
+                        loadGlobalStats();
+                        updateDisplay();
+                    }
+                });
+            }
             
             // Ενημέρωση κάθε 10 δευτερόλεπτα
             realtimeInterval = setInterval(async () => {
                 await loadGlobalStats();
                 updateDisplay();
-                updateActiveVisitors();
             }, 10000);
             
             // Online/offline detection
