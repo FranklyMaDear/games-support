@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Καφέ Βόλτα — Online Παραγγελίες</title>
-    <meta name="description" content="Παράγγειλε online & παρέλαβε χωρίς αναμονή! ⭐ 1€ = 1 πόντος · Εβδομαδιαίες προσφορές · 🥞 3 κρέπες = +1 ΔΩΡΟ. Φήκη Τρικάλων · 06:00–22:00">
-    <meta property="og:title" content="Καφέ Βόλτα ☕ Online Παραγγελίες & Πόντοι">
-    <meta property="og:description" content="Ο καφές σου έτοιμος πριν φτάσεις! Μάζεψε πόντους κάθε εβδομάδα. 15⭐= 1 ρόφημα · 25⭐= 2 ροφήματα · 🥞 3+1 ΔΩΡΟ · 🔮 Καφεμαντεία! Φήκη Τρικάλων · 06:00–22:00">
+    <meta name="description" content="Παράγγειλε online & παρέλαβε χωρίς αναμονή! 💎 1€ = 1 διαμάντι · Προσφορές Αυγούστου · 🥞 3 κρέπες = +1 ΔΩΡΟ. Φήκη Τρικάλων · 06:00–22:00">
+    <meta property="og:title" content="Καφέ Βόλτα ☕ Online Παραγγελίες & Διαμάντια">
+    <meta property="og:description" content="Ο καφές σου έτοιμος πριν φτάσεις! Μάζεψε διαμάντια. 25💎= 1 ρόφημα · 40💎= 2 ροφήματα · 🥞 3+1 ΔΩΡΟ · 🔮 Καφεμαντεία! Φήκη Τρικάλων · 06:00–22:00">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://volta.franklygames.com/">
     <meta property="og:image" content="https://volta.franklygames.com/photo.png">
     <meta property="og:locale" content="el_GR">
     <meta property="og:site_name" content="Καφέ Βόλτα">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Καφέ Βόλτα ☕ Online Παραγγελίες & Πόντοι">
-    <meta name="twitter:description" content="Παράγγειλε online & κέρδισε πόντους! 15⭐= 1 ρόφημα · 25⭐= 2 ροφήματα · 3 κρέπες = +1 ΔΩΡΟ">
+    <meta name="twitter:title" content="Καφέ Βόλτα ☕ Online Παραγγελίες & Διαμάντια">
+    <meta name="twitter:description" content="Παράγγειλε online & κέρδισε διαμάντια! 25💎= 1 ρόφημα · 40💎= 2 ροφήματα · 3 κρέπες = +1 ΔΩΡΟ">
     <meta name="twitter:image" content="https://volta.franklygames.com/photo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#5C3A21">
@@ -33,6 +33,7 @@
             --line: #E6D5C3;
             --accent: #C7956D;
             --soft: #FBF4E4;
+            --diamond: #00bcd4;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -60,8 +61,8 @@
         .logo .name { font-family: 'Literata', serif; font-weight: 900; font-size: 1.2rem; }
         .logo .name em { font-style: italic; color: var(--mocha); }
         .header-actions { display: flex; align-items: center; gap: 8px; }
-        .points-badge { background: var(--accent); color: var(--ink); padding: 5px 10px; border-radius: 999px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; }
-        .points-badge span { background: var(--mocha-dark); color: #fff; border-radius: 999px; padding: 1px 6px; font-size: 0.7rem; }
+        .points-badge { background: #e0f7fa; color: var(--ink); padding: 5px 10px; border-radius: 999px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; border: 1px solid #b2ebf2; }
+        .points-badge span { background: var(--diamond); color: #fff; border-radius: 999px; padding: 1px 6px; font-size: 0.7rem; }
         .cart-btn { background: var(--mocha); color: #fff; border: none; cursor: pointer; padding: 7px 14px; border-radius: 999px; font-weight: 600; font-size: 0.85rem; }
         
         /* ★ Hero Section */
@@ -199,7 +200,7 @@
     <div class="bar">
         <a class="logo" href="#"><span class="name">Καφέ <em>Βόλτα</em></span></a>
         <div class="header-actions">
-            <div class="points-badge" id="pointsDisplay">⭐ <span id="pointsValue">0</span> πόντοι</div>
+            <div class="points-badge" id="pointsDisplay">💎 <span id="pointsValue">0</span> διαμάντια</div>
             <button class="cart-btn" id="openCart">🧺 Καλάθι <span id="cartCount">0</span></button>
         </div>
     </div>
@@ -219,17 +220,17 @@
     </div>
 </section>
 
-<!-- ★ Τα 3 Πλαίσια των Πόντων (Αστέρια) -->
+<!-- ★ Τα 3 Πλαίσια των Πόντων (Διαμάντια) -->
 <section class="offers">
     <div class="offers-inner">
         <div class="offer-card">
-            <div class="o-big">1€ = 1 ⭐</div>
+            <div class="o-big">1€ = 1 💎</div>
         </div>
         <div class="offer-card">
-            <div class="o-big">15 ⭐ = 1 ☕</div>
+            <div class="o-big">25 💎 = 1 ☕</div>
         </div>
         <div class="offer-card">
-            <div class="o-big">25 ⭐ = 2 ☕</div>
+            <div class="o-big">40 💎 = 2 ☕</div>
         </div>
     </div>
 </section>
@@ -237,7 +238,7 @@
 <!-- ★ Φωτογραφικό Banner Προσφορών -->
 <section class="promo-banner">
     <div class="promo-banner-inner">
-        <div class="promo-title">Προσφορές Εβδομάδας</div>
+        <div class="promo-title">Προσφορές Αυγούστου</div>
         <div class="promo-text">
             <strong>2+1 ΔΩΡΟ</strong> Γρανίτες & Milkshake <br>
             <strong>3+1 ΔΩΡΟ</strong> Κρέπες (με έξτρα υλικό)
@@ -268,40 +269,39 @@
 <div class="pl-overlay" id="offersOverlay">
     <div class="pl-box">
         <div class="pl-head">
-            <h2>📣 <em>Προσφορές</em> & Πόντοι</h2>
+            <h2>📣 <em>Προσφορές</em> & Διαμάντια</h2>
             <button class="pl-close" onclick="closeModal('offersOverlay')">&times;</button>
         </div>
         <div class="pl-body">
             <div class="ev-sec">
-                <h3 style="color:var(--mocha); font-family:'Literata', serif; font-size:1rem; margin-bottom:6px;">⭐ Εβδομαδιαίοι Πόντοι</h3>
-                <p class="ev-text">Μάζεψε πόντους με παραγγελίες προϊόντων εκτός προσφορών (1€ = 1⭐). Οι πόντοι μηδενίζονται κάθε Κυριακή βράδυ!</p>
+                <h3 style="color:var(--mocha); font-family:'Literata', serif; font-size:1rem; margin-bottom:6px;">💎 Συλλογή Διαμαντιών</h3>
+                <p class="ev-text">Μάζεψε διαμάντια με τις παραγγελίες σου (1€ = 1💎). Τα διαμάντια <strong>ΔΕΝ</strong> μηδενίζονται ποτέ. Μάζεψέ τα με τον δικό σου ρυθμό!</p>
                 
                 <div style="background:var(--soft); padding:12px; border-radius:8px; margin:10px 0; border: 1px solid var(--line);">
                     <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:700; margin-bottom:6px;">
-                        <span>Οι πόντοι σου: <span id="modalPointsVal" style="color:var(--mocha);">0</span></span>
-                        <span>Λήξη σε: <span id="weeklyTimer" style="color:#d32f2f;">--:--:--</span></span>
+                        <span>Τα διαμάντια σου: <span id="modalPointsVal" style="color:var(--mocha);">0</span></span>
                     </div>
                     <div style="background:#e6d5c3; height:10px; border-radius:999px; overflow:hidden;">
-                        <div id="pointsProgressBar" style="background:var(--mocha); height:100%; width:0%; transition:width 0.4s ease;"></div>
+                        <div id="pointsProgressBar" style="background:var(--diamond); height:100%; width:0%; transition:width 0.4s ease;"></div>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:4px; color:var(--mocha-dark); font-weight:600;">
                         <span>0</span>
-                        <span>15 (1 ρόφημα)</span>
-                        <span>25 (2 ροφήματα)</span>
+                        <span>25 (1 ρόφημα)</span>
+                        <span>40 (2 ροφήματα)</span>
                     </div>
                 </div>
             </div>
 
             <div class="ev-sec">
-                <h3 style="color:var(--mocha); font-family:'Literata', serif; font-size:1rem; margin-bottom:6px;">🎁 Προσφορές Εβδομάδας</h3>
-                <p class="ev-text">Ισχύουν αυτόματα προσθέτοντας τα προϊόντα στο καλάθι. <em>*Τα προϊόντα των προσφορών δεν αποδίδουν πόντους.</em></p>
+                <h3 style="color:var(--mocha); font-family:'Literata', serif; font-size:1rem; margin-bottom:6px;">🎁 Προσφορές Αυγούστου</h3>
+                <p class="ev-text">Ισχύουν αυτόματα προσθέτοντας τα προϊόντα στο καλάθι. <em>*Τα προϊόντα των προσφορών δεν αποδίδουν διαμάντια.</em></p>
                 <ul style="font-size: 0.85rem; margin-left: 18px; margin-top: 6px; color: #4d4336; line-height: 1.6;">
                     <li><strong>3+1 Κρέπες:</strong> Στις 3 κρέπες <strong>(που έχουν επιπλέον μπισκότο ή παγωτό)</strong>, ΔΩΡΟ 1 κρέπα Σοκολάτα-Μπισκότο.</li>
                     <li><strong>2+1 Ροφήματα:</strong> Στις 2 Γρανίτες η 3η δωρεάν.</li>
                     <li><strong>2+1 Milkshake:</strong> Στα 2 Milkshake το 3ο δωρεάν.</li>
                 </ul>
                 <div style="background:#fff3e0; border:1px dashed #ff9800; padding:10px; border-radius:8px; text-align:center; font-weight:700; font-size:0.85rem; color:#e65100; margin-top:10px;">
-                    ⏳ Λήξη προσφορών την Κυριακή στις 22:00<br>
+                    ⏳ Λήξη προσφορών: 31 Αυγούστου<br>
                     <span id="crepeTimer" style="font-size:1.2rem; display:block; margin-top:4px;">--:--:--</span>
                 </div>
             </div>
@@ -315,7 +315,7 @@
 
 <section class="tg-banner" id="tgBanner" style="display:none;">
     <div class="tg-banner-inner">
-        <span>💡 Παράγγειλε μέσα από το <strong>Telegram</strong> για να λαμβάνεις επιβεβαίωση παραγγελίας και να μαζεύεις πόντους σε κάθε συσκευή!</span>
+        <span>💡 Παράγγειλε μέσα από το <strong>Telegram</strong> για να λαμβάνεις επιβεβαίωση παραγγελίας και να μαζεύεις διαμάντια σε κάθε συσκευή!</span>
         <a class="tg-btn" href="https://t.me/coffeevolta_bot/app" target="_blank">Άνοιξε το eShop στο Telegram</a>
     </div>
 </section>
@@ -373,7 +373,7 @@
                 <p class="ev-text">🔑 <strong>Επιλογή 1 — Ενοικίαση (50–70€):</strong> Αποκλειστική χρήση του στεγασμένου χώρου χωρίς δέσμευση κατανάλωσης.</p>
                 <p class="ev-text">🤝 <strong>Επιλογή 2 — Δωρεάν Παραχώρηση:</strong> Δωρεάν χώρος με ελάχιστη κατανάλωση ενός είδους ανά άτομο.</p>
             </details>
-            <p class="ev-note">ℹ️ Οι πόντοι επιβράβευσης δεν ισχύουν στις εκδηλώσεις.</p>
+            <p class="ev-note">ℹ️ Τα διαμάντια επιβράβευσης δεν ισχύουν στις εκδηλώσεις.</p>
         </div>
         <div class="pl-foot ev-foot">
             <button class="msg-btn bk-open" id="openBooking">📝 Αίτημα Κράτησης</button>
@@ -455,7 +455,7 @@
         <div class="discount-line" id="extraDiscountLine" style="display:none; color:#e65100;"><span>🎁 Προσφορά</span><span id="extraDiscountValue"></span></div>
         <div class="totals"><span>Σύνολο</span><span id="cartTotal">0,00 €</span></div>
 
-        <div class="reward-note" id="rewardNote" style="display:none; font-size: 0.8rem; margin-bottom: 10px; color: #4d4336;">🎁 Θα κερδίσεις <strong id="earnedPoints">0</strong> πόντους</div>
+        <div class="reward-note" id="rewardNote" style="display:none; font-size: 0.8rem; margin-bottom: 10px; color: #4d4336;">🎁 Θα κερδίσεις <strong id="earnedPoints">0</strong> 💎</div>
         <div class="form-group">
             <input type="text" id="nameField" placeholder="Ονοματεπώνυμο (προαιρετικό)">
             <input type="tel" id="phoneField" placeholder="Τηλέφωνο *">
@@ -533,8 +533,8 @@
     const FLAVORS = ['Βανίλια', 'Σοκολάτα', 'Φράουλα', 'Μπανάνα', 'Στρατσιατέλα', 'Καϊμάκι'];
 
     const REWARDS = [
-        { id: 'gift-drink1', name: '1 Δωρεάν ρόφημα (☕)', cost: 15, value: 2.20 },
-        { id: 'gift-drink2', name: '2 Δωρεάν ροφήματα (☕☕)', cost: 25, value: 4.40 }
+        { id: 'gift-drink1', name: '1 Δωρεάν ρόφημα (☕)', cost: 25, value: 2.20 },
+        { id: 'gift-drink2', name: '2 Δωρεάν ροφήματα (☕☕)', cost: 40, value: 4.40 }
     ];
     
     const redeemed = new Map();
@@ -582,21 +582,8 @@
         localStorage.setItem(LS_FAVS, JSON.stringify(favs));
     }
 
-    function getNextSunday(hours, minutes, seconds) {
-        const now = new Date();
-        const next = new Date(now);
-        const day = now.getDay();
-        const diff = day === 0 ? 0 : 7 - day;
-        next.setDate(now.getDate() + diff);
-        next.setHours(hours, minutes, seconds, 0);
-        if (day === 0 && now.getTime() > next.getTime()) {
-            next.setDate(next.getDate() + 7);
-        }
-        return next;
-    }
-
-    const weeklyResetDate = getNextSunday(23, 59, 59);
-    const crepeEndDate = getNextSunday(22, 0, 0);
+    // Προσφορές μέχρι 31 Αυγούστου 2026, 23:59:59
+    const crepeEndDate = new Date('2026-08-31T23:59:59');
 
     function formatTimeDiff(ms) {
         if (ms <= 0) return "Έληξε";
@@ -604,33 +591,18 @@
         const h = Math.floor((ms / (1000 * 60 * 60)) % 24);
         const m = Math.floor((ms / 1000 / 60) % 60);
         const s = Math.floor((ms / 1000) % 60);
-        return (d > 0 ? d + "μ " : "") + h.toString().padStart(2, '0') + ":" + m.toString().padStart(2, '0') + ":" + s.toString().padStart(2, '0');
+        return (d > 0 ? d + " μέρες, " : "") + h.toString().padStart(2, '0') + ":" + m.toString().padStart(2, '0') + ":" + s.toString().padStart(2, '0');
     }
 
     function updateTimers() {
         const now = new Date().getTime();
-        const wTimer = document.getElementById('weeklyTimer');
         const cTimer = document.getElementById('crepeTimer');
-        if (wTimer) wTimer.textContent = formatTimeDiff(weeklyResetDate.getTime() - now);
         if (cTimer) cTimer.textContent = formatTimeDiff(crepeEndDate.getTime() - now);
     }
     setInterval(updateTimers, 1000);
     updateTimers();
 
-    function checkWeeklyReset() {
-        const now = new Date().getTime();
-        const currentResetTime = parseInt(localStorage.getItem('kv_reset_time') || '0');
-        
-        if (now > currentResetTime && currentResetTime !== 0) {
-            localStorage.setItem(LS_POINTS, '0');
-            localStorage.setItem('kv_reset_time', weeklyResetDate.getTime().toString());
-        } else if (currentResetTime === 0) {
-            localStorage.setItem('kv_reset_time', weeklyResetDate.getTime().toString());
-        }
-    }
-
     function loadData() {
-        checkWeeklyReset();
         document.getElementById('nameField').value = localStorage.getItem(LS_NAME) || '';
         document.getElementById('phoneField').value = localStorage.getItem(LS_PHONE) || '';
         updatePointsDisplay();
@@ -642,20 +614,22 @@
         if (n) localStorage.setItem(LS_NAME, n);
         if (p) localStorage.setItem(LS_PHONE, p);
     }
-    function getPoints() { return parseInt(localStorage.getItem(LS_POINTS) || '0'); }
+    function getPoints() { return parseFloat(localStorage.getItem(LS_POINTS) || '0'); }
     function setPoints(v) { localStorage.setItem(LS_POINTS, Math.max(0, v)); updatePointsDisplay(); }
     
     function updatePointsDisplay() {
-        checkWeeklyReset();
         const pts = getPoints();
-        document.getElementById('pointsValue').textContent = pts;
+        const displayPts = pts % 1 === 0 ? pts : pts.toFixed(1);
+        
+        document.getElementById('pointsValue').textContent = displayPts;
         document.getElementById('pointsDisplay').style.display = pts > 0 ? 'flex' : 'none';
 
         const modalPts = document.getElementById('modalPointsVal');
         const bar = document.getElementById('pointsProgressBar');
-        if (modalPts) modalPts.textContent = pts;
+        if (modalPts) modalPts.textContent = displayPts;
         if (bar) {
-            const pct = Math.min(100, (pts / 25) * 100);
+            // Η μπάρα πλέον γεμίζει με βάση το 40 (τον μεγάλο στόχο)
+            const pct = Math.min(100, (pts / 40) * 100);
             bar.style.width = pct + '%';
         }
     }
@@ -891,12 +865,12 @@
             const missing = r.cost - left;
             return `
                 <div class="reward-row">
-                    <span>${r.name}<br><span class="r-cost">${r.cost} ⭐</span></span>
+                    <span>${r.name}<br><span class="r-cost">${r.cost} 💎</span></span>
                     <span style="display:flex;align-items:center;gap:6px;">
                         ${qty > 0 ? `<button class="redeem-btn" onclick="redeemReward('${r.id}', -1)">−</button><strong>${qty}</strong>` : ''}
                         ${canAdd
                             ? `<button class="redeem-btn" onclick="redeemReward('${r.id}', 1)">${qty > 0 ? '+' : 'Εξαργύρωση'}</button>`
-                            : (qty > 0 ? '' : `<button class="redeem-btn" disabled>Λείπουν ${missing}</button>`)}
+                            : (qty > 0 ? '' : `<button class="redeem-btn" disabled>Λείπουν ${missing % 1 === 0 ? missing : missing.toFixed(1)}</button>`)}
                     </span>
                 </div>`;
         }).join('');
@@ -904,9 +878,9 @@
         const anyAffordable = REWARDS.some(r => left >= r.cost) || spent > 0;
         area.innerHTML = `
             <div class="rewards-box">
-                <h4>🎁 Δώρα με πόντους — έχεις ${pts} ⭐${spent ? ` (θα ξοδέψεις ${spent})` : ''}</h4>
+                <h4>🎁 Δώρα με διαμάντια — έχεις ${pts % 1 === 0 ? pts : pts.toFixed(1)} 💎${spent ? ` (θα ξοδέψεις ${spent})` : ''}</h4>
                 ${rows}
-                ${anyAffordable ? '' : '<small>Κέρδισε 1 πόντο για κάθε 1€ παραγγελίας.</small>'}
+                ${anyAffordable ? '' : '<small>Κέρδισε 1 διαμάντι για κάθε 1€ παραγγελίας.</small>'}
             </div>`;
     }
 
@@ -962,7 +936,8 @@
         for(let i=0; i < mSets * 3; i++) pointsDeduction += milkshakeItems[i];
         
         const eligibleForPoints = Math.max(0, subtotal - pointsDeduction - rewardDiscount);
-        const earned = Math.floor(eligibleForPoints);
+        // Κρατάμε 1 δεκαδικό για τα διαμάντια
+        const earned = Math.round(eligibleForPoints * 10) / 10;
 
         document.getElementById('cartCount').textContent = count;
         document.getElementById('cartTotal').textContent = euro(total);
@@ -982,7 +957,7 @@
             document.getElementById('extraDiscountValue').textContent = '−' + euro(extraDiscount);
         } else exLine.style.display = 'none';
 
-        document.getElementById('earnedPoints').textContent = earned;
+        document.getElementById('earnedPoints').textContent = earned % 1 === 0 ? earned : earned.toFixed(1);
         document.getElementById('rewardNote').style.display = (count > 0 && earned > 0) ? 'block' : 'none';
 
         renderRewards();
@@ -1093,7 +1068,7 @@
         for(let i=0; i < mSets * 3; i++) pointsDeduction += milkshakeItems[i];
         
         const eligibleForPoints = Math.max(0, subtotal - pointsDeduction - rewardDiscount);
-        const earned = Math.floor(eligibleForPoints);
+        const earned = Math.round(eligibleForPoints * 10) / 10;
         
         const redeemedCost = redeemedCostTotal();
         const gifts = redeemedList();
@@ -1117,15 +1092,17 @@
         if (extraDiscount > 0) itemsText += `🎁 Έκπτωση 2+1: -${euro(extraDiscount)}\n`;
 
         let rewardText = gifts.length
-            ? `\n🎁 <b>Δώρα Πόντων:</b> ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')} (−${euro(rewardDiscount)}, −${redeemedCost} πόντοι)`
+            ? `\n🎁 <b>Δώρα:</b> ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')} (−${euro(rewardDiscount)}, −${redeemedCost} 💎)`
             : '';
 
         const newTotalPoints = getPoints() - redeemedCost + earned;
+        const formattedNewTotal = newTotalPoints % 1 === 0 ? newTotalPoints : newTotalPoints.toFixed(1);
+        const formattedEarned = earned % 1 === 0 ? earned : earned.toFixed(1);
 
-        const fullOrderMessage = `🚨 <b>ΝΕΑ ΠΑΡΑΓΓΕΛΙΑ</b>\n👤 ${customerName}${contactLink}\n📞 ${phone}\n📝 ${comment || '-'}\n⏰ ${time}${rewardText}\n💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n📦 <b>Αναλυτικά:</b>\n${itemsText}\n\n⭐ <b>Πόντοι:</b>\n🔹 Κέρδισε: +${earned}${redeemedCost ? `\n🔻 Εξαργύρωσε: −${redeemedCost}` : ''}\n💰 Σύνολο πόντων συσκευής: <b>${newTotalPoints}</b>`;
+        const fullOrderMessage = `🚨 <b>ΝΕΑ ΠΑΡΑΓΓΕΛΙΑ</b>\n👤 ${customerName}${contactLink}\n📞 ${phone}\n📝 ${comment || '-'}\n⏰ ${time}${rewardText}\n💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n📦 <b>Αναλυτικά:</b>\n${itemsText}\n\n💎 <b>Διαμάντια:</b>\n🔹 Κέρδισε: +${formattedEarned}${redeemedCost ? `\n🔻 Εξαργύρωσε: −${redeemedCost}` : ''}\n💰 Σύνολο διαμαντιών: <b>${formattedNewTotal}</b>`;
 
         const hasGreek = [...cart.values()].some(v => v.prod.id === 'ellinikos' || v.prod.id === 'ellinikos2');
-        const receipt = `✅ <b>Καφέ Βόλτα — Επιβεβαίωση παραγγελίας</b>\n⏰ Παραλαβή: ${time}\n\n📦 <b>Η παραγγελία σου:</b>\n${itemsText}${gifts.length ? `🎁 Δώρα Πόντων: ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}\n` : ''}💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n⭐ Κέρδισες <b>+${earned}</b> πόντους${redeemedCost ? ` (εξαργύρωσες ${redeemedCost})` : ''}\n💰 Σύνολο πόντων σου: <b>{POINTS}</b>${hasGreek ? '\n\n🔮 Ήπιες τον ελληνικό σου; Δες τι λέει το φλιτζάνι → @omenread_bot' : ''}\n\n📣 Προσφορές & νέα μας → t.me/kafevolta\nΣε ευχαριστούμε! ☕`;
+        const receipt = `✅ <b>Καφέ Βόλτα — Επιβεβαίωση παραγγελίας</b>\n⏰ Παραλαβή: ${time}\n\n📦 <b>Η παραγγελία σου:</b>\n${itemsText}${gifts.length ? `🎁 Δώρα: ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}\n` : ''}💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n💎 Κέρδισες <b>+${formattedEarned}</b> διαμάντια${redeemedCost ? ` (εξαργύρωσες ${redeemedCost})` : ''}\n💰 Σύνολο διαμαντιών σου: <b>{POINTS}</b>${hasGreek ? '\n\n🔮 Ήπιες τον ελληνικό σου; Δες τι λέει το φλιτζάνι → @omenread_bot' : ''}\n\n📣 Προσφορές & νέα μας → t.me/kafevolta\nΣε ευχαριστούμε! ☕`;
 
         const groupResult = await sendOrder({
             text: fullOrderMessage,
@@ -1147,7 +1124,7 @@
             const receiptNote = groupResult.receiptSent
                 ? '<br>📩 Σου στείλαμε επιβεβαίωση παραγγελίας στο Telegram!'
                 : `<br><small>ℹ️ Η επιβεβαίωση δεν στάλθηκε${groupResult.receiptError ? ` (${groupResult.receiptError})` : ''}. Πάτησε Start στο @coffeevolta_bot για να λαμβάνεις επιβεβαιώσεις παραγγελίας.</small>`;
-            document.getElementById('cartBody').innerHTML = `<div class="thanks"><h3>Ευχαριστούμε!</h3><p>Παραλαβή σε ${time}</p><p>${gifts.length ? `🎁 ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}<br>` : ''}Κέρδισες ${earned} πόντους — σύνολο ${finalPts} ⭐${receiptNote}</p></div>`;
+            document.getElementById('cartBody').innerHTML = `<div class="thanks"><h3>Ευχαριστούμε!</h3><p>Παραλαβή σε ${time}</p><p>${gifts.length ? `🎁 ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}<br>` : ''}Κέρδισες ${formattedEarned} διαμάντια — σύνολο ${finalPts % 1 === 0 ? finalPts : finalPts.toFixed(1)} 💎${receiptNote}</p></div>`;
             document.getElementById('commentField').value = '';
         } else {
             alert(`❌ Απέτυχε να σταλεί στην ΟΜΑΔΑ!\nΛόγος: ${groupResult.error}\n\nΒεβαιώσου ότι το bot είναι μέλος και διαχειριστής της ομάδας.`);
