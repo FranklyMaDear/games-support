@@ -1169,7 +1169,20 @@
         showToast('Ευχαριστούμε! Η παραγγελία ξεκινάει.');
     };
 
+    // ΕΔΩ Η ΔΙΟΡΘΩΣΗ ΓΙΑ ΤΟ SCROLL ΠΛΗΚΤΡΟΛΟΓΙΟΥ! (αφαιρέσαμε το button από το auto-blur)
+    document.addEventListener('touchstart', e => {
+        if (!e.target.closest('input, textarea, select, button, a')) {
+            const a = document.activeElement;
+            if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) a.blur();
+        }
+    }, { passive: true });
+
     document.getElementById('checkout').onclick = async () => {
+        // Κρύβουμε χειροκίνητα το πληκτρολόγιο με το που πατήσει Ολοκλήρωση
+        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+            document.activeElement.blur();
+        }
+
         if (!isOpen()) { alert('🌙 Είμαστε κλειστά αυτή τη στιγμή.\nΩράριο παραγγελιών: 06:00 – 22:00'); return; }
         
         const isTreat = document.getElementById('isTreat').checked;
@@ -1337,13 +1350,6 @@
         t.textContent = msg; t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 1500);
     }
-
-    document.addEventListener('touchstart', e => {
-        if (!e.target.closest('input, textarea, select')) {
-            const a = document.activeElement;
-            if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) a.blur();
-        }
-    }, { passive: true });
 
     document.querySelectorAll('.form-group input, .form-group textarea').forEach(el => {
         el.addEventListener('focus', () => {
