@@ -328,7 +328,7 @@
         <div class="chip" data-cat="rofimata">🥤 Ροφήματα</div>
         <div class="chip" data-cat="crepe">🥞 Κρέπες</div>
         <div class="chip" data-cat="icecream">🍦 Παγωτό</div>
-        <div class="chip" data-cat="soft">🥤 Αναψυκτικά</div>
+        <div class="chip" data-cat="soft">🥤 Δροσιστικά</div>
         <div class="chip" data-cat="icetea">🧃 Ice Tea</div>
         <div class="chip" data-cat="juice">🍊 Χυμοί Κλιάφα</div>
     </div>
@@ -456,9 +456,21 @@
         <div class="totals"><span>Σύνολο</span><span id="cartTotal">0,00 €</span></div>
 
         <div class="reward-note" id="rewardNote" style="display:none; font-size: 0.8rem; margin-bottom: 10px; color: #4d4336;">🎁 Θα κερδίσεις <strong id="earnedPoints">0</strong> 💎</div>
+        
         <div class="form-group">
-            <input type="text" id="nameField" placeholder="Ονοματεπώνυμο (προαιρετικό)">
-            <input type="tel" id="phoneField" placeholder="Τηλέφωνο *">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--mocha); font-size:0.95rem; margin-bottom: 4px; cursor:pointer;">
+                <input type="checkbox" id="isTreat" style="width:20px; height:20px; accent-color:var(--mocha);"> 🎁 Είναι κέρασμα / δώρο; (IRIS/PayPal)
+            </label>
+            
+            <div id="treatFields" style="display:none; flex-direction:column; gap:8px; background:#fff3e0; border:1px dashed #ffb74d; padding:10px; border-radius:8px; margin-bottom:8px;">
+                <span style="font-size:0.8rem; color:#e65100; font-weight:700;">Στοιχεία Παραλήπτη (Αυτός που κερνάς):</span>
+                <input type="text" id="treatName" placeholder="Όνομα Παραλήπτη *">
+                <input type="tel" id="treatPhone" placeholder="Τηλέφωνο Παραλήπτη *">
+                <textarea id="treatMessage" placeholder="Ευχή / Μήνυμα (π.χ. Χρόνια πολλά!)" rows="2"></textarea>
+            </div>
+
+            <input type="text" id="nameField" placeholder="Το Ονοματεπώνυμό σου *">
+            <input type="tel" id="phoneField" placeholder="Το Τηλέφωνό σου *">
             <textarea id="commentField" placeholder="Σχόλιο για την παραγγελία" rows="2"></textarea>
             <select id="timeField">
                 <option value="Σε 5 λεπτά">Παραλαβή σε 5'</option>
@@ -524,7 +536,7 @@
     const CAT_NAMES = {
         coffee: '☕ Καφέδες',
         rofimata: '🥤 Ροφήματα',
-        soft: '🥤 Αναψυκτικά',
+        soft: '🥤 Δροσιστικά',
         icetea: '🧃 Ice Tea',
         juice: '🍊 Χυμοί',
         crepe: '🥞 Κρέπες',
@@ -556,6 +568,10 @@
     const cart = new Map();
 
     const LS_NAME = 'kv_name', LS_PHONE = 'kv_phone', LS_POINTS = 'kv_points', LS_FAVS = 'kv_favs';
+
+    document.getElementById('isTreat').addEventListener('change', function() {
+        document.getElementById('treatFields').style.display = this.checked ? 'flex' : 'none';
+    });
 
     function openModal(id, isDrawer = false) {
         document.getElementById(id).classList.add('open');
@@ -628,7 +644,6 @@
         const bar = document.getElementById('pointsProgressBar');
         if (modalPts) modalPts.textContent = displayPts;
         if (bar) {
-            // Η μπάρα πλέον γεμίζει με βάση το 40 (τον μεγάλο στόχο)
             const pct = Math.min(100, (pts / 40) * 100);
             bar.style.width = pct + '%';
         }
@@ -1041,9 +1056,27 @@
 
     document.getElementById('checkout').onclick = async () => {
         if (!isOpen()) { alert('🌙 Είμαστε κλειστά αυτή τη στιγμή.\nΩράριο παραγγελιών: 06:00 – 22:00'); return; }
+        
+        const isTreat = document.getElementById('isTreat').checked;
+        const name = document.getElementById('nameField').value.trim();
         const phone = document.getElementById('phoneField').value.trim();
-        if (!phone) { alert('Συμπληρώστε τηλέφωνο'); return; }
+        
+        if (!name || !phone) { alert('Συμπληρώστε το ονοματεπώνυμο και το τηλέφωνό σας!'); return; }
         saveData();
+
+        let treatText = '';
+        let treatReceiptText = '';
+        
+        if (isTreat) {
+            const tName = document.getElementById('treatName').value.trim();
+            const tPhone = document.getElementById('treatPhone').value.trim();
+            const tMsg = document.getElementById('treatMessage').value.trim();
+            
+            if (!tName || !tPhone) { alert('Συμπληρώστε το όνομα και το τηλέφωνο του παραλήπτη για το κέρασμα!'); return; }
+            
+            treatText = `\n\n🎁 <b>ΠΑΡΑΛΗΠΤΗΣ (Κερνιέται):</b>\nΌνομα: ${tName}\nΤηλέφωνο: ${tPhone}\nΕυχή: ${tMsg || '-'}`;
+            treatReceiptText = `\n🎁 <b>Κέρασμα σε:</b> ${tName} (${tPhone})\n💬 <b>Μήνυμα:</b> ${tMsg || '-'}`;
+        }
 
         const subtotal = getSubtotal();
         const extraDiscount = getExtraDiscount();
@@ -1074,7 +1107,6 @@
         const gifts = redeemedList();
 
         const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-        const name = document.getElementById('nameField').value.trim();
         const comment = document.getElementById('commentField').value.trim();
         const time = document.getElementById('timeField').value;
         const customerName = name || (tgUser?.first_name || 'Πελάτης');
@@ -1099,10 +1131,10 @@
         const formattedNewTotal = newTotalPoints % 1 === 0 ? newTotalPoints : newTotalPoints.toFixed(1);
         const formattedEarned = earned % 1 === 0 ? earned : earned.toFixed(1);
 
-        const fullOrderMessage = `🚨 <b>ΝΕΑ ΠΑΡΑΓΓΕΛΙΑ</b>\n👤 ${customerName}${contactLink}\n📞 ${phone}\n📝 ${comment || '-'}\n⏰ ${time}${rewardText}\n💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n📦 <b>Αναλυτικά:</b>\n${itemsText}\n\n💎 <b>Διαμάντια:</b>\n🔹 Κέρδισε: +${formattedEarned}${redeemedCost ? `\n🔻 Εξαργύρωσε: −${redeemedCost}` : ''}\n💰 Σύνολο διαμαντιών: <b>${formattedNewTotal}</b>`;
+        const fullOrderMessage = `🚨 <b>ΝΕΑ ΠΑΡΑΓΓΕΛΙΑ${isTreat ? ' — ΚΕΡΑΣΜΑ (ΑΝΑΜΟΝΗ ΠΛΗΡΩΜΗΣ IRIS/PAYPAL)' : ''}</b>\n👤 <b>ΑΠΟΣΤΟΛΕΑΣ:</b> ${customerName}${contactLink}\n📞 ${phone}\n📝 ${comment || '-'}\n⏰ ${time}${treatText}\n${rewardText}\n💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n📦 <b>Αναλυτικά:</b>\n${itemsText}\n\n💎 <b>Διαμάντια:</b>\n🔹 Κέρδισε: +${formattedEarned}${redeemedCost ? `\n🔻 Εξαργύρωσε: −${redeemedCost}` : ''}\n💰 Σύνολο διαμαντιών: <b>${formattedNewTotal}</b>`;
 
         const hasGreek = [...cart.values()].some(v => v.prod.id === 'ellinikos' || v.prod.id === 'ellinikos2');
-        const receipt = `✅ <b>Καφέ Βόλτα — Επιβεβαίωση παραγγελίας</b>\n⏰ Παραλαβή: ${time}\n\n📦 <b>Η παραγγελία σου:</b>\n${itemsText}${gifts.length ? `🎁 Δώρα: ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}\n` : ''}💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n💎 Κέρδισες <b>+${formattedEarned}</b> διαμάντια${redeemedCost ? ` (εξαργύρωσες ${redeemedCost})` : ''}\n💰 Σύνολο διαμαντιών σου: <b>{POINTS}</b>${hasGreek ? '\n\n🔮 Ήπιες τον ελληνικό σου; Δες τι λέει το φλιτζάνι → @omenread_bot' : ''}\n\n📣 Προσφορές & νέα μας → t.me/kafevolta\nΣε ευχαριστούμε! ☕`;
+        const receipt = `✅ <b>Καφέ Βόλτα — Επιβεβαίωση παραγγελίας</b>\n⏰ Παραλαβή: ${time}\n\n📦 <b>Η παραγγελία σου:</b>\n${itemsText}${treatReceiptText}${gifts.length ? `\n🎁 Δώρα: ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}\n` : ''}💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n💎 Κέρδισες <b>+${formattedEarned}</b> διαμάντια${redeemedCost ? ` (εξαργύρωσες ${redeemedCost})` : ''}\n💰 Σύνολο διαμαντιών σου: <b>{POINTS}</b>${hasGreek ? '\n\n🔮 Ήπιες τον ελληνικό σου; Δες τι λέει το φλιτζάνι → @omenread_bot' : ''}\n\n📣 Προσφορές & νέα μας → t.me/kafevolta\nΣε ευχαριστούμε! ☕`;
 
         const groupResult = await sendOrder({
             text: fullOrderMessage,
@@ -1121,11 +1153,31 @@
             cart.clear();
             redeemed.clear();
             updateCart();
-            const receiptNote = groupResult.receiptSent
-                ? '<br>📩 Σου στείλαμε επιβεβαίωση παραγγελίας στο Telegram!'
-                : `<br><small>ℹ️ Η επιβεβαίωση δεν στάλθηκε${groupResult.receiptError ? ` (${groupResult.receiptError})` : ''}. Πάτησε Start στο @coffeevolta_bot για να λαμβάνεις επιβεβαιώσεις παραγγελίας.</small>`;
-            document.getElementById('cartBody').innerHTML = `<div class="thanks"><h3>Ευχαριστούμε!</h3><p>Παραλαβή σε ${time}</p><p>${gifts.length ? `🎁 ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}<br>` : ''}Κέρδισες ${formattedEarned} διαμάντια — σύνολο ${finalPts % 1 === 0 ? finalPts : finalPts.toFixed(1)} 💎${receiptNote}</p></div>`;
+            
+            if (isTreat) {
+                document.getElementById('cartBody').innerHTML = `
+                    <div class="thanks" style="text-align:center; padding:10px 0;">
+                        <h3 style="color:#d32f2f; margin-bottom:10px;">🎁 Το αίτημα κεράσματος εστάλη!</h3>
+                        <p style="font-size:0.9rem; margin-bottom:12px;">Για να προχωρήσει η παραγγελία, κάνε την πληρωμή (<b>${euro(totalAmount)}</b>) σε έναν από τους παρακάτω λογαριασμούς:</p>
+                        <div style="background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:12px; text-align:left; font-size:0.85rem; margin-bottom:12px;">
+                            <strong style="color:var(--mocha);">1. IRIS (Εθνική / Όλες οι τράπεζες)</strong><br>
+                            ΑΦΜ: <b>126559439</b><br><br>
+                            <strong style="color:var(--mocha);">2. PayPal</strong><br>
+                            <a href="https://www.paypal.me/fragosapostolos79" target="_blank" style="color:#1a7fbc; font-weight:700; text-decoration:none;">🔗 Πάτησε εδώ για πληρωμή μέσω PayPal</a>
+                        </div>
+                        <p style="font-size:0.8rem; color:#6b5d4d; margin-bottom:12px;">Μόλις ολοκληρώσεις τη μεταφορά, πάτησε το παρακάτω κουμπί για να μας στείλεις το αποδεικτικό και να ετοιμάσουμε το κέρασμα!</p>
+                        <a href="https://t.me/kafevolta?direct" target="_blank" style="display:block; background:#2AABEE; color:#fff; text-decoration:none; padding:12px; border-radius:999px; font-weight:700;">💬 Στείλε μας το αποδεικτικό</a>
+                    </div>`;
+            } else {
+                const receiptNote = groupResult.receiptSent
+                    ? '<br>📩 Σου στείλαμε επιβεβαίωση παραγγελίας στο Telegram!'
+                    : `<br><small>ℹ️ Η επιβεβαίωση δεν στάλθηκε${groupResult.receiptError ? ` (${groupResult.receiptError})` : ''}. Πάτησε Start στο @coffeevolta_bot για να λαμβάνεις επιβεβαιώσεις παραγγελίας.</small>`;
+                document.getElementById('cartBody').innerHTML = `<div class="thanks"><h3>Ευχαριστούμε!</h3><p>Παραλαβή σε ${time}</p><p>${gifts.length ? `🎁 ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}<br>` : ''}Κέρδισες ${formattedEarned} διαμάντια — σύνολο ${finalPts % 1 === 0 ? finalPts : finalPts.toFixed(1)} 💎${receiptNote}</p></div>`;
+            }
+            
             document.getElementById('commentField').value = '';
+            document.getElementById('isTreat').checked = false;
+            document.getElementById('treatFields').style.display = 'none';
         } else {
             alert(`❌ Απέτυχε να σταλεί στην ΟΜΑΔΑ!\nΛόγος: ${groupResult.error}\n\nΒεβαιώσου ότι το bot είναι μέλος και διαχειριστής της ομάδας.`);
         }
