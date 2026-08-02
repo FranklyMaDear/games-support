@@ -742,29 +742,33 @@
     document.getElementById('openCart').onclick = () => openModal('drawer', true);
     document.getElementById('openBooking').onclick = () => { closeModal('evOverlay'); openModal('bkOverlay'); };
 
-    document.getElementById('askTreatBtn').onclick = async () => {
-        const textMsg = "Γεια! Μήπως ήρθε η ώρα να με κεράσεις έναν καφέ από το Καφέ Βόλτα; ☕🙏 Μπες εδώ, διάλεξε ό,τι θες και κάνε μου την έκπληξη!";
-        const urlLink = "https://t.me/coffeevolta_bot/app";
-        
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Καφέ Βόλτα - Κέρασμα',
-                    text: textMsg,
-                    url: urlLink
+    const askBtn = document.getElementById('askTreatBtn');
+    if (askBtn) {
+        askBtn.onclick = async () => {
+            const shareTitle = 'Καφέ Βόλτα — Κέρασε έναν φίλο!';
+            const shareText = 'Γεια! ☕ Μήπως ήρθε η ώρα να με κεράσεις έναν καφέ; Μπες στο Καφέ Βόλτα, διάλεξε ό,τι θες και κάνε μου την έκπληξη! 🎁👇';
+            const shareUrl = 'https://volta.franklygames.com/';
+            
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: shareTitle,
+                        text: shareText,
+                        url: shareUrl
+                    });
+                } catch (err) {
+                    console.log('Share cancelled', err);
+                }
+            } else {
+                const copyText = shareText + "\n" + shareUrl;
+                navigator.clipboard.writeText(copyText).then(() => {
+                    showToast('Το μήνυμα αντιγράφηκε! Κάνε επικόλληση (paste) όπου θέλεις.');
+                }).catch(() => {
+                    showToast('Απέτυχε η αντιγραφή.');
                 });
-            } catch (err) {
-                console.log('Share cancelled', err);
             }
-        } else {
-            const copyText = textMsg + " " + urlLink;
-            navigator.clipboard.writeText(copyText).then(() => {
-                showToast('Ο σύνδεσμος αντιγράφηκε! Στείλε τον στους φίλους σου.');
-            }).catch(() => {
-                showToast('Απέτυχε η αντιγραφή.');
-            });
-        }
-    };
+        };
+    }
 
     document.getElementById('bkType').addEventListener('change', function () {
         const isTalk = this.value.startsWith('Ομιλία');
