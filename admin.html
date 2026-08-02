@@ -6,7 +6,7 @@
 <title>Καφέ Βόλτα — Διαχείριση</title>
 <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,700;7..72,900&family=Commissioner:wght@400;600;700&display=swap&subset=greek" rel="stylesheet">
 <style>
-:root { --paper:#FDF8F0; --mocha:#5C3A21; --mocha-dark:#3E2723; --ink:#2C1810; --line:#E6D5C3; --soft:#FBF4E4; --accent:#C7956D; }
+:root { --paper:#FDF8F0; --mocha:#5C3A21; --mocha-dark:#3E2723; --ink:#2C1810; --line:#E6D5C3; --soft:#FBF4E4; --accent:#C7956D; --diamond:#00bcd4; }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Commissioner',sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; padding:16px; }
 h1 { font-family:'Literata',serif; font-weight:900; font-size:1.3rem; margin-bottom:4px; }
@@ -22,10 +22,10 @@ button:disabled { opacity:0.5; }
 .cust { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; }
 .cust .top { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
 .cust .name { font-family:'Literata',serif; font-weight:700; }
-.cust .pts { font-weight:900; color:var(--mocha); font-size:1.1rem; white-space:nowrap; }
+.cust .pts { font-weight:900; color:var(--diamond); font-size:1.1rem; white-space:nowrap; }
 .cust .meta { font-size:0.75rem; color:#6b5d4d; margin:2px 0 8px; }
 .cust .actions { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
-.cust .actions input { width:70px; }
+.cust .actions input { width:80px; }
 .msg { max-width:520px; padding:10px 14px; border-radius:8px; margin-bottom:12px; font-size:0.85rem; display:none; }
 .msg.ok { display:block; background:#eaf6ea; border:1px solid #9CCC9C; }
 .msg.err { display:block; background:#fdecea; border:1px solid #f5b5b0; }
@@ -35,7 +35,7 @@ button:disabled { opacity:0.5; }
 </head>
 <body>
 <h1>Καφέ <em>Βόλτα</em> — Πίνακας Διαχείρισης</h1>
-<p class="sub">Πόντοι πελατών · προσθήκη / αφαίρεση / διόρθωση</p>
+<p class="sub">Διαμάντια πελατών · προσθήκη / αφαίρεση / διόρθωση</p>
 
 <div class="msg" id="msg"></div>
 
@@ -102,18 +102,19 @@ function renderCustomers(list) {
     list.forEach(cu => {
         const div = document.createElement('div');
         div.className = 'cust';
+        const displayPts = cu.points % 1 === 0 ? cu.points : parseFloat(cu.points).toFixed(1);
         div.innerHTML = `
             <div class="top">
                 <span class="name">${esc(cu.name || 'Πελάτης')} ${cu.username ? `<small>@${esc(cu.username)}</small>` : ''}</span>
-                <span class="pts" id="pts-${cu.id}">${cu.points ?? 0} ⭐</span>
+                <span class="pts" id="pts-${cu.id}">${displayPts ?? 0} 💎</span>
             </div>
             <div class="meta">📞 ${esc(cu.phone || '—')} · 🧾 ${cu.orders || 0} παραγγελίες · 🕐 ${fmtDate(cu.lastOrder)}</div>
             <div class="actions">
-                <button class="ghost" onclick="adjust('${cu.id}', -5)">−5</button>
                 <button class="ghost" onclick="adjust('${cu.id}', -1)">−1</button>
+                <button class="ghost" onclick="adjust('${cu.id}', 0.5)">+0.5</button>
                 <button class="ghost" onclick="adjust('${cu.id}', 1)">+1</button>
                 <button class="ghost" onclick="adjust('${cu.id}', 5)">+5</button>
-                <input type="number" min="0" id="set-${cu.id}" placeholder="π.χ. 20">
+                <input type="number" step="0.5" min="0" id="set-${cu.id}" placeholder="π.χ. 20.5">
                 <button class="ghost" onclick="setPts('${cu.id}')">Ορισμός</button>
             </div>`;
         c.appendChild(div);
@@ -125,17 +126,26 @@ function esc(s) { return String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<'
 window.adjust = async (id, delta) => {
     try {
         const d = await api('/admin/adjust', { method: 'POST', body: JSON.stringify({ id, delta }) });
-        if (d.success) { $('pts-' + id).textContent = d.points + ' ⭐'; showMsg(`Έγινε: ${delta > 0 ? '+' : ''}${delta} πόντοι`, true); }
+        if (d.success) { 
+            const newPts = d.points % 1 === 0 ? d.points : parseFloat(d.points).toFixed(1);
+            $('pts-' + id).textContent = newPts + ' 💎'; 
+            showMsg(`Έγινε: ${delta > 0 ? '+' : ''}${delta} διαμάντια`, true); 
+        }
         else showMsg(d.error || 'Σφάλμα', false);
     } catch { showMsg('Σφάλμα δικτύου', false); }
 };
 
 window.setPts = async (id) => {
-    const v = parseInt($('set-' + id).value);
+    const v = parseFloat($('set-' + id).value);
     if (isNaN(v) || v < 0) { showMsg('Βάλε έγκυρο αριθμό', false); return; }
     try {
         const d = await api('/admin/adjust', { method: 'POST', body: JSON.stringify({ id, set: v }) });
-        if (d.success) { $('pts-' + id).textContent = d.points + ' ⭐'; $('set-' + id).value = ''; showMsg('Οι πόντοι ορίστηκαν σε ' + d.points, true); }
+        if (d.success) { 
+            const newPts = d.points % 1 === 0 ? d.points : parseFloat(d.points).toFixed(1);
+            $('pts-' + id).textContent = newPts + ' 💎'; 
+            $('set-' + id).value = ''; 
+            showMsg('Τα διαμάντια ορίστηκαν σε ' + newPts, true); 
+        }
         else showMsg(d.error || 'Σφάλμα', false);
     } catch { showMsg('Σφάλμα δικτύου', false); }
 };
