@@ -292,7 +292,7 @@
             </div>
         </div>
         <div class="pl-foot ev-foot">
-            <button class="msg-btn" onclick="closeModal('treatOverlay'); document.getElementById('openPricelist').click();">🛒 Ξεκίνα το κέρασμα</button>
+            <button class="msg-btn" onclick="closeModal('treatOverlay');">🛒 Ξεκίνα το κέρασμα</button>
         </div>
     </div>
 </div>
@@ -499,46 +499,50 @@
     <div class="drawer-body">
         <div id="cartBody"></div>
         
-        <div id="rewardsArea"></div>
+        <div id="drawerFoot" style="display:none;">
+            <div id="rewardsArea"></div>
 
-        <div class="discount-line" id="discountLine" style="display:none;"><span>🎁 Έκπτωση δώρου</span><span id="discountValue"></span></div>
-        <div class="discount-line" id="extraDiscountLine" style="display:none; color:#e65100;"><span>🎁 Προσφορά</span><span id="extraDiscountValue"></span></div>
-        <div class="totals"><span>Σύνολο</span><span id="cartTotal">0,00 €</span></div>
+            <div class="discount-line" id="discountLine" style="display:none;"><span>🎁 Έκπτωση δώρου</span><span id="discountValue"></span></div>
+            <div class="discount-line" id="extraDiscountLine" style="display:none; color:#e65100;"><span>🎁 Προσφορά</span><span id="extraDiscountValue"></span></div>
+            <div class="totals"><span>Σύνολο</span><span id="cartTotal">0,00 €</span></div>
 
-        <div class="reward-note" id="rewardNote" style="display:none; font-size: 0.8rem; margin-bottom: 10px; color: #4d4336;">🎁 Θα κερδίσεις <strong id="earnedPoints">0</strong> 💎</div>
-        
-        <div class="form-group">
-            <label style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--mocha); font-size:0.95rem; margin-bottom: 4px; cursor:pointer;">
-                <input type="checkbox" id="isTreat" style="width:20px; height:20px; accent-color:var(--mocha);"> 🎁 Είναι κέρασμα / δώρο; (IRIS/PayPal)
-            </label>
+            <div class="reward-note" id="rewardNote" style="display:none; font-size: 0.8rem; margin-bottom: 10px; color: #4d4336;">🎁 Θα κερδίσεις <strong id="earnedPoints">0</strong> 💎</div>
             
-            <div id="treatFields" style="display:none; flex-direction:column; gap:8px; background:#fff3e0; border:1px dashed #ffb74d; padding:10px; border-radius:8px; margin-bottom:8px;">
-                <span style="font-size:0.8rem; color:#e65100; font-weight:700;">Στοιχεία Παραλήπτη (Αυτόν που κερνάς):</span>
-                <input type="text" id="treatName" placeholder="Όνομα Παραλήπτη *">
-                <input type="tel" id="treatPhone" placeholder="Τηλέφωνο Παραλήπτη *">
-                <textarea id="treatMessage" placeholder="Ευχή / Μήνυμα (π.χ. Χρόνια πολλά!)" rows="2"></textarea>
-            </div>
+            <div class="form-group">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--mocha); font-size:0.95rem; margin-bottom: 4px; cursor:pointer;">
+                    <input type="checkbox" id="isTreat" style="width:20px; height:20px; accent-color:var(--mocha);"> 🎁 Είναι κέρασμα / δώρο; (IRIS/PayPal)
+                </label>
+                
+                <div id="treatFields" style="display:none; flex-direction:column; gap:8px; background:#fff3e0; border:1px dashed #ffb74d; padding:10px; border-radius:8px; margin-bottom:8px;">
+                    <span style="font-size:0.8rem; color:#e65100; font-weight:700;">Στοιχεία Παραλήπτη (Αυτόν που κερνάς):</span>
+                    <input type="text" id="treatName" placeholder="Όνομα Παραλήπτη *">
+                    <input type="tel" id="treatPhone" placeholder="Τηλέφωνο Παραλήπτη *">
+                    <textarea id="treatMessage" placeholder="Ευχή / Μήνυμα (π.χ. Χρόνια πολλά!)" rows="2"></textarea>
+                </div>
 
-            <input type="text" id="nameField" placeholder="Το Ονοματεπώνυμό σου *">
-            <input type="tel" id="phoneField" placeholder="Το Τηλέφωνό σου *">
-            <textarea id="commentField" placeholder="Σχόλιο για την παραγγελία" rows="2"></textarea>
-            <select id="timeField">
-                <option value="Σε 5 λεπτά">Παραλαβή σε 5'</option>
-                <option value="Σε 10 λεπτά" selected>Παραλαβή σε 10'</option>
-                <option value="Σε 15 λεπτά">Παραλαβή σε 15'</option>
-                <option value="Σε 20 λεπτά">Παραλαβή σε 20'</option>
-                <option value="Σε 30 λεπτά">Παραλαβή σε 30'</option>
-            </select>
+                <input type="text" id="nameField" placeholder="Το Ονοματεπώνυμό σου *">
+                <input type="tel" id="phoneField" placeholder="Το Τηλέφωνό σου *">
+                <textarea id="commentField" placeholder="Σχόλιο για την παραγγελία" rows="2"></textarea>
+                <select id="timeField">
+                    <option value="Σε 5 λεπτά">Παραλαβή σε 5'</option>
+                    <option value="Σε 10 λεπτά" selected>Παραλαβή σε 10'</option>
+                    <option value="Σε 15 λεπτά">Παραλαβή σε 15'</option>
+                    <option value="Σε 20 λεπτά">Παραλαβή σε 20'</option>
+                    <option value="Σε 30 λεπτά">Παραλαβή σε 30'</option>
+                </select>
+            </div>
+            <div class="tg-note" id="tgNote" style="display:none;">💡 Θες επιβεβαίωση παραγγελίας στο κινητό σου; <a href="https://t.me/coffeevolta_bot" target="_blank">Παράγγειλε μέσα από το Telegram</a></div>
+            
+            <button class="checkout" id="checkout" disabled>Ολοκλήρωση παραγγελίας</button>
         </div>
-        <div class="tg-note" id="tgNote" style="display:none;">💡 Θες επιβεβαίωση παραγγελίας στο κινητό σου; <a href="https://t.me/coffeevolta_bot" target="_blank">Παράγγειλε μέσα από το Telegram</a></div>
-        
-        <!-- Το κουμπί μεταφέρθηκε εδώ για να κάνει scroll μαζί με την υπόλοιπη φόρμα -->
-        <button class="checkout" id="checkout" disabled>Ολοκλήρωση παραγγελίας</button>
     </div>
 </aside>
 <div class="toast" id="toast"></div>
 
 <script>
+    // Σημαντικό: Κρατάει το καλάθι στην οθόνη επιτυχίας αν ο χρήστης βγει για να πληρώσει
+    window.isSuccessScreen = false;
+
     const PRODUCTS = [
         // Καφές
         { id: 'ellinikos', n: "Ελληνικός Μονός", p: 1.50, cat: 'coffee', sugar: true },
@@ -631,9 +635,16 @@
         if (isDrawer) document.getElementById('overlay').classList.add('open');
         document.body.classList.add('no-scroll');
     }
+    
     window.closeModal = function(id, isDrawer = false) {
         document.getElementById(id).classList.remove('open');
-        if (isDrawer) document.getElementById('overlay').classList.remove('open');
+        if (isDrawer) {
+            document.getElementById('overlay').classList.remove('open');
+            if (window.isSuccessScreen) {
+                window.isSuccessScreen = false;
+                updateCart(); // Όταν κλείνει το καλάθι, μηδενίζει και φεύγει η οθόνη επιτυχίας
+            }
+        }
         document.body.classList.remove('no-scroll');
     };
 
@@ -1034,6 +1045,20 @@
         const earned = Math.round(eligibleForPoints * 10) / 10;
 
         document.getElementById('cartCount').textContent = count;
+        
+        if (window.isSuccessScreen) return; // Εμποδίζει το interval να σβήσει το μήνυμα επιτυχίας!
+
+        const cartBody = document.getElementById('cartBody');
+        const drawerFoot = document.getElementById('drawerFoot');
+        
+        if (!count) { 
+            cartBody.innerHTML = '<div class="empty">Το καλάθι είναι άδειο.</div>'; 
+            drawerFoot.style.display = 'none';
+            return; 
+        }
+        
+        drawerFoot.style.display = 'block';
+
         document.getElementById('cartTotal').textContent = euro(total);
         const checkoutBtn = document.getElementById('checkout');
         checkoutBtn.disabled = count === 0 || !isOpen();
@@ -1056,11 +1081,7 @@
 
         renderRewards();
 
-        const cartBody = document.getElementById('cartBody');
-        if (!count) { cartBody.innerHTML = '<div class="empty">Το καλάθι είναι άδειο.</div>'; return; }
-        
         let html = '';
-        
         let hintsHtml = '';
         const cCount = crepeItems.length % 3;
         if (cCount > 0 && cCount < 3) {
@@ -1133,6 +1154,21 @@
         }
     }
 
+    // Το νέο κουμπί "Η Πληρωμή Ολοκληρώθηκε"
+    window.confirmTreatPayment = async function(cName, cPhone) {
+        const btn = document.getElementById('confirmPayBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Ενημέρωση καταστήματος...';
+        
+        const msg = `✅ <b>ΕΠΙΒΕΒΑΙΩΣΗ ΠΛΗΡΩΜΗΣ ΚΕΡΑΣΜΑΤΟΣ</b>\nΟ πελάτης ${cName} (${cPhone}) αναφέρει ότι ολοκλήρωσε την πληρωμή (IRIS/PayPal)!\nΠαρακαλούμε ελέγξτε τον λογαριασμό σας.`;
+        
+        await sendOrder({ text: msg });
+        
+        btn.textContent = '✔️ Ενημερώσαμε το κατάστημα!';
+        btn.style.background = '#1b5e20';
+        showToast('Ευχαριστούμε! Η παραγγελία ξεκινάει.');
+    };
+
     document.getElementById('checkout').onclick = async () => {
         if (!isOpen()) { alert('🌙 Είμαστε κλειστά αυτή τη στιγμή.\nΩράριο παραγγελιών: 06:00 – 22:00'); return; }
         
@@ -1141,8 +1177,7 @@
         const phone = document.getElementById('phoneField').value.trim();
         
         if (!name || !phone) { alert('Συμπληρώστε το ονοματεπώνυμο και το τηλέφωνό σας!'); return; }
-        saveData();
-
+        
         let treatText = '';
         let treatReceiptText = '';
         
@@ -1156,6 +1191,12 @@
             treatText = `\n\n🎁 <b>ΠΑΡΑΛΗΠΤΗΣ (Κερνιέται):</b>\nΌνομα: ${tName}\nΤηλέφωνο: ${tPhone}\nΕυχή: ${tMsg || '-'}`;
             treatReceiptText = `\n🎁 <b>Κέρασμα σε:</b> ${tName} (${tPhone})\n💬 <b>Μήνυμα:</b> ${tMsg || '-'}`;
         }
+
+        const btn = document.getElementById('checkout');
+        btn.disabled = true;
+        btn.textContent = '⏳ Παρακαλώ περιμένετε...';
+
+        saveData();
 
         const subtotal = getSubtotal();
         const extraDiscount = getExtraDiscount();
@@ -1228,38 +1269,66 @@
         });
 
         if (groupResult.success) {
+            window.isSuccessScreen = true; // Ενεργοποιούμε το flag επιτυχίας
+            
             const finalPts = (typeof groupResult.points === 'number') ? groupResult.points : newTotalPoints;
             setPoints(finalPts);
             cart.clear();
             redeemed.clear();
-            updateCart();
+            updateCart(); // Ανανεώνει το εικονίδιο του header σε 0, αλλά σταματάει εκεί.
             
+            document.getElementById('drawerFoot').style.display = 'none'; // Κρύβουμε τα πεδία/κουμπιά
+
+            const escName = customerName.replace(/'/g, "\\'");
+            const escPhone = phone.replace(/'/g, "\\'");
+
             if (isTreat) {
                 document.getElementById('cartBody').innerHTML = `
                     <div class="thanks" style="text-align:center; padding:10px 0;">
                         <h3 style="color:#d32f2f; margin-bottom:10px;">🎁 Το αίτημα κεράσματος εστάλη!</h3>
-                        <p style="font-size:0.9rem; margin-bottom:12px;">Για να προχωρήσει η παραγγελία, κάνε την πληρωμή (<b>${euro(totalAmount)}</b>) σε έναν από τους παρακάτω λογαριασμούς:</p>
-                        <div style="background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:12px; text-align:left; font-size:0.85rem; margin-bottom:12px;">
+                        <p style="font-size:0.95rem; margin-bottom:12px;">Για να προχωρήσει η παραγγελία, κάνε την πληρωμή (<b>${euro(totalAmount)}</b>) σε έναν από τους παρακάτω λογαριασμούς:</p>
+                        <div style="background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:12px; text-align:left; font-size:0.9rem; margin-bottom:16px;">
                             <strong style="color:var(--mocha);">1. IRIS (Εθνική / Όλες οι τράπεζες)</strong><br>
-                            ΑΦΜ: <b>126559439</b><br><br>
+                            <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; border:1px solid #ccc; padding:8px 10px; border-radius:6px; margin-top:6px; margin-bottom: 12px;">
+                                <span>ΑΦΜ: <b style="font-size:1.1rem; color:var(--mocha);">126559439</b></span>
+                                <button onclick="navigator.clipboard.writeText('126559439'); showToast('Το ΑΦΜ αντιγράφηκε!');" style="background:var(--mocha);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:0.8rem;cursor:pointer;font-weight:700;">📋 Αντιγραφή</button>
+                            </div>
                             <strong style="color:var(--mocha);">2. PayPal</strong><br>
-                            <a href="https://www.paypal.me/fragosapostolos79" target="_blank" style="color:#1a7fbc; font-weight:700; text-decoration:none;">🔗 Πάτησε εδώ για πληρωμή μέσω PayPal</a>
+                            <a href="https://www.paypal.me/fragosapostolos79" target="_blank" style="display:block; text-align:center; margin-top:6px; color:#1a7fbc; font-weight:700; text-decoration:none; background:#e7f3fb; padding:10px; border-radius:6px; border:1px solid #a9d3ee;">🔗 Πληρωμή στο PayPal</a>
                         </div>
-                        <p style="font-size:0.8rem; color:#6b5d4d; margin-bottom:12px;">Μόλις ολοκληρώσεις τη μεταφορά, πάτησε το παρακάτω κουμπί για να μας στείλεις το αποδεικτικό και να ετοιμάσουμε το κέρασμα!</p>
-                        <a href="https://t.me/kafevolta?direct" target="_blank" style="display:block; background:#2AABEE; color:#fff; text-decoration:none; padding:12px; border-radius:999px; font-weight:700;">💬 Στείλε μας το αποδεικτικό</a>
+                        <p style="font-size:0.85rem; color:#6b5d4d; margin-bottom:12px;">Όταν ολοκληρώσεις τη μεταφορά, πάτησε το παρακάτω κουμπί για να μας ειδοποιήσεις!</p>
+                        <button onclick="confirmTreatPayment('${escName}', '${escPhone}')" id="confirmPayBtn" style="width:100%; background:#2e7d32; color:#fff; border:none; padding:14px; border-radius:999px; font-weight:900; font-size:1rem; cursor:pointer; margin-bottom:10px; box-shadow:0 4px 10px rgba(46,125,50,0.3);">✅ Η πληρωμή ολοκληρώθηκε</button>
+                        <a href="https://t.me/kafevolta?direct" target="_blank" style="display:block; background:#2AABEE; color:#fff; text-decoration:none; padding:12px; border-radius:999px; font-weight:700; font-size:0.9rem;">💬 Ή στείλε μας μήνυμα/αποδεικτικό</a>
                     </div>`;
             } else {
                 const receiptNote = groupResult.receiptSent
                     ? '<br>📩 Σου στείλαμε επιβεβαίωση παραγγελίας στο Telegram!'
-                    : `<br><small>ℹ️ Η επιβεβαίωση δεν στάλθηκε${groupResult.receiptError ? ` (${groupResult.receiptError})` : ''}. Πάτησε Start στο @coffeevolta_bot για να λαμβάνεις επιβεβαιώσεις παραγγελίας.</small>`;
-                document.getElementById('cartBody').innerHTML = `<div class="thanks"><h3>Ευχαριστούμε!</h3><p>Παραλαβή σε ${time}</p><p>${gifts.length ? `🎁 ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}<br>` : ''}Κέρδισες ${formattedEarned} διαμάντια — σύνολο ${finalPts % 1 === 0 ? finalPts : finalPts.toFixed(1)} 💎${receiptNote}</p></div>`;
+                    : `<br><small>ℹ️ Η επιβεβαίωση δεν στάλθηκε. Πάτησε Start στο @coffeevolta_bot για να λαμβάνεις επιβεβαιώσεις.</small>`;
+                document.getElementById('cartBody').innerHTML = `
+                    <div class="thanks" style="text-align:center; padding: 20px 10px;">
+                        <h3 style="color:var(--mocha); font-size:1.4rem; margin-bottom:10px;">Ευχαριστούμε!</h3>
+                        <p style="font-size:1rem;">Παραλαβή: <strong>${time}</strong></p>
+                        <div style="margin-top:16px; background:var(--soft); padding:12px; border-radius:8px; border:1px solid var(--line);">
+                            ${gifts.length ? `<p style="margin-bottom:6px;">🎁 ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}</p>` : ''}
+                            <p>Κέρδισες <strong>${formattedEarned} 💎</strong></p>
+                            <p style="font-size:0.85rem; color:#6b5d4d; margin-top:4px;">Σύνολο: ${finalPts % 1 === 0 ? finalPts : finalPts.toFixed(1)} 💎</p>
+                        </div>
+                        <p style="margin-top:16px; font-size:0.9rem; color:#4d4336;">${receiptNote}</p>
+                    </div>`;
             }
+            
+            // Το παράθυρο κάνει αυτόματα scroll τέρμα πάνω
+            document.querySelector('.drawer-body').scrollTop = 0;
             
             document.getElementById('commentField').value = '';
             document.getElementById('isTreat').checked = false;
             document.getElementById('treatFields').style.display = 'none';
+            document.getElementById('timeField').style.display = 'block';
+            btn.textContent = 'Ολοκλήρωση παραγγελίας'; // Επαναφορά για την επόμενη φορά
         } else {
-            alert(`❌ Απέτυχε να σταλεί στην ΟΜΑΔΑ!\nΛόγος: ${groupResult.error}\n\nΒεβαιώσου ότι το bot είναι μέλος και διαχειριστής της ομάδας.`);
+            alert(`❌ Απέτυχε να σταλεί στην ΟΜΑΔΑ!\nΛόγος: ${groupResult.error}`);
+            btn.disabled = false;
+            btn.textContent = 'Ολοκλήρωση παραγγελίας';
         }
     };
 
