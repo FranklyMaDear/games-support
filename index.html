@@ -114,6 +114,17 @@
         .bk-row { display: flex; gap: 8px; }
         .bk-row label { flex: 1; }
         
+        /* ★ CSS Για 3D Παράθυρο Παιχνιδιών */
+        .games-box { border: 3px solid #ff9800; box-shadow: 0 10px 40px rgba(255, 152, 0, 0.4), inset 0 0 20px rgba(255, 152, 0, 0.1); background: #fffcf9; overflow: hidden; }
+        .games-head { background: linear-gradient(135deg, #ff9800, #e65100); border-bottom: none; }
+        .games-head h2 { color: #fff; text-shadow: 1px 2px 4px rgba(0,0,0,0.3); font-size: 1.2rem; }
+        .games-head .pl-close { color: #fff; text-shadow: 1px 2px 4px rgba(0,0,0,0.3); opacity: 0.9; }
+        .game-cat-title { font-family: 'Literata', serif; color: var(--mocha-dark); font-weight: 900; font-size: 1.05rem; margin: 18px 0 10px; border-bottom: 2px dashed #ffcc80; padding-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .game-cat-title:first-child { margin-top: 0; }
+        .game-links-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .game-link-btn { background: linear-gradient(to bottom, #ffffff, #fff3e0); border: 2px solid #ffb74d; border-radius: 12px; padding: 12px 6px; text-align: center; text-decoration: none; color: var(--mocha-dark); font-weight: 700; font-size: 0.85rem; transition: all 0.15s ease-out; box-shadow: 0 5px 0 #ff9800, 0 8px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-family: 'Commissioner', sans-serif; position: relative; top: 0; }
+        .game-link-btn:active { top: 5px; box-shadow: 0 0 0 #ff9800, 0 2px 4px rgba(0,0,0,0.1); background: #fff3e0; }
+
         .tg-banner { max-width: 1100px; margin: 0 auto; padding: 6px 16px 0; }
         .tg-banner-inner { background: #e7f3fb; border: 1px solid #a9d3ee; border-radius: 10px; padding: 10px 12px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 8px; }
         .tg-btn { align-self: flex-start; background: #2AABEE; color: #fff; text-decoration: none; border-radius: 999px; padding: 6px 14px; font-weight: 700; font-size: 0.8rem; }
@@ -296,8 +307,45 @@
 <section class="entertainment-grid">
     <a class="ent-card" href="https://t.me/omenread_bot" target="_blank">🔮 Καφεμαντεία</a>
     <button class="ent-card" id="openEvents">🎉 Εκδηλώσεις</button>
-    <a class="ent-card full" href="https://t.me/Franklygames_bot/games" target="_blank">🎮 Games & Εβδομαδιαίες Κληρώσεις</a>
+    <button class="ent-card full" id="openGamesModal">🎮 Παίξε δωρεάν παιχνίδια και κέρδισε δώρο κάρτες</button>
 </section>
+
+<!-- ★ 3D Αναδυόμενο Παράθυρο Παιχνιδιών -->
+<div class="pl-overlay" id="gamesOverlay">
+    <div class="pl-box games-box">
+        <div class="pl-head games-head">
+            <h2>🎮 Παίξε δωρεάν παιχνίδια</h2>
+            <button class="pl-close" onclick="closeModal('gamesOverlay')">&times;</button>
+        </div>
+        <div class="pl-body games-body">
+            
+            <div class="game-cat-title">🕹️ Games</div>
+            <div class="game-links-grid">
+                <a class="game-link-btn" href="https://t.me/Franklygames_bot/chess" target="_blank"><span>♟️</span> Chess</a>
+                <a class="game-link-btn" href="https://t.me/Franklygames_bot/animals" target="_blank"><span>🦁</span> Animals</a>
+                <a class="game-link-btn" href="https://t.me/Franklygames_bot/connectfour" target="_blank"><span>🔴</span> Connect 4</a>
+                <a class="game-link-btn" href="https://t.me/Franklygames_bot/sudoku" target="_blank"><span>🔢</span> Sudoku</a>
+                <a class="game-link-btn" href="https://t.me/Franklygames_bot/balloons" target="_blank"><span>🎈</span> Balloons</a>
+                <a class="game-link-btn" href="https://t.me/crackthecodes_bot/codewords" target="_blank"><span>📝</span> Codewords</a>
+                <a class="game-link-btn" href="https://t.me/Franklygames_bot/cubes3d" target="_blank"><span>🧊</span> Cube</a>
+                <a class="game-link-btn" href="https://t.me/Franklygames_bot/drop4096aziram" target="_blank"><span>🧩</span> Drop 4096</a>
+            </div>
+
+            <div class="game-cat-title">☕ Palmistry - Coffee Reading</div>
+            <div class="game-links-grid">
+                <a class="game-link-btn" href="https://t.me/lifeline2026_bot/games" target="_blank"><span>✋</span> LifeLine</a>
+                <a class="game-link-btn" href="https://t.me/omenread_bot/omen" target="_blank"><span>🔮</span> Omen</a>
+            </div>
+
+            <div class="game-cat-title">🇬🇷 Find The Words Greece</div>
+            <div class="game-links-grid">
+                <a class="game-link-btn" href="https://t.me/crackthecodes_bot/kids" target="_blank"><span>🧒</span> Kids</a>
+                <a class="game-link-btn" href="https://t.me/crackthecodes_bot/games" target="_blank"><span>🔑</span> CrackTheCode</a>
+            </div>
+            
+        </div>
+    </div>
+</div>
 
 <!-- ★ Αναδυόμενο παράθυρο: Διαδικασία Κεράσματος -->
 <div class="pl-overlay" id="treatOverlay">
@@ -592,7 +640,7 @@
             sessionStorage.setItem('kv_in_eu', data.in_eu ? 'true' : 'false');
         } catch (e) {
             console.error('Geo fallback');
-            sessionStorage.setItem('kv_in_eu', 'false'); // Προεπιλογή: Διεθνής χρέωση
+            sessionStorage.setItem('kv_in_eu', 'false'); 
         }
     }
     fetchUserLocation();
@@ -635,11 +683,11 @@
         { id: 'icecone', n: "Παγωτό Χωνάκι (🍦)", p: 1.50, cat: 'icecream' },
         { id: 'icecup', n: "Παγωτό Κύπελλο (🍧)", p: 1.50, cat: 'icecream' },
         
-        // Νέα Προϊόντα - Ποτά
         { id: 'whiskey', n: "Ουίσκι", p: 4.00, cat: 'alcohol' },
         { id: 'beer-can-500', n: "Μπύρα κουτί 500ml", p: 2.50, cat: 'alcohol' },
         { id: 'beer-draft-500', n: "Βαρελίσια 500 ml", p: 3.00, cat: 'alcohol' },
-        { id: 'beer-draft-330', n: "Βαρελίσια 330 ml", p: 2.50, cat: 'alcohol' }
+        { id: 'beer-draft-330', n: "Βαρελίσια 330 ml", p: 2.50, cat: 'alcohol' },
+        { id: 'wine-330', n: "Κρασί 330ml", p: 2.00, cat: 'alcohol' }
     ];
     
     const CAT_NAMES = {
@@ -654,7 +702,6 @@
     };
     const FLAVORS = ['Βανίλια', 'Σοκολάτα', 'Φράουλα', 'Μπανάνα', 'Στρατσιατέλα', 'Καϊμάκι'];
 
-    // Ανανεωμένο σύστημα επιβράβευσης
     const REWARDS = [
         { id: 'discount-250', name: 'Έκπτωση 2,50€ (Εξαιρούνται κρέπες/παγωτά)', cost: 25, value: 2.50 },
         { id: 'discount-400', name: 'Έκπτωση 4,00€ (Εξαιρούνται κρέπες/παγωτά)', cost: 40, value: 4.00 }
@@ -709,7 +756,7 @@
         document.body.classList.remove('no-scroll');
     };
 
-    ['plOverlay', 'offersOverlay', 'evOverlay', 'bkOverlay', 'treatOverlay', 'shareOverlay'].forEach(id => {
+    ['plOverlay', 'offersOverlay', 'evOverlay', 'bkOverlay', 'treatOverlay', 'shareOverlay', 'gamesOverlay'].forEach(id => {
         const el = document.getElementById(id);
         el.addEventListener('click', e => { if (e.target === el) closeModal(id); });
     });
@@ -785,7 +832,6 @@
             if (!items.length) return;
             html += `<div class="pl-cat">${CAT_NAMES[cat].replace(/[^A-Za-zΑ-Ωα-ωά-ώί-ίύ-ύό-όέ-έή-ή ]/g, '')}</div>`;
             
-            // 18+ Προειδοποίηση για αλκοόλ
             if (cat === 'alcohol') {
                 html += `<div class="pl-note" style="color:#d32f2f; font-weight:bold; margin-bottom: 6px;">⚠️ Απαγορεύεται η κατανάλωση αλκοόλ σε άτομα κάτω των 18 ετών.</div>`;
             }
@@ -807,6 +853,11 @@
     document.getElementById('openEvents').onclick = () => openModal('evOverlay');
     document.getElementById('openCart').onclick = () => openModal('drawer', true);
     document.getElementById('openBooking').onclick = () => { closeModal('evOverlay'); openModal('bkOverlay'); };
+
+    const openGamesBtn = document.getElementById('openGamesModal');
+    if (openGamesBtn) {
+        openGamesBtn.onclick = () => openModal('gamesOverlay');
+    }
 
     const openShareBtn = document.getElementById('openShareModalBtn');
     if (openShareBtn) {
@@ -1056,8 +1107,6 @@
     }
 
     function getRewardDiscount() {
-        // Η έκπτωση εφαρμόζεται μόνο στα προϊόντα που επιτρέπονται (όχι κρέπες, όχι παγωτά)
-        // αφού αφαιρέσουμε πρώτα τυχόν έτοιμες προσφορές 2+1 που αφορούν αυτά τα προϊόντα.
         const eligibleTotal = Math.max(0, getEligibleSubtotal() - getExtraDiscount());
         return Math.min(redeemedValueTotal(), eligibleTotal);
     }
