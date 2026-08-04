@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Καφέ Βόλτα — Online Παραγγελίες</title>
     <meta name="description" content="Παράγγειλε online & παρέλαβε χωρίς αναμονή! 💎 1€ = 1 διαμάντι · Προσφορές Αυγούστου · 🥞 3 κρέπες = +1 ΔΩΡΟ. Φήκη Τρικάλων · 06:00–22:00">
-    <!-- Η εικόνα για τον γενικό διαμοιρασμό της σελίδας παραμένει η photo.png -->
     <meta property="og:title" content="Καφέ Βόλτα ☕ Online Παραγγελίες & Διαμάντια">
     <meta property="og:description" content="Ο καφές σου έτοιμος πριν φτάσεις! Μάζεψε διαμάντια. 25💎= 1 ρόφημα · 40💎= 2 ροφήματα · 🥞 3+1 ΔΩΡΟ · 🔮 Καφεμαντεία! Φήκη Τρικάλων · 06:00–22:00">
     <meta property="og:type" content="website">
@@ -74,12 +73,13 @@
         
         /* ★ Share Banner */
         .share-banner { max-width: 1100px; margin: 6px auto; padding: 0 16px; }
-        .share-banner-inner { background: linear-gradient(135deg, #fffcf9, #ffecb3); border: 1px dashed #ff9800; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; align-items: stretch; box-shadow: 0 4px 10px rgba(255, 152, 0, 0.12); }
-        .share-icon { font-size: 1.8rem; line-height: 1; }
-        .share-text { flex: 1; display: flex; flex-direction: column; }
-        .share-text strong { color: #e65100; font-size: 0.9rem; font-family: 'Literata', serif; font-weight: 900; }
-        .share-text span { color: #b26a00; font-size: 0.75rem; line-height: 1.3; margin-top: 2px; }
-        .share-btn { background: #ff9800; color: #fff; border: none; border-radius: 999px; padding: 8px 16px; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 2px 6px rgba(255,152,0,0.3); font-family: 'Commissioner', sans-serif; white-space: nowrap; transition: transform 0.2s; align-self: center; width: 100%;}
+        .share-banner-inner { background: #fff8e1; border: 1px dashed #ffb300; border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 0 4px 10px rgba(255, 152, 0, 0.08); }
+        .share-text-wrap { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .share-icon { font-size: 2rem; line-height: 1; }
+        .share-text { display: flex; flex-direction: column; }
+        .share-text strong { color: #e65100; font-size: 1.05rem; font-family: 'Literata', serif; font-weight: 900; line-height: 1.2; }
+        .share-text span { color: #8d6e63; font-size: 0.8rem; line-height: 1.3; margin-top: 4px; }
+        .share-btn { background: #ff9800; color: #fff; border: none; border-radius: 999px; padding: 10px 18px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(255,152,0,0.25); font-family: 'Commissioner', sans-serif; white-space: nowrap; transition: transform 0.2s; }
         .share-btn:active { transform: scale(0.95); }
 
         /* ★ Πλαίσια Πόντων */
@@ -231,20 +231,43 @@
     </div>
 </section>
 
-<!-- ★ Νέο πλαίσιο για Κοινοποίηση -->
+<!-- ★ Πλαίσιο για Κοινοποίηση -->
 <section class="share-banner">
     <div class="share-banner-inner">
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="share-text-wrap">
             <div class="share-icon">🎁</div>
             <div class="share-text">
-                <strong>Ζήτα από έναν φίλο να σε κεράσει!</strong>
-                <span>Στείλε το link σε chat ή social media.</span>
+                <strong>Ζήτα από έναν φίλο<br>να σε κεράσει!</strong>
+                <span>Στείλε το link της εφαρμογής<br>σε chat, social media ή email.</span>
             </div>
         </div>
-        <textarea id="customShareText" rows="2" placeholder="Γράψε το δικό σου μήνυμα (προαιρετικό)..." style="width:100%; border:1px solid #ffb74d; border-radius:6px; padding:6px; font-family:inherit; font-size:0.85rem;"></textarea>
-        <button class="share-btn" id="askTreatBtn">📤 Κοινοποίηση</button>
+        <button class="share-btn" id="openShareModalBtn">📤 Κοινοποίηση</button>
     </div>
 </section>
+
+<!-- ★ Αναδυόμενο παράθυρο Κοινοποίησης (Κέρασμα) -->
+<div class="pl-overlay" id="shareOverlay">
+    <div class="pl-box">
+        <div class="pl-head">
+            <h2>🎁 Ζήτα ένα <em>κέρασμα</em></h2>
+            <button class="pl-close" onclick="closeModal('shareOverlay')">&times;</button>
+        </div>
+        <div class="pl-body">
+            <div style="background: #fff3e0; padding: 14px; border-radius: 8px; margin-bottom: 16px; text-align: center; border: 1px dashed #ffb74d;">
+                <span style="font-size: 2.2rem;">☕</span>
+                <h4 style="color: #e65100; margin-top: 8px; font-family: 'Literata', serif; font-size: 1.1rem;">Κάνε την έκπληξη!</h4>
+                <p style="font-size: 0.85rem; color: #6d4c41; margin-top: 4px; line-height: 1.4;">Το μήνυμά σου, μαζί με την κάρτα του eShop μας, θα ενσωματωθούν αυτόματα σε ένα όμορφο πλαίσιο κατά την αποστολή!</p>
+            </div>
+            
+            <label style="font-size: 0.85rem; font-weight: 700; color: var(--mocha); display: block; margin-bottom: 6px;">Το μήνυμά σου (προαιρετικό):</label>
+            <textarea id="customShareTextModal" rows="3" style="width:100%; border:1px solid #e0e0e0; border-radius:8px; padding:12px; font-family:inherit; font-size:0.9rem; resize: vertical;" placeholder="π.χ. Έλα, κέρνα έναν καφεδάκο! 😉"></textarea>
+            <p style="font-size: 0.75rem; color: #888; margin-top: 6px; font-style: italic;">*Αν το αφήσεις κενό, θα σταλεί το δικό μας έτοιμο κείμενο.</p>
+        </div>
+        <div class="pl-foot ev-foot">
+            <button class="msg-btn" id="doShareBtn" style="background: #ff9800; color: #fff; box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3); font-size: 1rem;">📤 Αποστολή Μηνύματος</button>
+        </div>
+    </div>
+</div>
 
 <!-- ★ Τα 3 Πλαίσια των Πόντων (Διαμάντια) -->
 <section class="offers">
@@ -291,7 +314,7 @@
             <div style="margin-top:12px; font-size: 0.85rem; line-height: 1.6; color: var(--mocha-dark);">
                 <p><strong>1. Διάλεξε προϊόντα:</strong> Πρόσθεσε στο καλάθι τους καφέδες ή το ρόφημα που θέλεις να κεράσεις.</p>
                 <p style="margin-top:8px;"><strong>2. Πάτα το κουτάκι:</strong> Μέσα στο καλάθι, επέλεξε το <em>"🎁 Είναι κέρασμα / δώρο;"</em> και συμπλήρωσε το όνομα και το τηλέφωνο του φίλου σου.</p>
-                <p style="margin-top:8px;"><strong>3. Ολοκλήρωση & Πληρωμή:</strong> Πάτα "Ολοκλήρωση παραγγελίας". Το σύστημα θα σου εμφανίσει το <strong>IRIS</strong> και το <strong>PayPal/Revolut</strong> μας για να κάνεις τη μεταφορά.</p>
+                <p style="margin-top:8px;"><strong>3. Ολοκλήρωση & Πληρωμή:</strong> Πάτα "Ολοκλήρωση παραγγελίας". Το σύστημα θα σου εμφανίσει το <strong>IRIS</strong> και το <strong>Revolut</strong> μας για να κάνεις τη μεταφορά.</p>
                 <p style="margin-top:8px;"><strong>4. Το αναλαμβάνουμε εμείς:</strong> Μόλις λάβουμε την παραγγελία και το αποδεικτικό σου, επικοινωνούμε μαζί του για να του παραδώσουμε το κέρασμα!</p>
             </div>
         </div>
@@ -508,7 +531,6 @@
 
             <div class="discount-line" id="discountLine" style="display:none;"><span>🎁 Έκπτωση δώρου</span><span id="discountValue"></span></div>
             <div class="discount-line" id="extraDiscountLine" style="display:none; color:#e65100;"><span>🎁 Προσφορά</span><span id="extraDiscountValue"></span></div>
-            <!-- ΝΕΑ ΓΡΑΜΜΗ ΠΡΟΜΗΘΕΙΑΣ REVOLUT -->
             <div class="discount-line" id="feeLine" style="display:none; color:#c62828;"><span>💳 Έξοδα Συναλλαγής (Revolut)</span><span id="feeValue"></span></div>
             <div class="totals"><span>Σύνολο</span><span id="cartTotal">0,00 €</span></div>
 
@@ -539,6 +561,11 @@
                 <input type="text" id="nameField" placeholder="Το Ονοματεπώνυμό σου *">
                 <input type="tel" id="phoneField" placeholder="Το Τηλέφωνό σου *">
                 <textarea id="commentField" placeholder="Σχόλιο για την παραγγελία" rows="2"></textarea>
+                
+                <div id="payOnPickupNote" style="font-size: 0.8rem; color: #2e7d32; font-weight: 700; background: #e8f5e9; padding: 8px; border-radius: 6px; border: 1px dashed #a5d6a7; text-align: center;">
+                    💳 Πληρωμή στο κατάστημα κατά την παραλαβή
+                </div>
+
                 <select id="timeField">
                     <option value="Σε 5 λεπτά">Παραλαβή σε 5'</option>
                     <option value="Σε 10 λεπτά" selected>Παραλαβή σε 10'</option>
@@ -556,11 +583,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    // Σημαντικό: Κρατάει το καλάθι στην οθόνη επιτυχίας αν ο χρήστης βγει για να πληρώσει
     window.isSuccessScreen = false;
 
     const PRODUCTS = [
-        // Καφές
         { id: 'ellinikos', n: "Ελληνικός Μονός", p: 1.50, cat: 'coffee', sugar: true },
         { id: 'ellinikos2', n: "Ελληνικός Διπλός", p: 1.50, cat: 'coffee', sugar: true },
         { id: 'nescafe', n: "Nescafé", p: 1.50, cat: 'coffee', sugar: true },
@@ -577,30 +602,24 @@
         { id: 'latte', n: "Latte", p: 2.00, cat: 'coffee', sugar: true },
         { id: 'sokolatavien', n: "Σοκολάτα Βιεννουά", p: 2.20, cat: 'coffee', sugar: true },
         
-        // ★ Ροφήματα (Γρανίτα & Milkshake με γεύσεις)
         { id: 'granita', n: "Γρανίτα", p: 1.50, cat: 'rofimata', isDrinkFlavors: true, flavList: ['Φράουλα', 'Καρπούζι', 'Λεμόνι'] },
         { id: 'milkshake', n: "Milkshake", p: 2.00, cat: 'rofimata', isDrinkFlavors: true, flavList: ['Βανίλια', 'Σοκολάτα', 'Φράουλα'] },
 
-        // Αναψυκτικά
         { id: 'cola', n: "Coca Cola", p: 1.50, cat: 'soft' },
         { id: 'portokalada', n: "Πορτοκαλάδα", p: 1.50, cat: 'soft' },
         { id: 'lemonada', n: "Λεμονάδα", p: 1.50, cat: 'soft' },
         { id: 'soda', n: "Σόδα", p: 1.50, cat: 'soft' },
         { id: 'gazoza', n: "Γκαζόζα", p: 1.50, cat: 'soft' },
         { id: 'vyssinada', n: "Βυσσινάδα", p: 1.50, cat: 'soft' },
-        // Ice Tea
         { id: 'icetea-lemoni', n: "Ice Tea Λεμόνι", p: 1.50, cat: 'icetea' },
         { id: 'icetea-rodakino', n: "Ice Tea Ροδάκινο", p: 1.50, cat: 'icetea' },
-        // Χυμοί Κλιάφα
         { id: 'xymos-portokali', n: "Χυμός Πορτοκάλι", p: 1.50, cat: 'juice' },
         { id: 'xymos-rodakino', n: "Χυμός Ροδάκινο", p: 1.50, cat: 'juice' },
         { id: 'xymos-anameiktos', n: "Χυμός Ανάμεικτος", p: 1.50, cat: 'juice' },
         { id: 'xymos-vyssino', n: "Χυμός Βύσσινο", p: 1.50, cat: 'juice' },
-        // Κρέπα
         { id: 'crepa-sok', n: "Κρέπα Σοκολάτα", p: 2.70, cat: 'crepe', crepe: true },
         { id: 'crepa-fraoula', n: "Κρέπα Φράουλα", p: 2.70, cat: 'crepe', crepe: true },
         { id: 'crepa-bueno', n: "Κρέπα Bueno", p: 2.70, cat: 'crepe', crepe: true },
-        // Παγωτό
         { id: 'icecone', n: "Παγωτό Χωνάκι (🍦)", p: 1.50, cat: 'icecream' },
         { id: 'icecup', n: "Παγωτό Κύπελλο (🍧)", p: 1.50, cat: 'icecream' }
     ];
@@ -644,7 +663,8 @@
     document.getElementById('isTreat').addEventListener('change', function() {
         document.getElementById('treatFields').style.display = this.checked ? 'flex' : 'none';
         document.getElementById('timeField').style.display = this.checked ? 'none' : 'block';
-        updateCart(); // Ανανεώνει το σύνολο
+        document.getElementById('payOnPickupNote').style.display = this.checked ? 'none' : 'block';
+        updateCart();
     });
 
     document.querySelectorAll('input[name="payMethod"]').forEach(radio => {
@@ -663,13 +683,13 @@
             document.getElementById('overlay').classList.remove('open');
             if (window.isSuccessScreen) {
                 window.isSuccessScreen = false;
-                updateCart(); // Όταν κλείνει το καλάθι, μηδενίζει και φεύγει η οθόνη επιτυχίας
+                updateCart();
             }
         }
         document.body.classList.remove('no-scroll');
     };
 
-    ['plOverlay', 'offersOverlay', 'evOverlay', 'bkOverlay', 'treatOverlay'].forEach(id => {
+    ['plOverlay', 'offersOverlay', 'evOverlay', 'bkOverlay', 'treatOverlay', 'shareOverlay'].forEach(id => {
         const el = document.getElementById(id);
         el.addEventListener('click', e => { if (e.target === el) closeModal(id); });
     });
@@ -685,7 +705,6 @@
         localStorage.setItem(LS_FAVS, JSON.stringify(favs));
     }
 
-    // Προσφορές μέχρι 31 Αυγούστου 2026, 23:59:59
     const crepeEndDate = new Date('2026-08-31T23:59:59');
 
     function formatTimeDiff(ms) {
@@ -763,47 +782,38 @@
     document.getElementById('openCart').onclick = () => openModal('drawer', true);
     document.getElementById('openBooking').onclick = () => { closeModal('evOverlay'); openModal('bkOverlay'); };
 
-    // Νέα λειτουργία κοινοποίησης Κεράσματος (Στέλνει και τη φωτογραφία photo2.png)
-    const askBtn = document.getElementById('askTreatBtn');
-    if (askBtn) {
-        askBtn.onclick = async () => {
-            const userText = document.getElementById('customShareText').value.trim();
-            const shareTitle = 'Καφέ Βόλτα — Κέρασε έναν φίλο!';
+    const openShareBtn = document.getElementById('openShareModalBtn');
+    if (openShareBtn) {
+        openShareBtn.onclick = () => openModal('shareOverlay');
+    }
+
+    const doShareBtn = document.getElementById('doShareBtn');
+    if (doShareBtn) {
+        doShareBtn.onclick = async () => {
+            const userText = document.getElementById('customShareTextModal').value.trim();
             const defaultText = 'Γεια! ☕ Μήπως ήρθε η ώρα να με κεράσεις έναν καφέ; Μπες στο Καφέ Βόλτα, διάλεξε ό,τι θες και κάνε μου την έκπληξη! 🎁👇';
-            const shareText = userText !== '' ? userText : defaultText;
+            
+            const finalMessage = userText !== '' ? userText : defaultText;
+            
+            const shareTitle = 'Καφέ Βόλτα — Κέρασε έναν φίλο!';
             const shareUrl = 'https://volta.franklygames.com/';
             
             if (navigator.share) {
                 try {
-                    // Λήψη της photo2.png για να την στείλει ως αρχείο
-                    const imgRes = await fetch('photo2.png');
-                    const imgBlob = await imgRes.blob();
-                    const file = new File([imgBlob], 'photo2.png', { type: imgBlob.type });
-
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            title: shareTitle,
-                            text: shareText,
-                            url: shareUrl,
-                            files: [file]
-                        });
-                    } else {
-                        // Αν η συσκευή/browser δεν υποστηρίζει αρχεία, θα στείλει το URL και θα δείξει το photo.png
-                        await navigator.share({
-                            title: shareTitle,
-                            text: shareText,
-                            url: shareUrl
-                        });
-                    }
+                    await navigator.share({
+                        title: shareTitle,
+                        text: finalMessage,
+                        url: shareUrl
+                    });
+                    closeModal('shareOverlay');
                 } catch (err) {
                     console.log('Share error', err);
-                    // Fallback 
-                    navigator.share({ title: shareTitle, text: shareText, url: shareUrl }).catch(e=>console.log(e));
                 }
             } else {
-                const copyText = shareText + "\n" + shareUrl;
+                const copyText = finalMessage + "\n" + shareUrl;
                 navigator.clipboard.writeText(copyText).then(() => {
-                    showToast('Το μήνυμα αντιγράφηκε! Κάνε επικόλληση (paste) όπου θέλεις.');
+                    showToast('Το μήνυμα αντιγράφηκε! Κάνε επικόλληση όπου θέλεις.');
+                    closeModal('shareOverlay');
                 }).catch(() => {
                     showToast('Απέτυχε η αντιγραφή.');
                 });
@@ -1074,7 +1084,6 @@
         const extraDiscount = getExtraDiscount(); 
         const rewardDiscount = getRewardDiscount();
 
-        // Υπολογισμός Προμήθειας Revolut (2.8% + 0.20)
         const isTreat = document.getElementById('isTreat').checked;
         const payMethod = document.querySelector('input[name="payMethod"]:checked')?.value || 'iris';
         let transactionFee = 0;
@@ -1096,12 +1105,11 @@
         for(let i=0; i < mSets * 3; i++) pointsDeduction += milkshakeItems[i];
         
         const eligibleForPoints = Math.max(0, subtotal - pointsDeduction - rewardDiscount);
-        // Κρατάμε 1 δεκαδικό για τα διαμάντια
         const earned = Math.round(eligibleForPoints * 10) / 10;
 
         document.getElementById('cartCount').textContent = count;
         
-        if (window.isSuccessScreen) return; // Εμποδίζει το interval να σβήσει το μήνυμα επιτυχίας!
+        if (window.isSuccessScreen) return;
 
         const cartBody = document.getElementById('cartBody');
         const drawerFoot = document.getElementById('drawerFoot');
@@ -1131,7 +1139,6 @@
             document.getElementById('extraDiscountValue').textContent = '−' + euro(extraDiscount);
         } else exLine.style.display = 'none';
 
-        // Εμφάνιση προμήθειας Revolut
         const fLine = document.getElementById('feeLine');
         if (transactionFee > 0) {
             fLine.style.display = 'flex';
@@ -1218,7 +1225,6 @@
         }
     }
 
-    // Το νέο κουμπί "Η Πληρωμή Ολοκληρώθηκε"
     window.confirmTreatPayment = async function(cName, cPhone) {
         const btn = document.getElementById('confirmPayBtn');
         btn.disabled = true;
@@ -1233,7 +1239,6 @@
         showToast('Ευχαριστούμε! Η παραγγελία ξεκινάει.');
     };
 
-    // ΕΔΩ Η ΔΙΟΡΘΩΣΗ ΓΙΑ ΤΟ SCROLL ΠΛΗΚΤΡΟΛΟΓΙΟΥ! 
     document.addEventListener('touchstart', e => {
         if (!e.target.closest('input, textarea, select, button, a')) {
             const a = document.activeElement;
@@ -1242,7 +1247,6 @@
     }, { passive: true });
 
     document.getElementById('checkout').onclick = async () => {
-        // Κρύβουμε χειροκίνητα το πληκτρολόγιο με το που πατήσει Ολοκλήρωση
         if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
             document.activeElement.blur();
         }
@@ -1312,7 +1316,6 @@
 
         const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
         const comment = document.getElementById('commentField').value.trim();
-        // Αν είναι κέρασμα, δεν στέλνουμε χρόνο παραλαβής
         const time = isTreat ? '-' : document.getElementById('timeField').value;
         const customerName = name || (tgUser?.first_name || 'Πελάτης');
 
@@ -1354,15 +1357,15 @@
         });
 
         if (groupResult.success) {
-            window.isSuccessScreen = true; // Ενεργοποιούμε το flag επιτυχίας
+            window.isSuccessScreen = true;
             
             const finalPts = (typeof groupResult.points === 'number') ? groupResult.points : newTotalPoints;
             setPoints(finalPts);
             cart.clear();
             redeemed.clear();
-            updateCart(); // Ανανεώνει το εικονίδιο του header σε 0, αλλά σταματάει εκεί.
+            updateCart();
             
-            document.getElementById('drawerFoot').style.display = 'none'; // Κρύβουμε τα πεδία/κουμπιά
+            document.getElementById('drawerFoot').style.display = 'none';
 
             const escName = customerName.replace(/'/g, "\\'");
             const escPhone = phone.replace(/'/g, "\\'");
@@ -1413,14 +1416,14 @@
                     </div>`;
             }
             
-            // Το παράθυρο κάνει αυτόματα scroll τέρμα πάνω
             document.querySelector('.drawer-body').scrollTop = 0;
             
             document.getElementById('commentField').value = '';
             document.getElementById('isTreat').checked = false;
             document.getElementById('treatFields').style.display = 'none';
             document.getElementById('timeField').style.display = 'block';
-            btn.textContent = 'Ολοκλήρωση παραγγελίας'; // Επαναφορά για την επόμενη φορά
+            document.getElementById('payOnPickupNote').style.display = 'block';
+            btn.textContent = 'Ολοκλήρωση παραγγελίας';
         } else {
             alert(`❌ Απέτυχε να σταλεί στην ΟΜΑΔΑ!\nΛόγος: ${groupResult.error}`);
             btn.disabled = false;
