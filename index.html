@@ -237,7 +237,7 @@
     <div class="hero-btns-top">
         <button class="pricelist-btn" id="openPricelist">📋 Τιμοκατάλογος</button>
         <button class="pricelist-btn" id="openOffers">📣 Προσφορές</button>
-        <button class="pricelist-btn" id="openTreatInfo" style="color: #e65100; border-color: #ff9800;">🎁 Κέρασε</button>
+        <button class="pricelist-btn" id="openTreatInfo" style="color: #e65100; border-color: #ff9800;">🎁 Διαδικασία πως θα κεράσεις</button>
     </div>
 </section>
 
@@ -359,7 +359,7 @@
             <div style="margin-top:12px; font-size: 0.85rem; line-height: 1.6; color: var(--mocha-dark);">
                 <p><strong>1. Διάλεξε προϊόντα:</strong> Πρόσθεσε στο καλάθι τα προϊόντα που θέλεις να κεράσεις.</p>
                 <p style="margin-top:8px;"><strong>2. Πάτα το κουτάκι:</strong> Μέσα στο καλάθι, επέλεξε το <em>"🎁 Είναι κέρασμα / δώρο;"</em> και συμπλήρωσε το όνομα και το τηλέφωνο του φίλου σου.</p>
-                <p style="margin-top:8px;"><strong>3. Ολοκλήρωση & Πληρωμή:</strong> Πάτα "Ολοκλήρωση παραγγελίας". Το σύστημα θα σου εμφανίσει το <strong>IRIS</strong> και τη <strong>Revolut</strong> μας για να κάνεις τη μεταφορά.</p>
+                <p style="margin-top:8px;"><strong>3. Ολοκλήρωση & Πληρωμή:</strong> Πάτα "Συνέχεια για πληρωμή". Το σύστημα θα σου εμφανίσει το <strong>IRIS</strong> και τη <strong>Revolut</strong> μας για να κάνεις τη μεταφορά.</p>
                 <p style="margin-top:8px;"><strong>4. Το αναλαμβάνουμε εμείς:</strong> Μόλις λάβουμε την παραγγελία και το αποδεικτικό σου, επικοινωνούμε μαζί του για να του παραδώσουμε το κέρασμα!</p>
             </div>
         </div>
@@ -608,8 +608,16 @@
                 <input type="tel" id="phoneField" placeholder="Το Τηλέφωνό σου *">
                 <textarea id="commentField" placeholder="Σχόλιο για την παραγγελία" rows="2"></textarea>
                 
-                <div id="payOnPickupNote" style="font-size: 0.8rem; color: #2e7d32; font-weight: 700; background: #e8f5e9; padding: 8px; border-radius: 6px; border: 1px dashed #a5d6a7; text-align: center;">
-                    💳 Πληρωμή στο κατάστημα κατά την παραλαβή
+                <div id="standardPayFields" style="margin-bottom: 12px; background: #f0f4f8; padding: 10px; border-radius: 8px; border: 1px dashed #90caf9;">
+                    <span style="font-size:0.85rem; color:#1565c0; font-weight:700;">Τρόπος Πληρωμής (Παραλαβή από το κατάστημα):</span>
+                    <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer; margin-top:6px;">
+                        <input type="radio" name="stdPayMethod" value="store" checked style="width:16px; height:16px; accent-color:#1565c0;"> 
+                        <strong>Πληρωμή στο κατάστημα</strong> (Μετρητά/Κάρτα)
+                    </label>
+                    <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer; margin-top:6px;">
+                        <input type="radio" name="stdPayMethod" value="iris" style="width:16px; height:16px; accent-color:#1565c0;"> 
+                        <strong>Προπληρωμή με IRIS</strong>
+                    </label>
                 </div>
 
                 <select id="timeField">
@@ -730,11 +738,15 @@
     document.getElementById('isTreat').addEventListener('change', function() {
         document.getElementById('treatFields').style.display = this.checked ? 'flex' : 'none';
         document.getElementById('timeField').style.display = this.checked ? 'none' : 'block';
-        document.getElementById('payOnPickupNote').style.display = this.checked ? 'none' : 'block';
+        document.getElementById('standardPayFields').style.display = this.checked ? 'none' : 'block';
         updateCart();
     });
 
     document.querySelectorAll('input[name="payMethod"]').forEach(radio => {
+        radio.addEventListener('change', updateCart);
+    });
+
+    document.querySelectorAll('input[name="stdPayMethod"]').forEach(radio => {
         radio.addEventListener('change', updateCart);
     });
 
@@ -1184,6 +1196,8 @@
 
         const isTreat = document.getElementById('isTreat').checked;
         const payMethod = document.querySelector('input[name="payMethod"]:checked')?.value || 'iris';
+        const stdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value || 'store';
+        
         let transactionFee = 0;
         
         if (isTreat && payMethod === 'revolut' && (subtotal - extraDiscount - rewardDiscount) > 0) {
@@ -1223,9 +1237,17 @@
         drawerFoot.style.display = 'block';
 
         document.getElementById('cartTotal').textContent = euro(total);
+        
         const checkoutBtn = document.getElementById('checkout');
         checkoutBtn.disabled = count === 0 || !isOpen();
-        checkoutBtn.textContent = isOpen() ? 'Ολοκλήρωση παραγγελίας' : 'Κλειστά τώρα (06:00–22:00)';
+
+        const isTreatChecked = document.getElementById('isTreat').checked;
+        const currentStdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value;
+        const needsPaymentStep = isTreatChecked || (currentStdPayMethod === 'iris' && !isTreatChecked);
+
+        checkoutBtn.textContent = isOpen() 
+            ? (needsPaymentStep ? 'Συνέχεια για πληρωμή' : 'Ολοκλήρωση παραγγελίας') 
+            : 'Κλειστά τώρα (06:00–22:00)';
 
         const dLine = document.getElementById('discountLine');
         if (rewardDiscount > 0) {
@@ -1330,11 +1352,11 @@
         btn.disabled = true;
         btn.textContent = '⏳ Ενημέρωση καταστήματος...';
         
-        const msg = `✅ <b>ΕΠΙΒΕΒΑΙΩΣΗ ΠΛΗΡΩΜΗΣ ΚΕΡΑΣΜΑΤΟΣ</b>\nΟ πελάτης ${cName} (${cPhone}) αναφέρει ότι ολοκλήρωσε την πληρωμή (IRIS/Revolut)!\nΠαρακαλούμε ελέγξτε τον λογαριασμό σας.`;
+        const msg = `✅ <b>ΕΠΙΒΕΒΑΙΩΣΗ ΠΛΗΡΩΜΗΣ</b>\nΟ πελάτης ${cName} (${cPhone}) αναφέρει ότι ολοκλήρωσε την πληρωμή (και έστειλε αποδεικτικό)!\nΠαρακαλούμε ελέγξτε τα μηνύματα ή τον λογαριασμό σας.`;
         
         await sendOrder({ text: msg });
         
-        btn.textContent = '✔️ Ενημερώσαμε το κατάστημα!';
+        btn.textContent = '✔️ Η παραγγελία ολοκληρώθηκε!';
         btn.style.background = '#1b5e20';
         showToast('Ευχαριστούμε! Η παραγγελία ξεκινάει.');
     };
@@ -1355,6 +1377,8 @@
         
         const isTreat = document.getElementById('isTreat').checked;
         const payMethod = document.querySelector('input[name="payMethod"]:checked')?.value || 'iris';
+        const stdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value || 'store';
+        const requiresPaymentStep = isTreat || (!isTreat && stdPayMethod === 'iris');
         const name = document.getElementById('nameField').value.trim();
         const phone = document.getElementById('phoneField').value.trim();
         
@@ -1442,7 +1466,15 @@
         const formattedEarned = earned % 1 === 0 ? earned : earned.toFixed(1);
 
         const methodText = payMethod === 'revolut' ? 'REVOLUT' : 'IRIS';
-        const fullOrderMessage = `🚨 <b>ΝΕΑ ΠΑΡΑΓΓΕΛΙΑ${isTreat ? ` — ΚΕΡΑΣΜΑ (ΑΝΑΜΟΝΗ ΠΛΗΡΩΜΗΣ ${methodText})` : ''}</b>\n👤 <b>ΑΠΟΣΤΟΛΕΑΣ:</b> ${customerName}${contactLink}\n📞 ${phone}\n📝 ${comment || '-'}\n⏰ ${time}${treatText}\n${rewardText}\n💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n📦 <b>Αναλυτικά:</b>\n${itemsText}\n\n💎 <b>Διαμάντια:</b>\n🔹 Κέρδισε: +${formattedEarned}${redeemedCost ? `\n🔻 Εξαργύρωσε: −${redeemedCost}` : ''}\n💰 Σύνολο διαμαντιών: <b>${formattedNewTotal}</b>`;
+        
+        let titleSuffix = '';
+        if (isTreat) {
+            titleSuffix = ` — ΚΕΡΑΣΜΑ (ΑΝΑΜΟΝΗ ΠΛΗΡΩΜΗΣ ${methodText})`;
+        } else if (stdPayMethod === 'iris') {
+            titleSuffix = ` — ΑΝΑΜΟΝΗ ΠΛΗΡΩΜΗΣ IRIS`;
+        }
+
+        const fullOrderMessage = `🚨 <b>ΝΕΑ ΠΑΡΑΓΓΕΛΙΑ${titleSuffix}</b>\n👤 <b>ΑΠΟΣΤΟΛΕΑΣ:</b> ${customerName}${contactLink}\n📞 ${phone}\n📝 ${comment || '-'}\n⏰ ${time}${treatText}\n${rewardText}\n💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n📦 <b>Αναλυτικά:</b>\n${itemsText}\n\n💎 <b>Διαμάντια:</b>\n🔹 Κέρδισε: +${formattedEarned}${redeemedCost ? `\n🔻 Εξαργύρωσε: −${redeemedCost}` : ''}\n💰 Σύνολο διαμαντιών: <b>${formattedNewTotal}</b>`;
 
         const hasGreek = [...cart.values()].some(v => v.prod.id === 'ellinikos' || v.prod.id === 'ellinikos2');
         const receipt = `✅ <b>Καφέ Βόλτα — Επιβεβαίωση παραγγελίας</b>\n⏰ Παραλαβή: ${time}\n\n📦 <b>Η παραγγελία σου:</b>\n${itemsText}${treatReceiptText}${gifts.length ? `\n🎁 Δώρα: ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}\n` : ''}💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n💎 Κέρδισες <b>+${formattedEarned}</b> διαμάντια${redeemedCost ? ` (εξαργύρωσες ${redeemedCost})` : ''}\n💰 Σύνολο διαμαντιών σου: <b>{POINTS}</b>${hasGreek ? '\n\n🔮 Ήπιες τον ελληνικό σου; Δες τι λέει το φλιτζάνι → @omenread_bot' : ''}\n\n📣 Προσφορές & νέα μας → t.me/kafevolta\nΣε ευχαριστούμε! ☕`;
@@ -1468,15 +1500,16 @@
             updateCart();
             
             document.getElementById('drawerFoot').style.display = 'none';
+            document.getElementById('standardPayFields').style.display = 'block';
 
             const escName = customerName.replace(/'/g, "\\'");
             const escPhone = phone.replace(/'/g, "\\'");
 
-            if (isTreat) {
+            if (requiresPaymentStep) {
                 let paymentInfoHtml = '';
-                if (payMethod === 'iris') {
+                if (!isTreat || payMethod === 'iris') {
                     paymentInfoHtml = `
-                        <strong style="color:var(--mocha);">1. Πληρωμή μέσω IRIS (Εθνική/Όλες οι τράπεζες)</strong><br>
+                        <strong style="color:var(--mocha);">Πληρωμή μέσω IRIS (Εθνική / Όλες οι τράπεζες)</strong><br>
                         <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; border:1px solid #ccc; padding:8px 10px; border-radius:6px; margin-top:6px; margin-bottom: 12px;">
                             <span>ΑΦΜ: <b style="font-size:1.1rem; color:var(--mocha);">126559439</b></span>
                             <button onclick="navigator.clipboard.writeText('126559439'); showToast('Το ΑΦΜ αντιγράφηκε!');" style="background:var(--mocha);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:0.8rem;cursor:pointer;font-weight:700;">📋 Αντιγραφή</button>
@@ -1492,14 +1525,14 @@
 
                 document.getElementById('cartBody').innerHTML = `
                     <div class="thanks" style="text-align:center; padding:10px 0;">
-                        <h3 style="color:#d32f2f; margin-bottom:10px;">🎁 Το αίτημα κεράσματος εστάλη!</h3>
+                        <h3 style="color:#d32f2f; margin-bottom:10px;">${isTreat ? '🎁 Το αίτημα κεράσματος εστάλη!' : '💳 Βήμα Πληρωμής'}</h3>
                         <p style="font-size:0.95rem; margin-bottom:12px;">Για να προχωρήσει η παραγγελία, κάνε την πληρωμή (<b>${euro(totalAmount)}</b>):</p>
                         <div style="background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:12px; text-align:left; font-size:0.9rem; margin-bottom:16px;">
                             ${paymentInfoHtml}
                         </div>
-                        <p style="font-size:0.85rem; color:#6b5d4d; margin-bottom:12px;">Όταν ολοκληρώσεις τη μεταφορά, πάτησε το παρακάτω κουμπί για να μας ειδοποιήσεις!</p>
-                        <button onclick="confirmTreatPayment('${escName}', '${escPhone}')" id="confirmPayBtn" style="width:100%; background:#2e7d32; color:#fff; border:none; padding:14px; border-radius:999px; font-weight:900; font-size:1rem; cursor:pointer; margin-bottom:10px; box-shadow:0 4px 10px rgba(46,125,50,0.3);">✅ Η πληρωμή ολοκληρώθηκε</button>
-                        <a href="https://t.me/kafevolta?direct" target="_blank" style="display:block; background:#2AABEE; color:#fff; text-decoration:none; padding:12px; border-radius:999px; font-weight:700; font-size:0.9rem;">💬 Ή στείλε μας αποδεικτικό</a>
+                        <p style="font-size:0.85rem; color:#6b5d4d; margin-bottom:12px;">Αφού κάνεις την πληρωμή και στείλεις το αποδεικτικό, πάτησε το κουμπί για να ολοκληρωθεί η παραγγελία!</p>
+                        <button onclick="confirmTreatPayment('${escName}', '${escPhone}')" id="confirmPayBtn" style="width:100%; background:#2e7d32; color:#fff; border:none; padding:14px; border-radius:999px; font-weight:900; font-size:1rem; cursor:pointer; margin-bottom:10px; box-shadow:0 4px 10px rgba(46,125,50,0.3);">✅ Ολοκλήρωση παραγγελίας</button>
+                        <a href="https://t.me/kafevolta?direct" target="_blank" style="display:block; background:#2AABEE; color:#fff; text-decoration:none; padding:12px; border-radius:999px; font-weight:700; font-size:0.9rem;">💬 Στείλε το αποδεικτικό εδώ</a>
                     </div>`;
             } else {
                 const receiptNote = groupResult.receiptSent
@@ -1524,7 +1557,6 @@
             document.getElementById('isTreat').checked = false;
             document.getElementById('treatFields').style.display = 'none';
             document.getElementById('timeField').style.display = 'block';
-            document.getElementById('payOnPickupNote').style.display = 'block';
             btn.textContent = 'Ολοκλήρωση παραγγελίας';
         } else {
             alert(`❌ Απέτυχε να σταλεί στην ΟΜΑΔΑ!\nΛόγος: ${groupResult.error}`);
