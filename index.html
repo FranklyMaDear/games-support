@@ -625,6 +625,11 @@
                     <span style="font-size:0.8rem; color:#e65100; font-weight:700;">Στοιχεία Παραλήπτη (Αυτόν που κερνάς):</span>
                     <input type="text" id="treatName" placeholder="Όνομα Παραλήπτη *">
                     <input type="tel" id="treatPhone" placeholder="Τηλέφωνο Παραλήπτη *">
+                    <!-- ★ Προσθήκη ημερομηνίας και ώρας παράδοσης για τον παραλήπτη -->
+                    <div style="display:flex; gap:8px;">
+                        <label style="flex:1; font-weight:600; font-size:0.8rem;">Ημερομηνία παράδοσης *<br><input type="date" id="treatDate" style="width:100%;"></label>
+                        <label style="flex:1; font-weight:600; font-size:0.8rem;">Ώρα παράδοσης *<br><input type="time" id="treatTime" style="width:100%;"></label>
+                    </div>
                     <textarea id="treatMessage" placeholder="Ευχή / Μήνυμα (π.χ. Χρόνια πολλά!)" rows="2"></textarea>
                     
                     <span style="font-size:0.8rem; color:var(--mocha); font-weight:700; margin-top:8px;">Τρόπος Πληρωμής:</span>
@@ -1428,12 +1433,17 @@
         if (isTreat) {
             const tName = document.getElementById('treatName').value.trim();
             const tPhone = document.getElementById('treatPhone').value.trim();
+            const tDate = document.getElementById('treatDate').value;
+            const tTime = document.getElementById('treatTime').value;
             const tMsg = document.getElementById('treatMessage').value.trim();
             
             if (!tName || !tPhone) { alert('Συμπληρώστε το όνομα και το τηλέφωνο του παραλήπτη για το κέρασμα!'); return; }
+            if (!tDate || !tTime) { alert('Συμπληρώστε την ημερομηνία και ώρα παράδοσης για το κέρασμα!'); return; }
             
-            treatText = `\n\n🎁 <b>ΠΑΡΑΛΗΠΤΗΣ (Κερνιέται):</b>\nΌνομα: ${tName}\nΤηλέφωνο: ${tPhone}\nΕυχή: ${tMsg || '-'}\n💳 <b>Τρόπος Πληρωμής:</b> ${payMethod.toUpperCase()}`;
-            treatReceiptText = `\n🎁 <b>Κέρασμα σε:</b> ${tName} (${tPhone})\n💬 <b>Μήνυμα:</b> ${tMsg || '-'}`;
+            const formattedDate = tDate ? new Date(tDate + 'T00:00').toLocaleDateString('el-GR') : '-';
+            
+            treatText = `\n\n🎁 <b>ΠΑΡΑΛΗΠΤΗΣ (Κερνιέται):</b>\nΌνομα: ${tName}\nΤηλέφωνο: ${tPhone}\n📅 Ημερομηνία παράδοσης: ${formattedDate}\n⏰ Ώρα παράδοσης: ${tTime}\nΕυχή: ${tMsg || '-'}\n💳 <b>Τρόπος Πληρωμής:</b> ${payMethod.toUpperCase()}`;
+            treatReceiptText = `\n🎁 <b>Κέρασμα σε:</b> ${tName} (${tPhone})\n📅 Παράδοση: ${formattedDate} ${tTime}\n💬 <b>Μήνυμα:</b> ${tMsg || '-'}`;
         }
 
         const btn = document.getElementById('checkout');
