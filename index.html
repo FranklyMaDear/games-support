@@ -638,6 +638,7 @@
                     </label>
                 </div>
 
+                <span id="senderTitle" style="display:none; font-size:0.85rem; color:var(--mocha); font-weight:700; margin-top:8px; margin-bottom:4px;">Στοιχεία αυτού που κερνάει:</span>
                 <input type="text" id="nameField" placeholder="Το Ονοματεπώνυμό σου *">
                 <input type="tel" id="phoneField" placeholder="Το Τηλέφωνό σου *">
                 <textarea id="commentField" placeholder="Σχόλιο για την παραγγελία" rows="2"></textarea>
@@ -646,11 +647,7 @@
                     <span style="font-size:0.85rem; color:#1565c0; font-weight:700;">Τρόπος Πληρωμής (Παραλαβή από το κατάστημα):</span>
                     <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer; margin-top:6px;">
                         <input type="radio" name="stdPayMethod" value="store" checked style="width:16px; height:16px; accent-color:#1565c0;"> 
-                        <strong>Πληρωμή στο κατάστημα</strong> (Μετρητά/Κάρτα)
-                    </label>
-                    <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer; margin-top:6px;">
-                        <input type="radio" name="stdPayMethod" value="iris" style="width:16px; height:16px; accent-color:#1565c0;"> 
-                        <strong>Προπληρωμή με IRIS</strong>
+                        <strong>Πληρωμή στο κατάστημα</strong> (Μετρητά / Κάρτα / IRIS)
                     </label>
                 </div>
 
@@ -745,8 +742,8 @@
     const FLAVORS = ['Βανίλια', 'Σοκολάτα', 'Φράουλα', 'Μπανάνα', 'Στρατσιατέλα', 'Καϊμάκι'];
 
     const REWARDS = [
-        { id: 'discount-250', name: 'Έκπτωση 2,50€ (Εξαιρούνται κρέπες/παγωτά)', cost: 25, value: 2.50 },
-        { id: 'discount-400', name: 'Έκπτωση 4,00€ (Εξαιρούνται κρέπες/παγωτά)', cost: 40, value: 4.00 }
+        { id: 'discount-250', name: 'Έκπτωση 2,50€', cost: 25, value: 2.50 },
+        { id: 'discount-400', name: 'Έκπτωση 4,00€', cost: 40, value: 4.00 }
     ];
     
     const redeemed = new Map();
@@ -771,6 +768,7 @@
 
     document.getElementById('isTreat').addEventListener('change', function() {
         document.getElementById('treatFields').style.display = this.checked ? 'flex' : 'none';
+        document.getElementById('senderTitle').style.display = this.checked ? 'block' : 'none';
         document.getElementById('timeField').style.display = this.checked ? 'none' : 'block';
         document.getElementById('standardPayFields').style.display = this.checked ? 'none' : 'block';
         updateCart();
@@ -1171,10 +1169,10 @@
                 <div class="reward-row">
                     <span>${r.name}<br><span class="r-cost">${r.cost} 💎</span></span>
                     <span style="display:flex;align-items:center;gap:6px;">
-                        ${qty > 0 ? `<button class="redeem-btn" onclick="redeemReward('${r.id}', -1)">−</button><strong>${qty}</strong>` : ''}
+                        ${qty > 0 ? \`<button class="redeem-btn" onclick="redeemReward('\${r.id}', -1)">−</button><strong>\${qty}</strong>\` : ''}
                         ${canAdd
-                            ? `<button class="redeem-btn" onclick="redeemReward('${r.id}', 1)">${qty > 0 ? '+' : 'Εξαργύρωση'}</button>`
-                            : (qty > 0 ? '' : `<button class="redeem-btn" disabled>Λείπουν ${missing % 1 === 0 ? missing : missing.toFixed(1)}</button>`)}
+                            ? \`<button class="redeem-btn" onclick="redeemReward('\${r.id}', 1)">\${qty > 0 ? '+' : 'Εξαργύρωση'}</button>\`
+                            : (qty > 0 ? '' : \`<button class="redeem-btn" disabled>Λείπουν \${missing % 1 === 0 ? missing : missing.toFixed(1)}</button>\`)}
                     </span>
                 </div>`;
         }).join('');
@@ -1182,9 +1180,10 @@
         const anyAffordable = REWARDS.some(r => left >= r.cost) || spent > 0;
         area.innerHTML = `
             <div class="rewards-box">
-                <h4>🎁 Δώρα με διαμάντια — έχεις ${pts % 1 === 0 ? pts : pts.toFixed(1)} 💎${spent ? ` (θα ξοδέψεις ${spent})` : ''}</h4>
-                ${rows}
-                ${anyAffordable ? '' : '<small>Κέρδισε 1 διαμάντι για κάθε 1€ παραγγελίας.</small>'}
+                <h4>🎁 Δώρα με διαμάντια — έχεις \${pts % 1 === 0 ? pts : pts.toFixed(1)} 💎\${spent ? \` (θα ξοδέψεις \${spent})\` : ''}</h4>
+                \${rows}
+                <div style="font-size: 0.75rem; color: #6b5d4d; margin-top: 6px; font-style: italic;">*Από την έκπτωση των δώρων εξαιρούνται οι κρέπες και τα παγωτά.</div>
+                \${anyAffordable ? '' : '<small>Κέρδισε 1 διαμάντι για κάθε 1€ παραγγελίας.</small>'}
             </div>`;
     }
 
@@ -1196,7 +1195,7 @@
             if (cart.size === 0) { showToast('Πρόσθεσε πρώτα προϊόντα στο καλάθι'); return; }
             if (getPoints() - redeemedCostTotal() < r.cost) return;
             redeemed.set(id, qty + 1);
-            showToast(`🎁 «${r.name}» προστέθηκε στα δώρα`);
+            showToast(`🎁 «\${r.name}» προστέθηκε στα δώρα`);
         } else {
             if (qty <= 1) redeemed.delete(id); else redeemed.set(id, qty - 1);
         }
@@ -1304,43 +1303,43 @@
         const cCount = crepeItems.length % 3;
         if (cCount > 0 && cCount < 3) {
             const rem = 3 - cCount;
-            hintsHtml += `<div class="cart-hint">💡 Πρόσθεσε ${rem} ακόμα κρέπ${rem===1?'α':'ες'} (με έξτρα) για 1 ΔΩΡΟ!</div>`;
+            hintsHtml += \`<div class="cart-hint">💡 Πρόσθεσε \${rem} ακόμα κρέπ\${rem===1?'α':'ες'} (με έξτρα) για 1 ΔΩΡΟ!</div>\`;
         }
         const gCount = granitaItems.length % 3;
         if (gCount > 0 && gCount < 3) {
             const rem = 3 - gCount;
-            hintsHtml += `<div class="cart-hint">💡 Πρόσθεσε ${rem} ακόμα γρανίτ${rem===1?'α':'ες'} για 1 ΔΩΡΟ!</div>`;
+            hintsHtml += \`<div class="cart-hint">💡 Πρόσθεσε \${rem} ακόμα γρανίτ\${rem===1?'α':'ες'} για 1 ΔΩΡΟ!</div>\`;
         }
         const mCount = milkshakeItems.length % 3;
         if (mCount > 0 && mCount < 3) {
             const rem = 3 - mCount;
-            hintsHtml += `<div class="cart-hint">💡 Πρόσθεσε ${rem} ακόμα milkshake για 1 ΔΩΡΟ!</div>`;
+            hintsHtml += \`<div class="cart-hint">💡 Πρόσθεσε \${rem} ακόμα milkshake για 1 ΔΩΡΟ!</div>\`;
         }
         
         if (hintsHtml) {
-            html += `<div style="margin-bottom:12px;">${hintsHtml}</div>`;
+            html += \`<div style="margin-bottom:12px;">\${hintsHtml}</div>\`;
         }
 
         cart.forEach((v, key) => {
-            let details = v.sugar ? `Ζάχαρη: ${v.sugar}` : (v.desc || v.extrasDesc || '');
-            html += `
+            let details = v.sugar ? \`Ζάχαρη: \${v.sugar}\` : (v.desc || v.extrasDesc || '');
+            html += \`
                 <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed #ddd;">
-                    <div style="flex:1"><strong>${v.prod.n}</strong>${details ? `<br><small>${details}</small>` : ''}</div>
+                    <div style="flex:1"><strong>\${v.prod.n}</strong>\${details ? \`<br><small>\${details}</small>\` : ''}</div>
                     <div style="display:flex;align-items:center;gap:4px;">
-                        <button onclick="changeQty('${key}', -1)" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;background:#fff;">−</button>
-                        <span>${v.qty}</span>
-                        <button onclick="changeQty('${key}', 1)" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;background:#fff;">+</button>
+                        <button onclick="changeQty('\${key}', -1)" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;background:#fff;">−</button>
+                        <span>\${v.qty}</span>
+                        <button onclick="changeQty('\${key}', 1)" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;background:#fff;">+</button>
                     </div>
-                    <div style="min-width:45px;text-align:right;">${euro(v.qty * itemPrice(v))}</div>
-                </div>`;
+                    <div style="min-width:45px;text-align:right;">\${euro(v.qty * itemPrice(v))}</div>
+                </div>\`;
         });
         const fc = freeCrepes();
         if (fc > 0) {
-            html += `
+            html += \`
                 <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed #ddd;color:#2e7d32;">
-                    <div style="flex:1"><strong>🥞 ΔΩΡΟ 3+1: ${fc}x Κρέπα Σοκολάτα + Μπισκότο</strong></div>
+                    <div style="flex:1"><strong>🥞 ΔΩΡΟ 3+1: \${fc}x Κρέπα Σοκολάτα + Μπισκότο</strong></div>
                     <div style="min-width:45px;text-align:right;font-weight:700;">0,00 €</div>
-                </div>`;
+                </div>\`;
         }
         cartBody.innerHTML = html;
     }
@@ -1377,7 +1376,7 @@
         btn.disabled = true;
         btn.textContent = '⏳ Ενημέρωση καταστήματος...';
         
-        const msg = `✅ <b>ΕΠΙΒΕΒΑΙΩΣΗ ΠΛΗΡΩΜΗΣ</b>\nΟ πελάτης ${cName} (${cPhone}) αναφέρει ότι ολοκλήρωσε την πληρωμή (και έστειλε αποδεικτικό)!\nΠαρακαλούμε ελέγξτε τα μηνύματα ή τον λογαριασμό σας.`;
+        const msg = \`✅ <b>ΕΠΙΒΕΒΑΙΩΣΗ ΠΛΗΡΩΜΗΣ</b>\nΟ πελάτης \${cName} (\${cPhone}) αναφέρει ότι ολοκλήρωσε την πληρωμή (και έστειλε αποδεικτικό)!\nΠαρακαλούμε ελέγξτε τα μηνύματα ή τον λογαριασμό σας.\`;
         
         await sendOrder({ text: msg });
         
@@ -1419,8 +1418,8 @@
             
             if (!tName || !tPhone) { alert('Συμπληρώστε το όνομα και το τηλέφωνο του παραλήπτη για το κέρασμα!'); return; }
             
-            treatText = `\n\n🎁 <b>ΠΑΡΑΛΗΠΤΗΣ (Κερνιέται):</b>\nΌνομα: ${tName}\nΤηλέφωνο: ${tPhone}\nΕυχή: ${tMsg || '-'}\n💳 <b>Τρόπος Πληρωμής:</b> ${payMethod.toUpperCase()}`;
-            treatReceiptText = `\n🎁 <b>Κέρασμα σε:</b> ${tName} (${tPhone})\n💬 <b>Μήνυμα:</b> ${tMsg || '-'}`;
+            treatText = \`\n\n🎁 <b>ΠΑΡΑΛΗΠΤΗΣ (Κερνιέται):</b>\nΌνομα: \${tName}\nΤηλέφωνο: \${tPhone}\nΕυχή: \${tMsg || '-'}\n💳 <b>Τρόπος Πληρωμής:</b> \${payMethod.toUpperCase()}\`;
+            treatReceiptText = \`\n🎁 <b>Κέρασμα σε:</b> \${tName} (\${tPhone})\n💬 <b>Μήνυμα:</b> \${tMsg || '-'}\`;
         }
 
         const btn = document.getElementById('checkout');
@@ -1465,20 +1464,20 @@
         const time = isTreat ? '-' : document.getElementById('timeField').value;
         const customerName = name || (tgUser?.first_name || 'Πελάτης');
 
-        let contactLink = tgUser ? (tgUser.username ? `\n💬 @${tgUser.username}` : `\n💬 <a href="tg://user?id=${tgUser.id}">Στείλε μήνυμα</a>`) : '';
+        let contactLink = tgUser ? (tgUser.username ? \`\n💬 @\${tgUser.username}\` : \`\n💬 <a href="tg://user?id=\${tgUser.id}">Στείλε μήνυμα</a>\`) : '';
         let itemsText = '';
         cart.forEach(v => {
-            let details = v.sugar ? `(Ζάχαρη: ${v.sugar})` : (v.desc || v.extrasDesc ? `(${v.desc || v.extrasDesc})` : '');
-            itemsText += `- ${v.qty}x ${v.prod.n} ${details}\n`;
+            let details = v.sugar ? \`(Ζάχαρη: \${v.sugar})\` : (v.desc || v.extrasDesc ? \`(\${v.desc || v.extrasDesc})\` : '');
+            itemsText += \`- \${v.qty}x \${v.prod.n} \${details}\n\`;
         });
         
         const fcCheckout = freeCrepes();
-        if (fcCheckout > 0) itemsText += `- ${fcCheckout}x Κρέπα Σοκολάτα + Μπισκότο 🥞 (ΔΩΡΟ 3+1)\n`;
+        if (fcCheckout > 0) itemsText += \`- \${fcCheckout}x Κρέπα Σοκολάτα + Μπισκότο 🥞 (ΔΩΡΟ 3+1)\n\`;
         
-        if (extraDiscount > 0) itemsText += `🎁 Έκπτωση 2+1: -${euro(extraDiscount)}\n`;
+        if (extraDiscount > 0) itemsText += \`🎁 Έκπτωση 2+1: -\${euro(extraDiscount)}\n\`;
 
         let rewardText = gifts.length
-            ? `\n🎁 <b>Δώρα:</b> ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')} (−${euro(rewardDiscount)}, −${redeemedCost} 💎)`
+            ? \`\n🎁 <b>Δώρα:</b> \${gifts.map(g => \`\${g.qty}x \${g.name}\`).join(', ')} (−\${euro(rewardDiscount)}, −\${redeemedCost} 💎)\`
             : '';
 
         const newTotalPoints = getPoints() - redeemedCost + earned;
@@ -1489,15 +1488,15 @@
         
         let titleSuffix = '';
         if (isTreat) {
-            titleSuffix = ` — ΚΕΡΑΣΜΑ (ΑΝΑΜΟΝΗ ΠΛΗΡΩΜΗΣ ${methodText})`;
+            titleSuffix = \` — ΚΕΡΑΣΜΑ (ΑΝΑΜΟΝΗ ΠΛΗΡΩΜΗΣ \${methodText})\`;
         } else if (stdPayMethod === 'iris') {
-            titleSuffix = ` — ΑΝΑΜΟΝΗ ΠΛΗΡΩΜΗΣ IRIS`;
+            titleSuffix = \` — ΑΝΑΜΟΝΗ ΠΛΗΡΩΜΗΣ IRIS\`;
         }
 
-        const fullOrderMessage = `🚨 <b>ΝΕΑ ΠΑΡΑΓΓΕΛΙΑ${titleSuffix}</b>\n👤 <b>ΑΠΟΣΤΟΛΕΑΣ:</b> ${customerName}${contactLink}\n📞 ${phone}\n📝 ${comment || '-'}\n⏰ ${time}${treatText}\n${rewardText}\n💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n📦 <b>Αναλυτικά:</b>\n${itemsText}\n\n💎 <b>Διαμάντια:</b>\n🔹 Κέρδισε: +${formattedEarned}${redeemedCost ? `\n🔻 Εξαργύρωσε: −${redeemedCost}` : ''}\n💰 Σύνολο διαμαντιών: <b>${formattedNewTotal}</b>`;
+        const fullOrderMessage = \`🚨 <b>ΝΕΑ ΠΑΡΑΓΓΕΛΙΑ\${titleSuffix}</b>\n👤 <b>ΑΠΟΣΤΟΛΕΑΣ:</b> \${customerName}\${contactLink}\n📞 \${phone}\n📝 \${comment || '-'}\n⏰ \${time}\${treatText}\n\${rewardText}\n💰 Σύνολο: <b>\${euro(totalAmount)}</b>\n\n📦 <b>Αναλυτικά:</b>\n\${itemsText}\n\n💎 <b>Διαμάντια:</b>\n🔹 Κέρδισε: +\${formattedEarned}\${redeemedCost ? \`\n🔻 Εξαργύρωσε: −\${redeemedCost}\` : ''}\n💰 Σύνολο διαμαντιών: <b>\${formattedNewTotal}</b>\`;
 
         const hasGreek = [...cart.values()].some(v => v.prod.id === 'ellinikos' || v.prod.id === 'ellinikos2');
-        const receipt = `✅ <b>Καφέ Βόλτα — Επιβεβαίωση παραγγελίας</b>\n⏰ Παραλαβή: ${time}\n\n📦 <b>Η παραγγελία σου:</b>\n${itemsText}${treatReceiptText}${gifts.length ? `\n🎁 Δώρα: ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}\n` : ''}💰 Σύνολο: <b>${euro(totalAmount)}</b>\n\n💎 Κέρδισες <b>+${formattedEarned}</b> διαμάντια${redeemedCost ? ` (εξαργύρωσες ${redeemedCost})` : ''}\n💰 Σύνολο διαμαντιών σου: <b>{POINTS}</b>${hasGreek ? '\n\n🔮 Ήπιες τον ελληνικό σου; Δες τι λέει το φλιτζάνι → @omenread_bot' : ''}\n\n📣 Προσφορές & νέα μας → t.me/kafevolta\nΣε ευχαριστούμε! ☕`;
+        const receipt = \`✅ <b>Καφέ Βόλτα — Επιβεβαίωση παραγγελίας</b>\n⏰ Παραλαβή: \${time}\n\n📦 <b>Η παραγγελία σου:</b>\n\${itemsText}\${treatReceiptText}\${gifts.length ? \`\n🎁 Δώρα: \${gifts.map(g => \`\${g.qty}x \${g.name}\`).join(', ')}\n\` : ''}💰 Σύνολο: <b>\${euro(totalAmount)}</b>\n\n💎 Κέρδισες <b>+\${formattedEarned}</b> διαμάντια\${redeemedCost ? \` (εξαργύρωσες \${redeemedCost})\` : ''}\n💰 Σύνολο διαμαντιών σου: <b>{POINTS}</b>\${hasGreek ? '\n\n🔮 Ήπιες τον ελληνικό σου; Δες τι λέει το φλιτζάνι → @omenread_bot' : ''}\n\n📣 Προσφορές & νέα μας → t.me/kafevolta\nΣε ευχαριστούμε! ☕\`;
 
         const groupResult = await sendOrder({
             text: fullOrderMessage,
@@ -1528,55 +1527,55 @@
             if (requiresPaymentStep) {
                 let paymentInfoHtml = '';
                 if (!isTreat || payMethod === 'iris') {
-                    paymentInfoHtml = `
+                    paymentInfoHtml = \`
                         <strong style="color:var(--mocha);">Πληρωμή μέσω IRIS (Εθνική / Όλες οι τράπεζες)</strong><br>
                         <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; border:1px solid #ccc; padding:8px 10px; border-radius:6px; margin-top:6px; margin-bottom: 12px;">
                             <span>ΑΦΜ: <b style="font-size:1.1rem; color:var(--mocha);">126559439</b></span>
                             <button onclick="navigator.clipboard.writeText('126559439'); showToast('Το ΑΦΜ αντιγράφηκε!');" style="background:var(--mocha);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:0.8rem;cursor:pointer;font-weight:700;">📋 Αντιγραφή</button>
                         </div>
-                    `;
+                    \`;
                 } else {
                     // ★ Νέο 3D Banner της Revolut
-                    paymentInfoHtml = `
+                    paymentInfoHtml = \`
                         <div style="background: linear-gradient(145deg, #f0f4f8, #e2e8f0); border: 2px solid #b0bec5; border-radius: 12px; padding: 16px; text-align: center; box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.05);">
                             <h4 style="color: #1a1a24; margin-bottom: 6px; font-family: 'Commissioner', sans-serif; font-size: 1.05rem; font-weight: 900;">Πληρωμή μέσω Revolut</h4>
                             <p style="font-size: 0.85rem; color: #455a64; margin-bottom: 12px; line-height: 1.4;">
                                 Πατήστε το κουμπί, ανοίξτε την εφαρμογή και συμπληρώστε το ποσό:<br>
-                                <strong style="font-size: 1.3rem; color: #d32f2f; display: block; margin-top: 4px;">${euro(totalAmount)}</strong>
+                                <strong style="font-size: 1.3rem; color: #d32f2f; display: block; margin-top: 4px;">\${euro(totalAmount)}</strong>
                             </p>
                             <a href="https://revolut.me/eleniz84" target="_blank" class="revolut-3d-btn">
                                 <span class="rev-logo">R</span> Άνοιγμα Revolut
                             </a>
                         </div>
-                    `;
+                    \`;
                 }
 
-                document.getElementById('cartBody').innerHTML = `
+                document.getElementById('cartBody').innerHTML = \`
                     <div class="thanks" style="text-align:center; padding:10px 0;">
-                        <h3 style="color:#d32f2f; margin-bottom:10px;">${isTreat ? '🎁 Το αίτημα κεράσματος εστάλη!' : '💳 Βήμα Πληρωμής'}</h3>
-                        <p style="font-size:0.95rem; margin-bottom:12px;">Για να προχωρήσει η παραγγελία, κάνε την πληρωμή (<b>${euro(totalAmount)}</b>):</p>
+                        <h3 style="color:#d32f2f; margin-bottom:10px;">\${isTreat ? '🎁 Το αίτημα κεράσματος εστάλη!' : '💳 Βήμα Πληρωμής'}</h3>
+                        <p style="font-size:0.95rem; margin-bottom:12px;">Για να προχωρήσει η παραγγελία, κάνε την πληρωμή (<b>\${euro(totalAmount)}</b>):</p>
                         <div style="background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:12px; text-align:left; font-size:0.9rem; margin-bottom:16px;">
-                            ${paymentInfoHtml}
+                            \${paymentInfoHtml}
                         </div>
                         <p style="font-size:0.85rem; color:#6b5d4d; margin-bottom:12px;">Αφού κάνεις την πληρωμή και στείλεις το αποδεικτικό, πάτησε το κουμπί για να ολοκληρωθεί η παραγγελία!</p>
-                        <button onclick="confirmTreatPayment('${escName}', '${escPhone}')" id="confirmPayBtn" style="width:100%; background:#2e7d32; color:#fff; border:none; padding:14px; border-radius:999px; font-weight:900; font-size:1rem; cursor:pointer; margin-bottom:10px; box-shadow:0 4px 10px rgba(46,125,50,0.3);">✅ Ολοκλήρωση παραγγελίας</button>
+                        <button onclick="confirmTreatPayment('\${escName}', '\${escPhone}')" id="confirmPayBtn" style="width:100%; background:#2e7d32; color:#fff; border:none; padding:14px; border-radius:999px; font-weight:900; font-size:1rem; cursor:pointer; margin-bottom:10px; box-shadow:0 4px 10px rgba(46,125,50,0.3);">✅ Ολοκλήρωση παραγγελίας</button>
                         <a href="https://t.me/kafevolta?direct" target="_blank" style="display:block; background:#2AABEE; color:#fff; text-decoration:none; padding:12px; border-radius:999px; font-weight:700; font-size:0.9rem;">💬 Στείλε το αποδεικτικό εδώ</a>
-                    </div>`;
+                    </div>\`;
             } else {
                 const receiptNote = groupResult.receiptSent
                     ? '<br>📩 Σου στείλαμε επιβεβαίωση παραγγελίας στο Telegram!'
-                    : `<br><small>ℹ️ Η επιβεβαίωση δεν στάλθηκε. Πάτησε Start στο @coffeevolta_bot για να λαμβάνεις επιβεβαιώσεις.</small>`;
-                document.getElementById('cartBody').innerHTML = `
+                    : \`<br><small>ℹ️ Η επιβεβαίωση δεν στάλθηκε. Πάτησε Start στο @coffeevolta_bot για να λαμβάνεις επιβεβαιώσεις.</small>\`;
+                document.getElementById('cartBody').innerHTML = \`
                     <div class="thanks" style="text-align:center; padding: 20px 10px;">
                         <h3 style="color:var(--mocha); font-size:1.4rem; margin-bottom:10px;">Ευχαριστούμε!</h3>
-                        <p style="font-size:1rem;">Παραλαβή: <strong>${time}</strong></p>
+                        <p style="font-size:1rem;">Παραλαβή: <strong>\${time}</strong></p>
                         <div style="margin-top:16px; background:var(--soft); padding:12px; border-radius:8px; border:1px solid var(--line);">
-                            ${gifts.length ? `<p style="margin-bottom:6px;">🎁 ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')}</p>` : ''}
-                            <p>Κέρδισες <strong>${formattedEarned} 💎</strong></p>
-                            <p style="font-size:0.85rem; color:#6b5d4d; margin-top:4px;">Σύνολο: ${finalPts % 1 === 0 ? finalPts : finalPts.toFixed(1)} 💎</p>
+                            \${gifts.length ? \`<p style="margin-bottom:6px;">🎁 \${gifts.map(g => \`\${g.qty}x \${g.name}\`).join(', ')}</p>\` : ''}
+                            <p>Κέρδισες <strong>\${formattedEarned} 💎</strong></p>
+                            <p style="font-size:0.85rem; color:#6b5d4d; margin-top:4px;">Σύνολο: \${finalPts % 1 === 0 ? finalPts : finalPts.toFixed(1)} 💎</p>
                         </div>
-                        <p style="margin-top:16px; font-size:0.9rem; color:#4d4336;">${receiptNote}</p>
-                    </div>`;
+                        <p style="margin-top:16px; font-size:0.9rem; color:#4d4336;">\${receiptNote}</p>
+                    </div>\`;
             }
             
             document.querySelector('.drawer-body').scrollTop = 0;
@@ -1587,7 +1586,7 @@
             document.getElementById('timeField').style.display = 'block';
             btn.textContent = 'Ολοκλήρωση παραγγελίας';
         } else {
-            alert(`❌ Απέτυχε να σταλεί στην ΟΜΑΔΑ!\nΛόγος: ${groupResult.error}`);
+            alert(\`❌ Απέτυχε να σταλεί στην ΟΜΑΔΑ!\nΛόγος: \${groupResult.error}\`);
             btn.disabled = false;
             btn.textContent = 'Ολοκλήρωση παραγγελίας';
         }
@@ -1674,7 +1673,7 @@
         const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
         if (!tgId) return;
         try {
-            const r = await fetch(`${WORKER_URL}/points?id=${tgId}`);
+            const r = await fetch(\`\${WORKER_URL}/points?id=\${tgId}\`);
             const d = await r.json();
             if (d.success && typeof d.points === 'number') {
                 setPoints(d.points);
