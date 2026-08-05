@@ -208,6 +208,40 @@
         .totals { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 8px; font-size: 1.05rem; color: var(--ink); }
         .discount-line { display: flex; justify-content: space-between; color: #2e7d32; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px; }
         
+        /* ★ Νέο 3D Κουμπί Revolut */
+        .revolut-3d-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(to bottom, #212130, #14141e);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 6px 0 #0a0a10, 0 10px 15px rgba(0,0,0,0.2);
+            transition: all 0.15s ease-out;
+            font-family: 'Commissioner', sans-serif;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        .revolut-3d-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 #0a0a10, 0 2px 4px rgba(0,0,0,0.2);
+            background: #14141e;
+        }
+        .rev-logo {
+            background: #fff;
+            color: #14141e;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.9rem;
+            font-weight: 900;
+        }
+
         @media (max-width: 560px) {
             .hero-btns-top { flex-wrap: wrap; gap: 8px; }
             .hero-btns-top .pricelist-btn { flex: 1 1 calc(33% - 8px); font-size: 0.85rem; padding: 10px 4px; }
@@ -596,11 +630,11 @@
                     <span style="font-size:0.8rem; color:var(--mocha); font-weight:700; margin-top:8px;">Τρόπος Πληρωμής:</span>
                     <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer;">
                         <input type="radio" name="payMethod" value="iris" checked style="width:16px; height:16px; accent-color:var(--mocha);"> 
-                        <strong>IRIS</strong> (Χωρίς προμήθεια)
+                        <strong>IRIS</strong>
                     </label>
                     <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer;">
                         <input type="radio" name="payMethod" value="revolut" style="width:16px; height:16px; accent-color:var(--mocha);"> 
-                        <strong>Revolut</strong> (Με χρέωση τράπεζας)
+                        <strong>Revolut</strong>
                     </label>
                 </div>
 
@@ -1194,17 +1228,8 @@
         const extraDiscount = getExtraDiscount(); 
         const rewardDiscount = getRewardDiscount();
 
-        const isTreat = document.getElementById('isTreat').checked;
-        const payMethod = document.querySelector('input[name="payMethod"]:checked')?.value || 'iris';
-        const stdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value || 'store';
-        
+        // ❗️Η έξτρα χρέωση (transactionFee) για τη Revolut αφαιρέθηκε εντελώς
         let transactionFee = 0;
-        
-        if (isTreat && payMethod === 'revolut' && (subtotal - extraDiscount - rewardDiscount) > 0) {
-            const inEU = sessionStorage.getItem('kv_in_eu') === 'true';
-            const feePct = inEU ? 0.012 : 0.028;
-            transactionFee = ((subtotal - extraDiscount - rewardDiscount) * feePct) + 0.25;
-        }
         
         const total = subtotal - extraDiscount - rewardDiscount + transactionFee;
 
@@ -1408,12 +1433,7 @@
         const extraDiscount = getExtraDiscount();
         const rewardDiscount = getRewardDiscount();
         
-        let transactionFee = 0;
-        if (isTreat && payMethod === 'revolut' && (subtotal - extraDiscount - rewardDiscount) > 0) {
-            const inEU = sessionStorage.getItem('kv_in_eu') === 'true';
-            const feePct = inEU ? 0.012 : 0.028;
-            transactionFee = ((subtotal - extraDiscount - rewardDiscount) * feePct) + 0.25;
-        }
+        let transactionFee = 0; // Αφαιρέθηκε η προμήθεια
         
         const totalAmount = subtotal - extraDiscount - rewardDiscount + transactionFee;
         
@@ -1516,10 +1536,18 @@
                         </div>
                     `;
                 } else {
+                    // ★ Νέο 3D Banner της Revolut
                     paymentInfoHtml = `
-                        <strong style="color:var(--mocha);">Πληρωμή μέσω Revolut</strong><br>
-                        <a href="https://revolut.me/eleniz84/${totalAmount.toFixed(2)}" target="_blank" style="display:block; text-align:center; margin-top:6px; color:#1a7fbc; font-weight:700; text-decoration:none; background:#e7f3fb; padding:10px; border-radius:6px; border:1px solid #a9d3ee;">🔗 Άνοιγμα Payment Link</a>
-                        <p style="font-size:0.75rem; margin-top:6px; color:#666;">Στο ποσό έχει συνυπολογιστεί η προμήθεια της τράπεζας.</p>
+                        <div style="background: linear-gradient(145deg, #f0f4f8, #e2e8f0); border: 2px solid #b0bec5; border-radius: 12px; padding: 16px; text-align: center; box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.05);">
+                            <h4 style="color: #1a1a24; margin-bottom: 6px; font-family: 'Commissioner', sans-serif; font-size: 1.05rem; font-weight: 900;">Πληρωμή μέσω Revolut</h4>
+                            <p style="font-size: 0.85rem; color: #455a64; margin-bottom: 12px; line-height: 1.4;">
+                                Πατήστε το κουμπί, ανοίξτε την εφαρμογή και συμπληρώστε το ποσό:<br>
+                                <strong style="font-size: 1.3rem; color: #d32f2f; display: block; margin-top: 4px;">${euro(totalAmount)}</strong>
+                            </p>
+                            <a href="https://revolut.me/eleniz84" target="_blank" class="revolut-3d-btn">
+                                <span class="rev-logo">R</span> Άνοιγμα Revolut
+                            </a>
+                        </div>
                     `;
                 }
 
