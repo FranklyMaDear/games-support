@@ -21,6 +21,10 @@
     <link rel="apple-touch-icon" href="photo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,700;7..72,900&family=Commissioner:wght@400;500;600;700&display=swap&subset=greek" rel="stylesheet">
+    
+    <!-- Φόρτωση του Three.js για το 3D κοριτσάκι -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -236,104 +240,87 @@
             font-weight: 900;
         }
 
-        /* ★★★★★ AI Volta Pop-up / Speech Bubble ★★★★★ */
-        .ai-volta-bubble {
+        /* ★★★★★ AI VOLTA 3D AVATAR & SPEECH BUBBLE ★★★★★ */
+        #girl-wrapper {
             position: fixed;
-            bottom: 25px;
-            right: 25px;
+            bottom: 10px;
+            right: 15px;
             z-index: 9999;
-            display: flex;
-            align-items: center;
-            flex-direction: row-reverse;
-            animation: bubble-pop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            background: none;
-            border: none;
+            width: 250px;
+            height: 250px;
             cursor: pointer;
             text-decoration: none;
+            touch-action: none;
         }
-        .ai-volta-bubble:hover {
-            transform: scale(1.05) !important;
-            transition: transform 0.3s;
+        #girl-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+            pointer-events: none; 
         }
-
-        .ai-volta-tooltip {
-            background-color: #fffcf9;
-            border: 2px solid var(--mocha);
-            color: var(--mocha);
-            padding: 12px 20px;
-            border-radius: 30px 30px 30px 4px;
-            margin-right: 15px;
+        
+        #speech {
+            position: absolute;
+            z-index: 9998;
+            pointer-events: none;
+            font-weight: 800;
+            font-size: 14px;
+            background: #ffffff;
+            color: #333;
+            padding: 8px 14px;
+            border-radius: 16px 16px 16px 4px;
+            border: 3px solid var(--mocha);
+            box-shadow: 3px 3px 0 var(--mocha);
+            transform: translate(-50%, -130%);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            max-width: 260px;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.3;
             font-family: 'Commissioner', sans-serif;
-            font-size: 15px;
-            font-weight: bold;
-            box-shadow: 0 8px 20px rgba(92,58,33,0.15);
-            position: relative;
-            white-space: nowrap;
-            transition: all 0.3s;
+            top: 0;
+            left: 50%;
         }
-        /* Μικρό βελάκι στο συννεφάκι */
-        .ai-volta-tooltip::after {
-            content: '';
-            position: absolute;
-            right: -12px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 8px 0 8px 12px;
-            border-style: solid;
-            border-color: transparent transparent transparent var(--mocha);
+        #speech.visible {
+            opacity: 1;
+            transform: translate(-50%, -145%);
         }
-        .ai-volta-tooltip::before {
-            content: '';
+        #speech::after {
+            content: "";
             position: absolute;
-            right: -8px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 6px 0 6px 10px;
+            top: 100%;
+            left: 50%;
+            margin-left: -10px;
+            border-width: 12px;
             border-style: solid;
-            border-color: transparent transparent transparent #fffcf9;
+            border-color: var(--mocha) transparent transparent transparent;
+        }
+        #speech::before {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -7px;
+            border-width: 9px;
+            border-style: solid;
+            border-color: #ffffff transparent transparent transparent;
             z-index: 1;
         }
-        .ai-volta-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px solid #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            background: #fff;
-            transition: all 0.3s;
-        }
-
-        @keyframes bubble-pop {
-            0% { opacity: 0; transform: scale(0.5) translateY(30px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
+        
         @media (max-width: 560px) {
-            .ai-volta-bubble { bottom: 15px; right: 15px; flex-direction: column; align-items: flex-end; }
-            .ai-volta-tooltip {
-                margin-right: 0;
-                margin-bottom: 10px;
-                border-radius: 20px 20px 4px 20px;
-                white-space: normal;
-                font-size: 13px;
-                padding: 8px 14px;
-                max-width: 200px;
+            #girl-wrapper {
+                width: 160px;
+                height: 160px;
+                bottom: 5px;
+                right: 5px;
             }
-            .ai-volta-tooltip::after {
-                right: 50%;
-                top: auto;
-                bottom: -16px;
-                transform: translateX(50%) rotate(90deg);
-                border-width: 8px 0 8px 12px;
+            #speech {
+                font-size: 12px;
+                max-width: 180px;
+                padding: 6px 10px;
+                border-radius: 12px 12px 12px 3px;
             }
-            .ai-volta-tooltip::before {
-                right: 50%;
-                top: auto;
-                bottom: -12px;
-                transform: translateX(50%) rotate(90deg);
-                border-width: 6px 0 6px 10px;
-            }
-            .ai-volta-image { width: 50px; height: 50px; }
         }
     </style>
 </head>
@@ -771,16 +758,15 @@
                 </select>
             </div>
             
-            <!-- ★ ΤΟ ΚΟΥΜΠΙ CHECKOUT — ΑΛΛΑΓΗ ΣΥΜΠΕΡΙΦΟΡΑΣ ΑΝΑΛΟΓΑ ΜΕ ΤΟ ΑΝ ΕΙΜΑΣΤΕ ΣΤΟ TELEGRAM -->
             <button class="checkout" id="checkout" disabled>Ολοκλήρωση παραγγελίας</button>
         </div>
     </div>
 </aside>
 
-<!-- ★ AI Volta Pop-up Bubble / Speech Bubble ★ -->
-<a href="https://t.me/coffeevolta_bot" target="_blank" class="ai-volta-bubble" title="Μίλα με το AI Volta! ☕">
-    <div class="ai-volta-tooltip">Μίλα με το AI Volta! ☕</div>
-    <img src="photo.png" class="ai-volta-image" alt="Καφέ Βόλτα Chat">
+<!-- ★ AI VOLTA 3D AVATAR WRAPPER (Αντικατέστησε το παλιό κουμπί) ★ -->
+<a href="https://t.me/coffeevolta_bot" target="_blank" id="girl-wrapper">
+    <canvas id="girl-canvas"></canvas>
+    <div id="speech"><span id="speechText">Καλώς ήρθατε!</span></div>
 </a>
 
 <div class="toast" id="toast"></div>
@@ -1390,16 +1376,13 @@
         const currentStdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value;
         const needsPaymentStep = isTreatChecked || (currentStdPayMethod === 'iris' && !isTreatChecked);
 
-        // ★★★ ΑΛΛΑΓΗ #3: Checkout συμπεριφορά εκτός Telegram ★★★
         if (!isInTelegram) {
-            // Εκτός Telegram: το κουμπί είναι ΠΑΝΤΑ enabled, αλλάζει κείμενο και κάνει redirect
             checkoutBtn.disabled = false;
             checkoutBtn.textContent = 'Παράγγειλε μέσω Telegram 🚀';
             checkoutBtn.classList.add('telegram-cta');
             checkoutBtn.style.background = '#2AABEE';
             checkoutBtn.style.color = '#fff';
         } else {
-            // Μέσα στο Telegram: κανονική λειτουργία
             checkoutBtn.classList.remove('telegram-cta');
             checkoutBtn.style.background = 'var(--mocha)';
             checkoutBtn.style.color = '#fff';
@@ -1561,20 +1544,17 @@
         }
     }, { passive: true });
 
-    // ★★★ ΤΟ ΠΙΟ ΣΗΜΑΝΤΙΚΟ ΣΗΜΕΙΟ: Event Listener για το Checkout ★★★
     document.getElementById('checkout').onclick = async function(e) {
         if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
             document.activeElement.blur();
         }
 
-        // ★ ΑΛΛΑΓΗ #3: Αν πατήσει το checkout εκτός Telegram, τον πάμε στο Bot!
         if (!isInTelegram) {
             alert("🔐 Οι παραγγελίες ολοκληρώνονται με ασφάλεια μέσα από το Telegram για να προστατεύονται τα προσωπικά σου δεδομένα και να συλλέγεις αυτόματα τα διαμάντια σου!\n\nΘα ανοίξει το bot μας σε νέο παράθυρο. Πάτα /start για να ξεκινήσεις!");
             window.open('https://t.me/coffeevolta_bot', '_blank');
-            return; // Σταματάμε εδώ — δεν προχωράει η παραγγελία
+            return; 
         }
 
-        // === Από εδώ και κάτω, όλα τρέχουν ΜΟΝΟ αν είμαστε στο Telegram ===
         const isTreat = document.getElementById('isTreat').checked;
         if (!isOpen() && !isTreat) { alert('🌙 Είμαστε κλειστά αυτή τη στιγμή.\nΩράριο παραγγελιών: 06:00 – 22:00'); return; }
         
@@ -1806,7 +1786,6 @@
         }
     })();
 
-    // ★ Εμφάνιση banner για Telegram ΜΟΝΟ αν δεν είμαστε ήδη μέσα
     if (!isInTelegram) {
         document.getElementById('tgBanner').style.display = 'block';
         const tgNote = document.getElementById('tgNote');
@@ -1855,7 +1834,6 @@
         navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 
-    // Συγχρονισμός πόντων από τον server (ΜΟΝΟ αν είμαστε στο Telegram)
     (async () => {
         const tgId = tgUser?.id;
         if (!tgId) return;
@@ -1867,6 +1845,353 @@
                 updateCart();
             }
         } catch (e) { /* offline */ }
+    })();
+</script>
+
+<!-- ★★★ NEW 3D GIRL AVATAR SYSTEM (Text-only, with Speech Bubble & Walking) ★★★ -->
+<script>
+    (function() {
+        'use strict';
+
+        const canvas = document.getElementById("girl-canvas");
+        const speechEl = document.getElementById("speech");
+        const speechText = document.getElementById("speechText");
+        
+        let renderer, scene, camera, girl, girlCore, sockets = {}, hairGroup, dressMesh, shoeMaterial, eyeL, eyeR, mouthMesh;
+        let girlNdcX = 0.7;
+        let wanderTargetX = 0.85;
+        let petState = 'walk';
+        let petStateTimer = 5;
+        let faceDir = 1;
+        let anims = [];
+        let stepAccum = 0;
+        let reactionTime = 0;
+        let speechTimer = null;
+        
+        const SKIN = 0xffd9bd;
+        const BLONDE = 0xf6cf5e;
+
+        function tween(obj, to, dur, ease, done) {
+            const from = {};
+            for (const k in to) from[k] = obj[k];
+            anims.push({
+                obj: obj,
+                from: from,
+                to: to,
+                dur: dur,
+                t: 0,
+                ease: ease || function(t) { return 1 - Math.pow(1 - t, 3); },
+                done: done
+            });
+        }
+
+        function stepAnims(dt) {
+            for (let i = anims.length - 1; i >= 0; i--) {
+                const a = anims[i];
+                a.t += dt / a.dur;
+                const k = a.t >= 1 ? 1 : a.ease(a.t);
+                for (const p in a.to) a.obj[p] = a.from[p] + (a.to[p] - a.from[p]) * k;
+                if (a.t >= 1) {
+                    anims.splice(i, 1);
+                    if (a.done) a.done();
+                }
+            }
+        }
+
+        function showSpeech(text, duration) {
+            if (speechTimer) clearTimeout(speechTimer);
+            speechText.innerText = text;
+            speechEl.classList.add("visible");
+            updateSpeechPosition();
+            speechTimer = setTimeout(function() {
+                speechEl.classList.remove("visible");
+            }, duration);
+        }
+
+        function updateSpeechPosition() {
+            if (!girl) return;
+            const vec = girl.position.clone();
+            vec.y += 0.8;
+            vec.project(camera);
+            const x = (vec.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-vec.y * 0.5 + 0.5) * window.innerHeight;
+            
+            const wrapperRect = document.getElementById('girl-wrapper').getBoundingClientRect();
+            const w = wrapperRect.width;
+            const h = wrapperRect.height;
+            const left = (w / 2) - 10;
+            const top = y - wrapperRect.top - 10;
+            
+            speechEl.style.left = left + 'px';
+            speechEl.style.top = top + 'px';
+        }
+
+        function createGirl() {
+            const petGroup = new THREE.Group();
+            petGroup.scale.set(0.9, 0.9, 0.9);
+            const core = new THREE.Group();
+            const headMat = new THREE.MeshPhongMaterial({ color: SKIN, shininess: 18 });
+            const limbMat = new THREE.MeshPhongMaterial({ color: SKIN, shininess: 18 });
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.46, 32, 32), headMat);
+            head.position.y = 0.95;
+            core.add(head);
+            const nose = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 12), new THREE.MeshPhongMaterial({ color: 0xf7c5a5 }));
+            nose.position.set(0, 0.92, 0.45);
+            core.add(nose);
+
+            function makeEye(x) {
+                const e = new THREE.Group();
+                const white = new THREE.Mesh(new THREE.SphereGeometry(0.105, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+                const iris = new THREE.Mesh(new THREE.SphereGeometry(0.06, 16, 16), new THREE.MeshPhongMaterial({ color: 0x3a76c9, shininess: 90 }));
+                iris.position.z = 0.06;
+                const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.028, 10, 10), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+                pupil.position.z = 0.1;
+                const hl = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+                hl.position.set(0.028, 0.03, 0.115);
+                e.add(white, iris, pupil, hl);
+                e.position.set(x, 1.03, 0.36);
+                return e;
+            }
+            eyeL = makeEye(-0.17);
+            eyeR = makeEye(0.17);
+            core.add(eyeL, eyeR);
+
+            mouthMesh = new THREE.Mesh(new THREE.SphereGeometry(0.09, 20, 14), new THREE.MeshBasicMaterial({ color: 0xc0392b }));
+            mouthMesh.position.set(0, 0.79, 0.41);
+            mouthMesh.scale.set(1, 0.3, 0.3);
+            core.add(mouthMesh);
+
+            const blushMat = new THREE.MeshBasicMaterial({ color: 0xff9caa, transparent: true, opacity: 0.55 });
+            const bl = new THREE.Mesh(new THREE.SphereGeometry(0.085, 12, 12), blushMat);
+            bl.position.set(-0.3, 0.88, 0.34);
+            bl.scale.z = 0.3;
+            const br = new THREE.Mesh(new THREE.SphereGeometry(0.085, 12, 12), blushMat);
+            br.position.set(0.3, 0.88, 0.34);
+            br.scale.z = 0.3;
+            core.add(bl, br);
+
+            hairGroup = new THREE.Group();
+            hairGroup.position.y = 0.95;
+            core.add(hairGroup);
+
+            socks = {
+                head: new THREE.Group(),
+                handL: new THREE.Group(),
+                handR: new THREE.Group(),
+                footL: new THREE.Group(),
+                footR: new THREE.Group(),
+                prop: new THREE.Group()
+            };
+            
+            socks.head.position.set(0, 1.5, 0);
+            core.add(socks.head);
+
+            dressMesh = new THREE.Mesh(new THREE.ConeGeometry(0.52, 0.95, 24), new THREE.MeshPhongMaterial({ color: 0xe8639c, shininess: 30 }));
+            dressMesh.position.y = 0.08;
+            core.add(dressMesh);
+
+            const collar = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.05, 10, 20), new THREE.MeshPhongMaterial({ color: 0xffffff }));
+            collar.rotation.x = Math.PI / 2;
+            collar.position.y = 0.53;
+            core.add(collar);
+
+            socks.handL.position.set(-0.30, 0.38, 0);
+            const armL = new THREE.Mesh(new THREE.SphereGeometry(0.09, 14, 14), limbMat);
+            armL.scale.set(1, 2.7, 1);
+            armL.position.y = -0.2;
+            const handL = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 14), limbMat);
+            handL.position.y = -0.44;
+            socks.handL.add(armL, handL);
+            socks.handL.rotation.z = 0.35;
+            core.add(socks.handL);
+
+            socks.handR.position.set(0.30, 0.38, 0);
+            const armR = new THREE.Mesh(new THREE.SphereGeometry(0.09, 14, 14), limbMat);
+            armR.scale.set(1, 2.7, 1);
+            armR.position.y = -0.2;
+            const handR = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 14), limbMat);
+            handR.position.y = -0.44;
+            socks.handR.add(armR, handR);
+            socks.handR.rotation.z = -0.35;
+            core.add(socks.handR);
+
+            socks.prop.position.set(0.02, -0.44, 0.12);
+            socks.handR.add(socks.prop);
+
+            shoeMaterial = new THREE.MeshPhongMaterial({ color: 0xd23b52, shininess: 60 });
+            socks.footL.position.set(-0.16, -0.42, 0);
+            const legL = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.4, 12), limbMat);
+            legL.position.y = -0.18;
+            const shoeL = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 14), shoeMaterial);
+            shoeL.scale.set(1, 0.7, 1.4);
+            shoeL.position.set(0, -0.4, 0.04);
+            socks.footL.add(legL, shoeL);
+            core.add(socks.footL);
+
+            socks.footR.position.set(0.16, -0.42, 0);
+            const legR = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.4, 12), limbMat);
+            legR.position.y = -0.18;
+            const shoeR = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 14), shoeMaterial);
+            shoeR.scale.set(1, 0.7, 1.4);
+            shoeR.position.set(0, -0.4, 0.04);
+            socks.footR.add(legR, shoeR);
+            core.add(socks.footR);
+
+            petGroup.add(core);
+            girlCore = core;
+            petGroup.rotation.x = 0.12;
+            
+            return petGroup;
+        }
+
+        function buildHair(styleId) {
+            while (hairGroup.children.length > 0) hairGroup.remove(hairGroup.children[0]);
+            hairGroup.userData.tails = [];
+            const blonde = new THREE.MeshPhongMaterial({ color: BLONDE, shininess: 55 });
+            const blondeDark = new THREE.MeshPhongMaterial({ color: 0xe0b53f, shininess: 55 });
+            const tieMat = new THREE.MeshPhongMaterial({ color: 0xff4f8b, shininess: 70 });
+
+            function addCap() {
+                const cap = new THREE.Mesh(new THREE.SphereGeometry(0.49, 28, 18, 0, Math.PI * 2, 0, Math.PI / 2.2), blonde);
+                cap.position.set(0, 0.1, -0.06);
+                hairGroup.add(cap);
+                const back = new THREE.Mesh(new THREE.SphereGeometry(0.47, 24, 16, 0, Math.PI * 2, 0, Math.PI / 1.6), blonde);
+                back.position.set(0, 0.04, -0.16);
+                hairGroup.add(back);
+                const bangs = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 12), blonde);
+                bangs.scale.set(1.4, 0.42, 0.55);
+                bangs.position.set(0, 0.4, 0.26);
+                hairGroup.add(bangs);
+            }
+            function makeTail(x) {
+                const tail = new THREE.Group();
+                tail.position.set(x, 0.0, -0.14);
+                const tie = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.028, 10, 16), tieMat);
+                tie.rotation.y = Math.PI / 2;
+                tail.add(tie);
+                for (let i = 0; i < 3; i++) {
+                    const s = new THREE.Mesh(new THREE.SphereGeometry(0.15 - i * 0.02, 14, 14), (i === 1) ? blondeDark : blonde);
+                    s.position.y = -0.12 - i * 0.19;
+                    s.position.x = Math.sign(x) * 0.04 * i;
+                    tail.add(s);
+                }
+                tail.rotation.z = Math.sign(x) * -0.3;
+                hairGroup.add(tail);
+                hairGroup.userData.tails.push(tail);
+                return tail;
+            }
+            addCap();
+            makeTail(-0.5);
+            makeTail(0.5);
+        }
+
+        function updateGirlScreenPosition() {
+            if (!girl || !camera) return;
+            const ndc = new THREE.Vector3(girlNdcX, -0.85, 0.1);
+            ndc.unproject(camera);
+            const dir = ndc.clone().sub(camera.position).normalize();
+            const pos = camera.position.clone().add(dir.multiplyScalar(7.0));
+            girl.position.copy(pos);
+            updateSpeechPosition();
+        }
+
+        function initAvatar() {
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+            
+            scene = new THREE.Scene();
+            scene.background = null; // Διάφανο φόντο
+            
+            camera = new THREE.PerspectiveCamera(28, canvas.parentElement.clientWidth / canvas.parentElement.clientHeight, 0.1, 120);
+            camera.position.set(0, 1.5, 4.5);
+            camera.lookAt(0, 1.2, 0);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+            const sun = new THREE.DirectionalLight(0xfff2cc, 0.9);
+            sun.position.set(4, 10, 7);
+            scene.add(sun);
+
+            girl = createGirl();
+            buildHair('hair_pigtails');
+            scene.add(girl);
+            updateGirlScreenPosition();
+
+            // Αυτόματα μηνύματα
+            setTimeout(() => {
+                showSpeech("Καλώς ήρθατε στο Καφέ Βόλτα! ☕ Είμαι η Volta, η ψηφιακή σας φίλη!", 4000);
+            }, 1500);
+            
+            setTimeout(() => {
+                showSpeech("Παραγγείλετε online, κερδίστε διαμάντια και εξαργυρώστε τα σε εκπτώσεις! 🥞🎁", 5000);
+            }, 7000);
+
+            window.addEventListener('resize', () => {
+                const w = canvas.parentElement.clientWidth;
+                const h = canvas.parentElement.clientHeight;
+                renderer.setSize(w, h);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                updateGirlScreenPosition();
+            });
+
+            requestAnimationFrame(loop);
+        }
+
+        function loop(t) {
+            const dt = Math.min(0.05, 0.016);
+            stepAnims(dt);
+
+            if (girl) {
+                const core = girlCore;
+                
+                // Λογική περπατήματος
+                petStateTimer -= dt;
+                if (petStateTimer <= 0) {
+                    if (petState === 'walk') {
+                        petState = 'stand';
+                        petStateTimer = 2 + Math.random() * 3;
+                    } else {
+                        petState = 'walk';
+                        wanderTargetX = (Math.random() > 0.5) ? 0.85 : 0.5;
+                        petStateTimer = 4 + Math.random() * 5;
+                    }
+                }
+
+                if (petState === 'walk') {
+                    const dir = Math.sign(wanderTargetX - girlNdcX);
+                    if (dir !== 0) faceDir = dir;
+                    girlNdcX += dir * 0.15 * dt;
+                    stepAccum += dt;
+                    if (stepAccum > 0.36) { stepAccum = 0; }
+                    girl.rotation.y += ((faceDir > 0 ? 0.6 : -0.9) - girl.rotation.y) * 0.08;
+                    core.position.y = Math.abs(Math.sin(t * 0.012)) * 0.09;
+                    socks.footL.rotation.x = Math.sin(t * 0.012) * 0.6;
+                    socks.footR.rotation.x = -Math.sin(t * 0.012) * 0.6;
+                    mouthMesh.scale.set(1, 0.3, 0.3);
+                } else {
+                    girl.rotation.y += (-0.2 - girl.rotation.y) * 0.1;
+                    core.position.y = Math.sin(t * 0.002) * 0.06;
+                    socks.footL.rotation.x += (0 - socks.footL.rotation.x) * 0.1;
+                    socks.footR.rotation.x += (0 - socks.footR.rotation.x) * 0.1;
+                }
+
+                // Τα μάτια αναβοσβήνουν
+                const blink = Math.sin(t * 0.0035);
+                if (blink > 0.985) { eyeL.scale.y = 0.1; eyeR.scale.y = 0.1; } 
+                else { eyeL.scale.y = 1; eyeR.scale.y = 1; }
+
+                updateGirlScreenPosition();
+            }
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(loop);
+        }
+
+        // Ξεκίνημα
+        if (canvas) {
+            initAvatar();
+        }
     })();
 </script>
 </body>
