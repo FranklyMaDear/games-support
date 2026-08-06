@@ -193,6 +193,8 @@
         .form-group input, .form-group select, .form-group textarea { padding: 9px; border-radius: 6px; border: 1px solid var(--line); font-family: inherit; font-size: 16px; background: #fff; }
         .checkout { width: 100%; background: var(--mocha); color: #fff; border: none; border-radius: 999px; padding: 14px; font-weight: 700; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(92, 58, 33, 0.2); margin-top: 16px; margin-bottom: 24px; transition: opacity 0.2s; }
         .checkout:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
+        /* Ειδικό στυλ για το κουμπί όταν οδηγεί στο Telegram */
+        .checkout.telegram-cta { background: #2AABEE; color: #fff; box-shadow: 0 4px 12px rgba(42, 171, 238, 0.3); }
         
         footer { background: var(--mocha-dark); color: #e7d7c4; padding: 16px; text-align: center; font-size: 0.85rem; margin-top: auto; }
         footer a { color: #fff; }
@@ -242,9 +244,51 @@
             font-weight: 900;
         }
 
+        /* ★ Floating AI Chat Button — πάντα ορατό, κάτω δεξιά */
+        .ai-volta-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .ai-volta-btn:hover { transform: scale(1.1); }
+        .ai-volta-btn img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid #fff;
+            background: #fff;
+        }
+        .ai-volta-tooltip {
+            background-color: #5c3a21;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            margin-right: 15px;
+            font-family: 'Commissioner', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            display: none;
+            white-space: nowrap;
+        }
+        @media (min-width: 768px) {
+            .ai-volta-btn:hover .ai-volta-tooltip { display: block; }
+        }
+
         @media (max-width: 560px) {
             .hero-btns-top { flex-wrap: wrap; gap: 8px; }
             .hero-btns-top .pricelist-btn { flex: 1 1 calc(33% - 8px); font-size: 0.85rem; padding: 10px 4px; }
+            .ai-volta-btn { bottom: 20px; right: 20px; }
+            .ai-volta-btn img { width: 55px; height: 55px; }
         }
     </style>
 </head>
@@ -596,7 +640,7 @@
 
 <div class="overlay" id="overlay"></div>
 
-<!-- Νέα δομή Καλαθιού -->
+<!-- Συρτάρι Καλαθιού -->
 <aside class="drawer" id="drawer">
     <div class="drawer-head">
         <h2>Το καλάθι σου</h2>
@@ -682,63 +726,25 @@
                 </select>
             </div>
             
+            <!-- ★ ΤΟ ΚΟΥΜΠΙ CHECKOUT — ΑΛΛΑΓΗ ΣΥΜΠΕΡΙΦΟΡΑΣ ΑΝΑΛΟΓΑ ΜΕ ΤΟ ΑΝ ΕΙΜΑΣΤΕ ΣΤΟ TELEGRAM -->
             <button class="checkout" id="checkout" disabled>Ολοκλήρωση παραγγελίας</button>
         </div>
     </div>
 </aside>
-<div class="toast" id="toast"></div>
 
-<!-- ΕΔΩ ΕΙΝΑΙ ΤΟ ΚΟΥΜΠΙ ΤΟΥ AI VOLTA ΓΙΑ ΟΛΟΥΣ! -->
-<a href="https://t.me/coffeevolta_bot" target="_blank" class="ai-volta-btn">
-  <div class="ai-volta-tooltip">Μίλα με το AI Volta! ☕</div>
-  <img src="photo.png" alt="Καφέ Βόλτα Chat">
+<!-- ★ Floating AI Chat Button — ΜΟΝΙΜΟ, ΠΑΝΤΑ ΟΡΑΤΟ, ΚΑΤΩ ΔΕΞΙΑ -->
+<a href="https://t.me/coffeevolta_bot" target="_blank" class="ai-volta-btn" title="Μίλα με το AI Volta! ☕">
+    <div class="ai-volta-tooltip">Μίλα με το AI Volta! ☕</div>
+    <img src="photo.png" alt="Καφέ Βόλτα Chat">
 </a>
 
-<style>
-  .ai-volta-btn {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    transition: transform 0.3s ease;
-  }
-  .ai-volta-btn:hover {
-    transform: scale(1.1);
-  }
-  .ai-volta-btn img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    border: 2px solid #fff;
-    background: #fff;
-  }
-  .ai-volta-tooltip {
-    background-color: #5c3a21;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 20px;
-    margin-right: 15px;
-    font-family: 'Commissioner', sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    display: none;
-  }
-  @media (min-width: 768px) {
-    .ai-volta-btn:hover .ai-volta-tooltip {
-      display: block;
-    }
-  }
-</style>
+<div class="toast" id="toast"></div>
 
 <script>
     window.isSuccessScreen = false;
 
-    // ΕΛΕΓΧΟΣ: Είμαστε μέσα στο Telegram;
+    // === ΑΝΙΧΝΕΥΣΗ ΠΕΡΙΒΑΛΛΟΝΤΟΣ ===
+    // ΔΕΝ υπάρχει hard lock — όλο το UI είναι ορατό σε όλους.
     const tgApp = window.Telegram?.WebApp;
     const tgUser = tgApp?.initDataUnsafe?.user;
     const isInTelegram = !!tgUser;
@@ -1051,6 +1057,7 @@
 
         const reqText = `🎉 <b>ΝΕΟ ΑΙΤΗΜΑ ΕΚΔΗΛΩΣΗΣ</b>\n👤 ${name}${contact}\n📞 ${phone}\n\n🎯 <b>Είδος:</b> ${type}\n📅 <b>Ημερομηνία:</b> ${dateText}${time ? ` · ⏰ ${time}` : ''}\n👥 <b>Άτομα:</b> ${kids || 0} παιδιά, ${adults || 0} ενήλικες${isTalk ? `\n🏡 <b>Φιλοξενία:</b> ${space}` : `\n🍽 <b>Παιδικό μενού:</b> ${menu}`}\n📝 <b>Σχόλια:</b> ${comment || '-'}`;
 
+        // Για αιτήματα εκδηλώσεων, αν δεν είναι σε Telegram, τον καθοδηγούμε
         if (!isInTelegram) {
             alert("Για να στείλετε το αίτημά σας, παρακαλούμε ανοίξτε την εφαρμογή μας στο Telegram!");
             window.open('https://t.me/coffeevolta_bot', '_blank');
@@ -1340,18 +1347,23 @@
         const currentStdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value;
         const needsPaymentStep = isTreatChecked || (currentStdPayMethod === 'iris' && !isTreatChecked);
 
-        // Αν ΔΕΝ είναι στο Telegram, φτιάχνουμε το κουμπί να τους στέλνει εκεί!
+        // ★★★ ΑΛΛΑΓΗ #3: Checkout συμπεριφορά εκτός Telegram ★★★
         if (!isInTelegram) {
+            // Εκτός Telegram: το κουμπί είναι ΠΑΝΤΑ enabled, αλλάζει κείμενο και κάνει redirect
             checkoutBtn.disabled = false;
             checkoutBtn.textContent = 'Παράγγειλε μέσω Telegram 🚀';
+            checkoutBtn.classList.add('telegram-cta');
             checkoutBtn.style.background = '#2AABEE';
             checkoutBtn.style.color = '#fff';
         } else {
+            // Μέσα στο Telegram: κανονική λειτουργία
+            checkoutBtn.classList.remove('telegram-cta');
+            checkoutBtn.style.background = 'var(--mocha)';
+            checkoutBtn.style.color = '#fff';
             checkoutBtn.disabled = count === 0 || (!isOpen() && !isTreatChecked);
             checkoutBtn.textContent = (isOpen() || isTreatChecked) 
                 ? (needsPaymentStep ? 'Συνέχεια για πληρωμή' : 'Ολοκλήρωση παραγγελίας') 
                 : 'Κλειστά τώρα (06:00–22:00)';
-            checkoutBtn.style.background = 'var(--mocha)';
         }
 
         const dLine = document.getElementById('discountLine');
@@ -1506,18 +1518,20 @@
         }
     }, { passive: true });
 
-    document.getElementById('checkout').onclick = async () => {
+    // ★★★ ΤΟ ΠΙΟ ΣΗΜΑΝΤΙΚΟ ΣΗΜΕΙΟ: Event Listener για το Checkout ★★★
+    document.getElementById('checkout').onclick = async function(e) {
         if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
             document.activeElement.blur();
         }
 
-        // ★ Αν πατήσει το checkout εκτός Telegram, τον πάμε στο Bot!
+        // ★ ΑΛΛΑΓΗ #3: Αν πατήσει το checkout εκτός Telegram, τον πάμε στο Bot!
         if (!isInTelegram) {
-            alert("Για να ολοκληρώσετε την παραγγελία σας με ασφάλεια και να μαζέψετε διαμάντια, παρακαλούμε ανοίξτε την εφαρμογή μας στο Telegram!");
+            alert("🔐 Οι παραγγελίες ολοκληρώνονται με ασφάλεια μέσα από το Telegram για να προστατεύονται τα προσωπικά σου δεδομένα και να συλλέγεις αυτόματα τα διαμάντια σου!\n\nΘα ανοίξει το bot μας σε νέο παράθυρο. Πάτα /start για να ξεκινήσεις!");
             window.open('https://t.me/coffeevolta_bot', '_blank');
-            return;
+            return; // Σταματάμε εδώ — δεν προχωράει η παραγγελία
         }
 
+        // === Από εδώ και κάτω, όλα τρέχουν ΜΟΝΟ αν είμαστε στο Telegram ===
         const isTreat = document.getElementById('isTreat').checked;
         if (!isOpen() && !isTreat) { alert('🌙 Είμαστε κλειστά αυτή τη στιγμή.\nΩράριο παραγγελιών: 06:00 – 22:00'); return; }
         
@@ -1749,9 +1763,11 @@
         }
     })();
 
+    // ★ Εμφάνιση banner για Telegram ΜΟΝΟ αν δεν είμαστε ήδη μέσα
     if (!isInTelegram) {
         document.getElementById('tgBanner').style.display = 'block';
-        document.getElementById('tgNote').style.display = 'block';
+        const tgNote = document.getElementById('tgNote');
+        if (tgNote) tgNote.style.display = 'block';
     }
 
     (function () {
@@ -1796,6 +1812,7 @@
         navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 
+    // Συγχρονισμός πόντων από τον server (ΜΟΝΟ αν είμαστε στο Telegram)
     (async () => {
         const tgId = tgUser?.id;
         if (!tgId) return;
