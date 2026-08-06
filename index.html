@@ -627,7 +627,6 @@
                     <input type="text" id="treatName" placeholder="Όνομα Παραλήπτη *">
                     <input type="tel" id="treatPhone" placeholder="Τηλέφωνο Παραλήπτη *">
                     
-                    <!-- ★ Διορθωμένα πλαίσια ημερομηνίας & ώρας: Πλέον είναι τέλεια ευθυγραμμισμένα -->
                     <label style="font-weight:600; font-size:0.8rem; color:var(--mocha); margin-bottom:-4px;">Ημερομηνία παράδοσης *</label>
                     <input type="date" id="treatDate">
                     
@@ -647,7 +646,6 @@
                     </label>
                 </div>
 
-                <!-- ★ Τίτλος για τα στοιχεία του πελάτη (αυτός που κερνάει) -->
                 <div id="customerFieldsTitle" style="font-weight:700; font-size:0.9rem; margin-top:10px; display:none;">👤 Στοιχεία αυτός που κερνάει</div>
 
                 <input type="text" id="nameField" placeholder="Το Ονοματεπώνυμό σου *">
@@ -662,7 +660,6 @@
                     </label>
                 </div>
 
-                <!-- ★ Νέο πλαίσιο για προαιρετικό φιλοδώρημα -->
                 <div style="margin-bottom: 12px; background: #fffcf9; padding: 10px; border-radius: 8px; border: 1px dashed var(--mocha);">
                     <label style="font-size:0.85rem; font-weight:700; color:var(--mocha); display:block; margin-bottom:6px;">💖 Φιλοδώρημα (Προαιρετικό):</label>
                     <select id="tipAmount" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--line); background:#fff; font-family:inherit; font-size:16px;" onchange="updateCart()">
@@ -692,10 +689,60 @@
 </aside>
 <div class="toast" id="toast"></div>
 
+<!-- AI Volta Floating Button -->
+<a href="https://t.me/coffeevolta_bot" target="_blank" class="ai-volta-btn">
+  <div class="ai-volta-tooltip">Μίλα με το AI Volta! ☕</div>
+  <img src="photo.png" alt="Καφέ Βόλτα Chat">
+</a>
+
+<style>
+  .ai-volta-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+  }
+  
+  .ai-volta-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .ai-volta-btn img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 2px solid #fff;
+    background: #fff;
+  }
+
+  .ai-volta-tooltip {
+    background-color: #5c3a21;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    margin-right: 15px;
+    font-family: 'Commissioner', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .ai-volta-btn:hover .ai-volta-tooltip {
+      display: block;
+    }
+  }
+</style>
+
 <script>
     window.isSuccessScreen = false;
 
-    // Λειτουργία Geolocation (Ανίχνευση IP)
     async function fetchUserLocation() {
         if (sessionStorage.getItem('kv_in_eu') !== null) return;
         try {
@@ -712,7 +759,6 @@
     const tgApp = window.Telegram?.WebApp;
     const tgUser = tgApp?.initDataUnsafe?.user;
 
-    // Κλείδωμα αποκλειστικά στο Telegram
     if (!tgUser) {
         document.body.innerHTML = `
             <div style="padding:40px 20px; text-align:center; color: var(--mocha-dark);">
@@ -822,7 +868,6 @@
         radio.addEventListener('change', updateCart);
     });
 
-    // ★ Συνάρτηση για την πληρωμή IRIS με το νέο κείμενο
     window.handleIrisPayment = function() {
         navigator.clipboard.writeText('126559439').then(() => {
             alert('Παρακαλώ πηγαίνετε στην τράπεζα σας και πληρώστε μέσω IRIS.\nΤο ΑΦΜ αντιγράφηκε, εσείς κάντε απλώς επικόλληση στο πλαίσιο IRIS της τράπεζάς σας.\nΑΦΜ: 126559439');
