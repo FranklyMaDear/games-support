@@ -596,7 +596,7 @@
 
 <div class="overlay" id="overlay"></div>
 
-<!-- Νέα δομή Καλαθιού για σωστό Scroll -->
+<!-- Νέα δομή Καλαθιού -->
 <aside class="drawer" id="drawer">
     <div class="drawer-head">
         <h2>Το καλάθι σου</h2>
@@ -611,7 +611,7 @@
 
             <div class="discount-line" id="discountLine" style="display:none;"><span>🎁 Έκπτωση δώρου</span><span id="discountValue"></span></div>
             <div class="discount-line" id="extraDiscountLine" style="display:none; color:#e65100;"><span>🎁 Προσφορά</span><span id="extraDiscountValue"></span></div>
-            <div class="discount-line" id="feeLine" style="display:none; color:#c62828;"><span>💳 Έξοδα Συναλλαγής (Revolut)</span><span id="feeValue"></span></div>
+            <div class="discount-line" id="feeLine" style="display:none; color:#c62828;"><span>💳 Έξοδα Συναλλαγής</span><span id="feeValue"></span></div>
             <div class="discount-line" id="tipLine" style="display:none; color:var(--mocha);"><span>💖 Φιλοδώρημα</span><span id="tipValue"></span></div>
             <div class="totals"><span>Σύνολο</span><span id="cartTotal">0,00 €</span></div>
 
@@ -681,7 +681,6 @@
                     <option value="Σε 30 λεπτά">Παραλαβή σε 30'</option>
                 </select>
             </div>
-            <div class="tg-note" id="tgNote" style="display:none;">💡 Θες επιβεβαίωση παραγγελίας στο κινητό σου; <a href="https://t.me/coffeevolta_bot" target="_blank">Παράγγειλε μέσα από το Telegram</a></div>
             
             <button class="checkout" id="checkout" disabled>Ολοκλήρωση παραγγελίας</button>
         </div>
@@ -689,7 +688,7 @@
 </aside>
 <div class="toast" id="toast"></div>
 
-<!-- AI Volta Floating Button -->
+<!-- ΕΔΩ ΕΙΝΑΙ ΤΟ ΚΟΥΜΠΙ ΤΟΥ AI VOLTA ΓΙΑ ΟΛΟΥΣ! -->
 <a href="https://t.me/coffeevolta_bot" target="_blank" class="ai-volta-btn">
   <div class="ai-volta-tooltip">Μίλα με το AI Volta! ☕</div>
   <img src="photo.png" alt="Καφέ Βόλτα Chat">
@@ -706,11 +705,9 @@
     text-decoration: none;
     transition: transform 0.3s ease;
   }
-  
   .ai-volta-btn:hover {
     transform: scale(1.1);
   }
-
   .ai-volta-btn img {
     width: 60px;
     height: 60px;
@@ -719,7 +716,6 @@
     border: 2px solid #fff;
     background: #fff;
   }
-
   .ai-volta-tooltip {
     background-color: #5c3a21;
     color: white;
@@ -732,7 +728,6 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     display: none;
   }
-
   @media (min-width: 768px) {
     .ai-volta-btn:hover .ai-volta-tooltip {
       display: block;
@@ -743,23 +738,9 @@
 <script>
     window.isSuccessScreen = false;
 
-    async function fetchUserLocation() {
-        if (sessionStorage.getItem('kv_in_eu') !== null) return;
-        try {
-            const res = await fetch('https://ipapi.co/json/');
-            const data = await res.json();
-            sessionStorage.setItem('kv_in_eu', data.in_eu ? 'true' : 'false');
-        } catch (e) {
-            console.error('Geo fallback');
-            sessionStorage.setItem('kv_in_eu', 'false'); 
-        }
-    }
-    fetchUserLocation();
-
+    // ΕΛΕΓΧΟΣ: Είμαστε μέσα στο Telegram;
     const tgApp = window.Telegram?.WebApp;
     const tgUser = tgApp?.initDataUnsafe?.user;
-    
-    // ΕΛΕΓΧΟΣ: Είμαστε μέσα στο Telegram;
     const isInTelegram = !!tgUser;
 
     const PRODUCTS = [
@@ -1323,19 +1304,15 @@
         const subtotal = getSubtotal();
         const extraDiscount = getExtraDiscount(); 
         const rewardDiscount = getRewardDiscount();
-        
         const tipAmount = parseFloat(document.getElementById('tipAmount').value) || 0;
         let transactionFee = 0;
-        
         const total = subtotal - extraDiscount - rewardDiscount + transactionFee + tipAmount;
 
         let pointsDeduction = 0;
         let cSets = Math.floor(crepeItems.length / 3);
         for(let i=0; i < cSets * 3; i++) pointsDeduction += crepeItems[i];
-        
         let gSets = Math.floor(granitaItems.length / 3);
         for(let i=0; i < gSets * 3; i++) pointsDeduction += granitaItems[i];
-        
         let mSets = Math.floor(milkshakeItems.length / 3);
         for(let i=0; i < mSets * 3; i++) pointsDeduction += milkshakeItems[i];
         
@@ -1356,7 +1333,6 @@
         }
         
         drawerFoot.style.display = 'block';
-
         document.getElementById('cartTotal').textContent = euro(total);
         
         const checkoutBtn = document.getElementById('checkout');
@@ -1364,7 +1340,7 @@
         const currentStdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value;
         const needsPaymentStep = isTreatChecked || (currentStdPayMethod === 'iris' && !isTreatChecked);
 
-        // ★ Αν ο χρήστης ΔΕΝ είναι στο Telegram, του αλλάζουμε το κουμπί!
+        // Αν ΔΕΝ είναι στο Telegram, φτιάχνουμε το κουμπί να τους στέλνει εκεί!
         if (!isInTelegram) {
             checkoutBtn.disabled = false;
             checkoutBtn.textContent = 'Παράγγειλε μέσω Telegram 🚀';
@@ -1835,4 +1811,3 @@
 </script>
 </body>
 </html>
-
