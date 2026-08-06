@@ -9,14 +9,12 @@
     <meta property="og:description" content="Ο καφές σου έτοιμος πριν φτάσεις! Μάζεψε διαμάντια. Έκπτωση 2,50€ ή 4,00€ · 🥞 3+1 ΔΩΡΟ · 🔮 Καφεμαντεία! Φήκη Τρικάλων · 06:00–22:00">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://t.me/coffeevolta_bot/app">
-    <!-- Διορθωμένο domain για την εικόνα -->
     <meta property="og:image" content="https://volta.franklymadear.com/photo.png">
     <meta property="og:locale" content="el_GR">
     <meta property="og:site_name" content="Καφέ Βόλτα">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Καφέ Βόλτα ☕ Online Παραγγελίες & Διαμάντια">
     <meta name="twitter:description" content="Παράγγειλε online & κέρδισε διαμάντια! Εξαργύρωσε σε εκπτώσεις! 3 κρέπες = +1 ΔΩΡΟ">
-    <!-- Διορθωμένο domain για την εικόνα -->
     <meta name="twitter:image" content="https://volta.franklymadear.com/photo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#5C3A21">
@@ -67,13 +65,11 @@
         .points-badge span { background: var(--diamond); color: #fff; border-radius: 999px; padding: 1px 6px; font-size: 0.7rem; }
         .cart-btn { background: var(--mocha); color: #fff; border: none; cursor: pointer; padding: 7px 14px; border-radius: 999px; font-weight: 600; font-size: 0.85rem; }
         
-        /* ★ Hero Section */
         .hero { max-width: 1100px; margin: 0 auto; padding: 16px 16px 8px; }
         .hero-btns-top { display: flex; gap: 8px; }
         .hero-btns-top .pricelist-btn { flex: 1; padding: 12px 6px; font-size: 0.95rem; border-radius: 999px; border: 2px solid var(--mocha); background: #fff; color: var(--mocha); font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(92,58,33,0.06); display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; white-space: nowrap; gap: 6px; transition: transform 0.2s, background 0.2s; font-family: 'Commissioner', sans-serif; }
         .hero-btns-top .pricelist-btn:active { transform: scale(0.98); background: var(--soft); }
         
-        /* ★ Share Banner */
         .share-banner { max-width: 1100px; margin: 6px auto; padding: 0 16px; }
         .share-banner-inner { background: #fffcf9; border: 2px dashed #d7ccc8; border-radius: 16px; padding: 24px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 4px 12px rgba(92, 58, 33, 0.05); }
         .share-icon { font-size: 3.5rem; line-height: 1; margin-bottom: 4px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
@@ -83,21 +79,18 @@
         .share-btn { background: #ff9800; color: #fff; border: none; border-radius: 999px; padding: 12px 24px; font-weight: 700; font-size: 1.05rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(255,152,0,0.3); font-family: 'Commissioner', sans-serif; white-space: nowrap; transition: transform 0.2s; width: 100%; max-width: 280px; margin-top: 8px; }
         .share-btn:active { transform: scale(0.95); }
 
-        /* ★ Πλαίσια Πόντων */
         .offers { max-width: 1100px; margin: 0 auto; padding: 8px 16px 4px; }
         .offers-inner { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; -ms-overflow-style: none; }
         .offers-inner::-webkit-scrollbar { display: none; }
         .offer-card { flex: 0 0 auto; min-width: 115px; padding: 14px 12px; background: #FAF3E8; border: 1px solid #EADDCD; border-radius: 12px; text-align: center; box-shadow: 0 2px 6px rgba(92,58,33,0.04); display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .offer-card .o-big { font-family: 'Commissioner', sans-serif; font-weight: 900; color: #5C3A21; font-size: 1.1rem; white-space: nowrap; }
         
-        /* ★ Φωτογραφικό Banner Προσφορών */
         .promo-banner { max-width: 1100px; margin: 0 auto 8px; padding: 0 16px; }
         .promo-banner-inner { position: relative; background-image: linear-gradient(rgba(92, 58, 33, 0.75), rgba(92, 58, 33, 0.85)), url('https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=600&q=80'); background-size: cover; background-position: center; border-radius: 12px; padding: 14px 16px; color: #fff; text-align: center; box-shadow: 0 4px 12px rgba(92, 58, 33, 0.15); }
         .promo-title { font-family: 'Literata', serif; font-weight: 900; font-size: 0.95rem; margin-bottom: 4px; color: #FDF8F0; text-transform: uppercase; letter-spacing: 0.5px; }
         .promo-text { font-size: 0.75rem; font-weight: 500; color: #E6D5C3; line-height: 1.5; }
         .promo-text strong { color: #fff; font-size: 0.85rem; font-weight: 700; }
         
-        /* ★ Grid Ψυχαγωγίας & Events */
         .entertainment-grid { max-width: 1100px; margin: 4px auto 8px; padding: 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .ent-card { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: var(--card); border: none; border-radius: 10px; text-decoration: none; color: var(--mocha-dark); font-weight: 700; font-size: 0.85rem; font-family: 'Commissioner', sans-serif; cursor: pointer; box-shadow: 0 4px 12px rgba(92, 58, 33, 0.08); transition: transform 0.2s; }
         .ent-card:active { transform: scale(0.98); }
@@ -116,7 +109,6 @@
         .bk-row { display: flex; gap: 8px; }
         .bk-row label { flex: 1; }
         
-        /* ★ CSS Για 3D Παράθυρο Παιχνιδιών */
         .games-box { border: 3px solid #ff9800; box-shadow: 0 10px 40px rgba(255, 152, 0, 0.4), inset 0 0 20px rgba(255, 152, 0, 0.1); background: #fffcf9; overflow: hidden; }
         .games-head { background: linear-gradient(135deg, #ff9800, #e65100); border-bottom: none; }
         .games-head h2 { color: #fff; text-shadow: 1px 2px 4px rgba(0,0,0,0.3); font-size: 1.2rem; }
@@ -195,7 +187,6 @@
         .form-group input, .form-group select, .form-group textarea { padding: 9px; border-radius: 6px; border: 1px solid var(--line); font-family: inherit; font-size: 16px; background: #fff; }
         .checkout { width: 100%; background: var(--mocha); color: #fff; border: none; border-radius: 999px; padding: 14px; font-weight: 700; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(92, 58, 33, 0.2); margin-top: 16px; margin-bottom: 24px; transition: opacity 0.2s; }
         .checkout:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
-        /* Ειδικό στυλ για το κουμπί όταν οδηγεί στο Telegram */
         .checkout.telegram-cta { background: #2AABEE; color: #fff; box-shadow: 0 4px 12px rgba(42, 171, 238, 0.3); }
         
         footer { background: var(--mocha-dark); color: #e7d7c4; padding: 16px; text-align: center; font-size: 0.85rem; margin-top: auto; }
@@ -212,7 +203,6 @@
         .totals { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 8px; font-size: 1.05rem; color: var(--ink); }
         .discount-line { display: flex; justify-content: space-between; color: #2e7d32; font-weight: 600; font-size: 0.85rem; margin-bottom: 4px; }
         
-        /* ★ Νέο 3D Κουμπί Revolut */
         .revolut-3d-btn {
             display: inline-flex;
             align-items: center;
@@ -246,51 +236,104 @@
             font-weight: 900;
         }
 
-        /* ★ Floating AI Chat Button — πάντα ορατό, κάτω δεξιά */
-        .ai-volta-btn {
+        /* ★★★★★ AI Volta Pop-up / Speech Bubble ★★★★★ */
+        .ai-volta-bubble {
             position: fixed;
             bottom: 25px;
             right: 25px;
             z-index: 9999;
             display: flex;
             align-items: center;
-            text-decoration: none;
-            transition: transform 0.3s ease;
+            flex-direction: row-reverse;
+            animation: bubble-pop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             background: none;
             border: none;
             cursor: pointer;
+            text-decoration: none;
         }
-        .ai-volta-btn:hover { transform: scale(1.1); }
-        .ai-volta-btn img {
+        .ai-volta-bubble:hover {
+            transform: scale(1.05) !important;
+            transition: transform 0.3s;
+        }
+
+        .ai-volta-tooltip {
+            background-color: #fffcf9;
+            border: 2px solid var(--mocha);
+            color: var(--mocha);
+            padding: 12px 20px;
+            border-radius: 30px 30px 30px 4px;
+            margin-right: 15px;
+            font-family: 'Commissioner', sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(92,58,33,0.15);
+            position: relative;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        /* Μικρό βελάκι στο συννεφάκι */
+        .ai-volta-tooltip::after {
+            content: '';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 8px 0 8px 12px;
+            border-style: solid;
+            border-color: transparent transparent transparent var(--mocha);
+        }
+        .ai-volta-tooltip::before {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px 0 6px 10px;
+            border-style: solid;
+            border-color: transparent transparent transparent #fffcf9;
+            z-index: 1;
+        }
+        .ai-volta-image {
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            border: 2px solid #fff;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             background: #fff;
+            transition: all 0.3s;
         }
-        .ai-volta-tooltip {
-            background-color: #5c3a21;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            margin-right: 15px;
-            font-family: 'Commissioner', sans-serif;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            display: none;
-            white-space: nowrap;
-        }
-        @media (min-width: 768px) {
-            .ai-volta-btn:hover .ai-volta-tooltip { display: block; }
+
+        @keyframes bubble-pop {
+            0% { opacity: 0; transform: scale(0.5) translateY(30px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         @media (max-width: 560px) {
-            .hero-btns-top { flex-wrap: wrap; gap: 8px; }
-            .hero-btns-top .pricelist-btn { flex: 1 1 calc(33% - 8px); font-size: 0.85rem; padding: 10px 4px; }
-            .ai-volta-btn { bottom: 20px; right: 20px; }
-            .ai-volta-btn img { width: 55px; height: 55px; }
+            .ai-volta-bubble { bottom: 15px; right: 15px; flex-direction: column; align-items: flex-end; }
+            .ai-volta-tooltip {
+                margin-right: 0;
+                margin-bottom: 10px;
+                border-radius: 20px 20px 4px 20px;
+                white-space: normal;
+                font-size: 13px;
+                padding: 8px 14px;
+                max-width: 200px;
+            }
+            .ai-volta-tooltip::after {
+                right: 50%;
+                top: auto;
+                bottom: -16px;
+                transform: translateX(50%) rotate(90deg);
+                border-width: 8px 0 8px 12px;
+            }
+            .ai-volta-tooltip::before {
+                right: 50%;
+                top: auto;
+                bottom: -12px;
+                transform: translateX(50%) rotate(90deg);
+                border-width: 6px 0 6px 10px;
+            }
+            .ai-volta-image { width: 50px; height: 50px; }
         }
     </style>
 </head>
@@ -734,10 +777,10 @@
     </div>
 </aside>
 
-<!-- ★ Floating AI Chat Button — ΜΟΝΙΜΟ, ΠΑΝΤΑ ΟΡΑΤΟ, ΚΑΤΩ ΔΕΞΙΑ -->
-<a href="https://t.me/coffeevolta_bot" target="_blank" class="ai-volta-btn" title="Μίλα με το AI Volta! ☕">
+<!-- ★ AI Volta Pop-up Bubble / Speech Bubble ★ -->
+<a href="https://t.me/coffeevolta_bot" target="_blank" class="ai-volta-bubble" title="Μίλα με το AI Volta! ☕">
     <div class="ai-volta-tooltip">Μίλα με το AI Volta! ☕</div>
-    <img src="photo.png" alt="Καφέ Βόλτα Chat">
+    <img src="photo.png" class="ai-volta-image" alt="Καφέ Βόλτα Chat">
 </a>
 
 <div class="toast" id="toast"></div>
@@ -746,7 +789,6 @@
     window.isSuccessScreen = false;
 
     // === ΑΝΙΧΝΕΥΣΗ ΠΕΡΙΒΑΛΛΟΝΤΟΣ ===
-    // ΔΕΝ υπάρχει hard lock — όλο το UI είναι ορατό σε όλους.
     const tgApp = window.Telegram?.WebApp;
     const tgUser = tgApp?.initDataUnsafe?.user;
     const isInTelegram = !!tgUser;
@@ -1059,7 +1101,6 @@
 
         const reqText = `🎉 <b>ΝΕΟ ΑΙΤΗΜΑ ΕΚΔΗΛΩΣΗΣ</b>\n👤 ${name}${contact}\n📞 ${phone}\n\n🎯 <b>Είδος:</b> ${type}\n📅 <b>Ημερομηνία:</b> ${dateText}${time ? ` · ⏰ ${time}` : ''}\n👥 <b>Άτομα:</b> ${kids || 0} παιδιά, ${adults || 0} ενήλικες${isTalk ? `\n🏡 <b>Φιλοξενία:</b> ${space}` : `\n🍽 <b>Παιδικό μενού:</b> ${menu}`}\n📝 <b>Σχόλια:</b> ${comment || '-'}`;
 
-        // Για αιτήματα εκδηλώσεων, αν δεν είναι σε Telegram, τον καθοδηγούμε
         if (!isInTelegram) {
             alert("Για να στείλετε το αίτημά σας, παρακαλούμε ανοίξτε την εφαρμογή μας στο Telegram!");
             window.open('https://t.me/coffeevolta_bot', '_blank');
