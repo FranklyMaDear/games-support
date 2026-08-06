@@ -612,6 +612,7 @@
             <div class="discount-line" id="discountLine" style="display:none;"><span>🎁 Έκπτωση δώρου</span><span id="discountValue"></span></div>
             <div class="discount-line" id="extraDiscountLine" style="display:none; color:#e65100;"><span>🎁 Προσφορά</span><span id="extraDiscountValue"></span></div>
             <div class="discount-line" id="feeLine" style="display:none; color:#c62828;"><span>💳 Έξοδα Συναλλαγής (Revolut)</span><span id="feeValue"></span></div>
+            <div class="discount-line" id="tipLine" style="display:none; color:var(--mocha);"><span>💖 Φιλοδώρημα</span><span id="tipValue"></span></div>
             <div class="totals"><span>Σύνολο</span><span id="cartTotal">0,00 €</span></div>
 
             <div class="reward-note" id="rewardNote" style="display:none; font-size: 0.8rem; margin-bottom: 10px; color: #4d4336;">🎁 Θα κερδίσεις <strong id="earnedPoints">0</strong> 💎</div>
@@ -626,17 +627,12 @@
                     <input type="text" id="treatName" placeholder="Όνομα Παραλήπτη *">
                     <input type="tel" id="treatPhone" placeholder="Τηλέφωνο Παραλήπτη *">
                     
-                    <!-- ★ Διορθωμένα πλαίσια ημερομηνίας & ώρας: Το ένα κάτω από το άλλο, ευθυγραμμισμένα -->
-                    <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
-                        <div style="width:100%; display:flex; flex-direction:column; gap:4px;">
-                            <label style="font-weight:600; font-size:0.8rem; color:var(--mocha);">Ημερομηνία παράδοσης *</label>
-                            <input type="date" id="treatDate" style="width:100%; padding:9px; border-radius:6px; border:1px solid var(--line); font-family:inherit; font-size:16px; background:#fff;">
-                        </div>
-                        <div style="width:100%; display:flex; flex-direction:column; gap:4px;">
-                            <label style="font-weight:600; font-size:0.8rem; color:var(--mocha);">Ώρα παράδοσης *</label>
-                            <input type="time" id="treatTime" style="width:100%; padding:9px; border-radius:6px; border:1px solid var(--line); font-family:inherit; font-size:16px; background:#fff;">
-                        </div>
-                    </div>
+                    <!-- ★ Διορθωμένα πλαίσια ημερομηνίας & ώρας: Πλέον είναι τέλεια ευθυγραμμισμένα -->
+                    <label style="font-weight:600; font-size:0.8rem; color:var(--mocha); margin-bottom:-4px;">Ημερομηνία παράδοσης *</label>
+                    <input type="date" id="treatDate">
+                    
+                    <label style="font-weight:600; font-size:0.8rem; color:var(--mocha); margin-bottom:-4px;">Ώρα παράδοσης *</label>
+                    <input type="time" id="treatTime">
 
                     <textarea id="treatMessage" placeholder="Ευχή / Μήνυμα (π.χ. Χρόνια πολλά!)" rows="2"></textarea>
                     
@@ -664,7 +660,20 @@
                         <input type="radio" name="stdPayMethod" value="store" checked style="width:16px; height:16px; accent-color:#1565c0;"> 
                         <strong>Πληρωμή στο κατάστημα</strong> (Μετρητά/Κάρτα/IRIS)
                     </label>
-                    <!-- Η επιλογή Προπληρωμή με IRIS αφαιρέθηκε όπως ζητήθηκε -->
+                </div>
+
+                <!-- ★ Νέο πλαίσιο για προαιρετικό φιλοδώρημα -->
+                <div style="margin-bottom: 12px; background: #fffcf9; padding: 10px; border-radius: 8px; border: 1px dashed var(--mocha);">
+                    <label style="font-size:0.85rem; font-weight:700; color:var(--mocha); display:block; margin-bottom:6px;">💖 Φιλοδώρημα (Προαιρετικό):</label>
+                    <select id="tipAmount" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--line); background:#fff; font-family:inherit; font-size:16px;" onchange="updateCart()">
+                        <option value="0">Χωρίς φιλοδώρημα</option>
+                        <option value="0.50">0,50 €</option>
+                        <option value="1.00">1,00 €</option>
+                        <option value="1.50">1,50 €</option>
+                        <option value="2.00">2,00 €</option>
+                        <option value="3.00">3,00 €</option>
+                        <option value="5.00">5,00 €</option>
+                    </select>
                 </div>
 
                 <select id="timeField">
@@ -813,13 +822,13 @@
         radio.addEventListener('change', updateCart);
     });
 
-    // Συνάρτηση για την πληρωμή IRIS (Κέρασμα)
+    // ★ Συνάρτηση για την πληρωμή IRIS με το νέο κείμενο
     window.handleIrisPayment = function() {
         navigator.clipboard.writeText('126559439').then(() => {
-            alert('Παρακαλώ πηγαίνετε στην τράπεζα σας και πληρώσετε μέσω IRIS.\nΑΦΜ για μεταφορά: 126559439');
+            alert('Παρακαλώ πηγαίνετε στην τράπεζα σας και πληρώστε μέσω IRIS.\nΤο ΑΦΜ αντιγράφηκε, εσείς κάντε απλώς επικόλληση στο πλαίσιο IRIS της τράπεζάς σας.\nΑΦΜ: 126559439');
             showToast('Το ΑΦΜ αντιγράφηκε!');
         }).catch(() => {
-            alert('Παρακαλώ πηγαίνετε στην τράπεζα σας και πληρώσετε μέσω IRIS.Το ΑΦΜ αντιγράφηκε,εσείς κάντε επικόληση στο πλαίσιο IRIS στην Τράπεζα σας .\nΑΦΜ: 126559439');
+            alert('Παρακαλώ πηγαίνετε στην τράπεζα σας και πληρώστε μέσω IRIS.\nΑΦΜ: 126559439');
         });
     }
 
@@ -1270,11 +1279,13 @@
         const subtotal = getSubtotal();
         const extraDiscount = getExtraDiscount(); 
         const rewardDiscount = getRewardDiscount();
+        
+        // ★ Υπολογισμός Φιλοδωρήματος
+        const tipAmount = parseFloat(document.getElementById('tipAmount').value) || 0;
 
-        // ❗️Η έξτρα χρέωση (transactionFee) για τη Revolut αφαιρέθηκε εντελώς
         let transactionFee = 0;
         
-        const total = subtotal - extraDiscount - rewardDiscount + transactionFee;
+        const total = subtotal - extraDiscount - rewardDiscount + transactionFee + tipAmount;
 
         let pointsDeduction = 0;
         let cSets = Math.floor(crepeItems.length / 3);
@@ -1335,6 +1346,14 @@
             document.getElementById('feeValue').textContent = '+ ' + euro(transactionFee);
         } else {
             fLine.style.display = 'none';
+        }
+
+        const tLine = document.getElementById('tipLine');
+        if (tipAmount > 0) {
+            tLine.style.display = 'flex';
+            document.getElementById('tipValue').textContent = '+ ' + euro(tipAmount);
+        } else {
+            tLine.style.display = 'none';
         }
 
         document.getElementById('earnedPoints').textContent = earned % 1 === 0 ? earned : earned.toFixed(1);
@@ -1505,10 +1524,11 @@
         const subtotal = getSubtotal();
         const extraDiscount = getExtraDiscount();
         const rewardDiscount = getRewardDiscount();
+        const tipAmount = parseFloat(document.getElementById('tipAmount').value) || 0;
         
-        let transactionFee = 0; // Αφαιρέθηκε η προμήθεια
+        let transactionFee = 0; 
         
-        const totalAmount = subtotal - extraDiscount - rewardDiscount + transactionFee;
+        const totalAmount = subtotal - extraDiscount - rewardDiscount + transactionFee + tipAmount;
         
         let crepeItems = [];
         let granitaItems = [];
@@ -1548,6 +1568,7 @@
         if (fcCheckout > 0) itemsText += `- ${fcCheckout}x Κρέπα Σοκολάτα + Μπισκότο 🥞 (ΔΩΡΟ 3+1)\n`;
         
         if (extraDiscount > 0) itemsText += `🎁 Έκπτωση 2+1: -${euro(extraDiscount)}\n`;
+        if (tipAmount > 0) itemsText += `💖 Φιλοδώρημα: ${euro(tipAmount)}\n`;
 
         let rewardText = gifts.length
             ? `\n🎁 <b>Δώρα:</b> ${gifts.map(g => `${g.qty}x ${g.name}`).join(', ')} (−${euro(rewardDiscount)}, −${redeemedCost} 💎)`
@@ -1601,7 +1622,6 @@
             if (requiresPaymentStep) {
                 let paymentInfoHtml = '';
                 if (!isTreat || payMethod === 'iris') {
-                    // ★ Νέο κουμπί IRIS με το δικό του prompt
                     paymentInfoHtml = `
                         <strong style="color:var(--mocha);">Πληρωμή μέσω IRIS</strong><br>
                         <div style="background:#f0f4f8; border:1px solid #90caf9; border-radius:8px; padding:16px; text-align:center; margin-top:6px; margin-bottom:12px;">
@@ -1610,7 +1630,6 @@
                         </div>
                     `;
                 } else {
-                    // ★ Νέο 3D Banner της Revolut
                     paymentInfoHtml = `
                         <div style="background: linear-gradient(145deg, #f0f4f8, #e2e8f0); border: 2px solid #b0bec5; border-radius: 12px; padding: 16px; text-align: center; box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.05);">
                             <h4 style="color: #1a1a24; margin-bottom: 6px; font-family: 'Commissioner', sans-serif; font-size: 1.05rem; font-weight: 900;">Πληρωμή μέσω Revolut</h4>
@@ -1660,6 +1679,7 @@
             document.getElementById('treatFields').style.display = 'none';
             document.getElementById('customerFieldsTitle').style.display = 'none';
             document.getElementById('timeField').style.display = 'block';
+            document.getElementById('tipAmount').value = '0';
             btn.textContent = 'Ολοκλήρωση παραγγελίας';
         } else {
             alert(`❌ Απέτυχε να σταλεί στην ΟΜΑΔΑ!\nΛόγος: ${groupResult.error}`);
