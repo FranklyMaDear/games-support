@@ -658,7 +658,7 @@
                     <span style="font-size:0.85rem; color:#1565c0; font-weight:700;">Τρόπος Πληρωμής (Παραλαβή από το κατάστημα):</span>
                     <label style="display:flex; align-items:center; gap:6px; font-size:0.85rem; cursor:pointer; margin-top:6px;">
                         <input type="radio" name="stdPayMethod" value="store" checked style="width:16px; height:16px; accent-color:#1565c0;"> 
-                        <strong>Πληρωμή στο κατάστημα</strong> (Μετρητά/Κάρτα/IRIS)
+                        <strong>Πληρωμή στο κατάστημα</strong> (Μετρητά / IRIS)
                     </label>
                 </div>
 
@@ -973,9 +973,9 @@
             
             if (navigator.share) {
                 try {
-                    const response = await fetch('photo2.png');
+                    const response = await fetch('photo.png');
                     const blob = await response.blob();
-                    const file = new File([blob], 'photo2.png', { type: blob.type });
+                    const file = new File([blob], 'photo.png', { type: blob.type });
 
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         await navigator.share({
