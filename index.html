@@ -700,6 +700,20 @@
     }
     fetchUserLocation();
 
+    const tgApp = window.Telegram?.WebApp;
+    const tgUser = tgApp?.initDataUnsafe?.user;
+
+    // Κλείδωμα αποκλειστικά στο Telegram
+    if (!tgUser) {
+        document.body.innerHTML = `
+            <div style="padding:40px 20px; text-align:center; color: var(--mocha-dark);">
+                <h2 style="font-family: 'Literata', serif;">Πρόσβαση μόνο μέσω Telegram</h2>
+                <p>Για την ασφάλεια των παραγγελιών, το eShop λειτουργεί αποκλειστικά μέσα από το Telegram bot μας.</p>
+                <a href="https://t.me/coffeevolta_bot" style="display:inline-block; margin-top:20px; padding:12px 24px; background:#2AABEE; color:#fff; text-decoration:none; border-radius:999px; font-weight:bold;">Άνοιγμα στο Telegram</a>
+            </div>`;
+        throw new Error("Εκτός Telegram");
+    }
+
     const PRODUCTS = [
         { id: 'ellinikos', n: "Ελληνικός Μονός", p: 1.50, cat: 'coffee', sugar: true },
         { id: 'ellinikos2', n: "Ελληνικός Διπλός", p: 1.50, cat: 'coffee', sugar: true },
@@ -863,7 +877,11 @@
     updateTimers();
 
     function loadData() {
-        document.getElementById('nameField').value = localStorage.getItem(LS_NAME) || '';
+        let savedName = localStorage.getItem(LS_NAME);
+        if (!savedName && tgUser && tgUser.first_name) {
+            savedName = tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '');
+        }
+        document.getElementById('nameField').value = savedName || '';
         document.getElementById('phoneField').value = localStorage.getItem(LS_PHONE) || '';
         updatePointsDisplay();
     }
@@ -1000,8 +1018,7 @@
         if (!name || !phone) { alert('Συμπληρώστε ονοματεπώνυμο και τηλέφωνο'); return; }
 
         const isTalk = type.startsWith('Ομιλία');
-        const tgU = window.Telegram?.WebApp?.initDataUnsafe?.user;
-        const contact = tgU ? (tgU.username ? `\n💬 @${tgU.username}` : `\n💬 <a href="tg://user?id=${tgU.id}">Στείλε μήνυμα</a>`) : '';
+        const contact = tgUser ? (tgUser.username ? `\n💬 @${tgUser.username}` : `\n💬 <a href="tg://user?id=${tgUser.id}">Στείλε μήνυμα</a>`) : '';
         const dateText = date ? new Date(date + 'T00:00').toLocaleDateString('el-GR') : 'Δεν ορίστηκε';
 
         const reqText = `🎉 <b>ΝΕΟ ΑΙΤΗΜΑ ΕΚΔΗΛΩΣΗΣ</b>\n👤 ${name}${contact}\n📞 ${phone}\n\n🎯 <b>Είδος:</b> ${type}\n📅 <b>Ημερομηνία:</b> ${dateText}${time ? ` · ⏰ ${time}` : ''}\n👥 <b>Άτομα:</b> ${kids || 0} παιδιά, ${adults || 0} ενήλικες${isTalk ? `\n🏡 <b>Φιλοξενία:</b> ${space}` : `\n🍽 <b>Παιδικό μενού:</b> ${menu}`}\n📝 <b>Σχόλια:</b> ${comment || '-'}`;
@@ -1290,13 +1307,13 @@
         document.getElementById('cartTotal').textContent = euro(total);
         
         const checkoutBtn = document.getElementById('checkout');
-        checkoutBtn.disabled = count === 0 || !isOpen();
-
         const isTreatChecked = document.getElementById('isTreat').checked;
         const currentStdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value;
         const needsPaymentStep = isTreatChecked || (currentStdPayMethod === 'iris' && !isTreatChecked);
 
-        checkoutBtn.textContent = isOpen() 
+        checkoutBtn.disabled = count === 0 || (!isOpen() && !isTreatChecked);
+
+        checkoutBtn.textContent = (isOpen() || isTreatChecked) 
             ? (needsPaymentStep ? 'Συνέχεια για πληρωμή' : 'Ολοκλήρωση παραγγελίας') 
             : 'Κλειστά τώρα (06:00–22:00)';
 
@@ -1383,7 +1400,7 @@
 
     async function sendOrder(payload) {
         try {
-            const response = await fetch(WORKER_URL, {
+            const response = await fetch(`${WORKER_URL}/order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -1392,7 +1409,7 @@
             if (!response.ok || !data.success) {
                 return { success: false, error: data.error || 'Σφάλμα server' };
             }
-            return { success: true, receiptSent: data.receiptSent, receiptError: data.receiptError, points: data.points };
+            return { success: true, orderId: data.orderId, receiptSent: data.receiptSent, points: data.points };
         } catch (error) {
             return { success: false, error: "Network Error (Δίκτυο)" };
         }
@@ -1400,16 +1417,41 @@
 
     window.confirmTreatPayment = async function(cName, cPhone) {
         const btn = document.getElementById('confirmPayBtn');
+        if (!window.currentOrderId) {
+            alert("Σφάλμα συστήματος: Δεν βρέθηκε ID παραγγελίας.");
+            return;
+        }
+
         btn.disabled = true;
-        btn.textContent = '⏳ Ενημέρωση καταστήματος...';
-        
-        const msg = `✅ <b>ΕΠΙΒΕΒΑΙΩΣΗ ΠΛΗΡΩΜΗΣ</b>\nΟ πελάτης ${cName} (${cPhone}) αναφέρει ότι ολοκλήρωσε την πληρωμή (και έστειλε αποδεικτικό)!\nΠαρακαλούμε ελέγξτε τα μηνύματα ή τον λογαριασμό σας.`;
-        
-        await sendOrder({ text: msg });
-        
-        btn.textContent = '✔️ Η παραγγελία ολοκληρώθηκε!';
-        btn.style.background = '#1b5e20';
-        showToast('Ευχαριστούμε! Η παραγγελία ξεκινάει.');
+        btn.textContent = '⏳ Αναμονή επιβεβαίωσης από το κατάστημα...';
+        btn.style.background = '#f57c00';
+        showToast('Παρακαλώ περιμένετε να ελέγξουμε την πληρωμή.');
+
+        const checkInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`${WORKER_URL}/status?id=${window.currentOrderId}`);
+                const data = await response.json();
+                
+                if (data.status === 'approved') {
+                    clearInterval(checkInterval);
+                    btn.disabled = false;
+                    btn.textContent = '✔️ Η παραγγελία επιβεβαιώθηκε!';
+                    btn.style.background = '#1b5e20';
+                    
+                    btn.onclick = () => {
+                        showToast('Ευχαριστούμε! Η παραγγελία ξεκινάει.');
+                        closeModal('drawer', true);
+                    };
+                } else if (data.status === 'rejected') {
+                    clearInterval(checkInterval);
+                    btn.textContent = '❌ Η πληρωμή δεν επιβεβαιώθηκε';
+                    btn.style.background = '#c62828';
+                    showToast('Η παραγγελία ακυρώθηκε από το κατάστημα.');
+                }
+            } catch (error) {
+                console.error("Σφάλμα επικοινωνίας");
+            }
+        }, 5000);
     };
 
     document.addEventListener('touchstart', e => {
@@ -1424,9 +1466,9 @@
             document.activeElement.blur();
         }
 
-        if (!isOpen()) { alert('🌙 Είμαστε κλειστά αυτή τη στιγμή.\nΩράριο παραγγελιών: 06:00 – 22:00'); return; }
-        
         const isTreat = document.getElementById('isTreat').checked;
+        if (!isOpen() && !isTreat) { alert('🌙 Είμαστε κλειστά αυτή τη στιγμή.\nΩράριο παραγγελιών: 06:00 – 22:00'); return; }
+        
         const payMethod = document.querySelector('input[name="payMethod"]:checked')?.value || 'iris';
         const stdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value || 'store';
         const requiresPaymentStep = isTreat || (!isTreat && stdPayMethod === 'iris');
@@ -1491,7 +1533,6 @@
         const redeemedCost = redeemedCostTotal();
         const gifts = redeemedList();
 
-        const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
         const comment = document.getElementById('commentField').value.trim();
         const time = isTreat ? '-' : document.getElementById('timeField').value;
         const customerName = name || (tgUser?.first_name || 'Πελάτης');
@@ -1543,6 +1584,7 @@
 
         if (groupResult.success) {
             window.isSuccessScreen = true;
+            window.currentOrderId = groupResult.orderId;
             
             const finalPts = (typeof groupResult.points === 'number') ? groupResult.points : newTotalPoints;
             setPoints(finalPts);
@@ -1667,18 +1709,17 @@
         const LS_A2HS = 'kv_a2hs_dismissed';
         if (localStorage.getItem(LS_A2HS)) return;
 
-        const tg = window.Telegram?.WebApp;
         let deferredPrompt = null;
         const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
         const inStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 
         function show() { banner.style.display = 'flex'; }
 
-        if (tg && typeof tg.addToHomeScreen === 'function' && isInTelegram) {
-            if (typeof tg.checkHomeScreenStatus === 'function') {
-                tg.checkHomeScreenStatus(status => { if (status !== 'added') show(); });
+        if (tgApp && typeof tgApp.addToHomeScreen === 'function' && isInTelegram) {
+            if (typeof tgApp.checkHomeScreenStatus === 'function') {
+                tgApp.checkHomeScreenStatus(status => { if (status !== 'added') show(); });
             } else show();
-            btn.onclick = () => { tg.addToHomeScreen(); };
+            btn.onclick = () => { tgApp.addToHomeScreen(); };
         } else if (!isInTelegram && !inStandalone) {
             window.addEventListener('beforeinstallprompt', e => {
                 e.preventDefault();
@@ -1704,7 +1745,7 @@
     }
 
     (async () => {
-        const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+        const tgId = tgUser?.id;
         if (!tgId) return;
         try {
             const r = await fetch(`${WORKER_URL}/points?id=${tgId}`);
