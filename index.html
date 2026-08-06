@@ -758,16 +758,9 @@
 
     const tgApp = window.Telegram?.WebApp;
     const tgUser = tgApp?.initDataUnsafe?.user;
-
-    if (!tgUser) {
-        document.body.innerHTML = `
-            <div style="padding:40px 20px; text-align:center; color: var(--mocha-dark);">
-                <h2 style="font-family: 'Literata', serif;">Πρόσβαση μόνο μέσω Telegram</h2>
-                <p>Για την ασφάλεια των παραγγελιών, το eShop λειτουργεί αποκλειστικά μέσα από το Telegram bot μας.</p>
-                <a href="https://t.me/coffeevolta_bot" style="display:inline-block; margin-top:20px; padding:12px 24px; background:#2AABEE; color:#fff; text-decoration:none; border-radius:999px; font-weight:bold;">Άνοιγμα στο Telegram</a>
-            </div>`;
-        throw new Error("Εκτός Telegram");
-    }
+    
+    // ΕΛΕΓΧΟΣ: Είμαστε μέσα στο Telegram;
+    const isInTelegram = !!tgUser;
 
     const PRODUCTS = [
         { id: 'ellinikos', n: "Ελληνικός Μονός", p: 1.50, cat: 'coffee', sugar: true },
@@ -1077,6 +1070,12 @@
 
         const reqText = `🎉 <b>ΝΕΟ ΑΙΤΗΜΑ ΕΚΔΗΛΩΣΗΣ</b>\n👤 ${name}${contact}\n📞 ${phone}\n\n🎯 <b>Είδος:</b> ${type}\n📅 <b>Ημερομηνία:</b> ${dateText}${time ? ` · ⏰ ${time}` : ''}\n👥 <b>Άτομα:</b> ${kids || 0} παιδιά, ${adults || 0} ενήλικες${isTalk ? `\n🏡 <b>Φιλοξενία:</b> ${space}` : `\n🍽 <b>Παιδικό μενού:</b> ${menu}`}\n📝 <b>Σχόλια:</b> ${comment || '-'}`;
 
+        if (!isInTelegram) {
+            alert("Για να στείλετε το αίτημά σας, παρακαλούμε ανοίξτε την εφαρμογή μας στο Telegram!");
+            window.open('https://t.me/coffeevolta_bot', '_blank');
+            return;
+        }
+
         this.disabled = true; this.textContent = 'Αποστολή...';
         const result = await sendOrder({ text: reqText });
         this.disabled = false; this.textContent = '📨 Αποστολή αιτήματος';
@@ -1325,9 +1324,7 @@
         const extraDiscount = getExtraDiscount(); 
         const rewardDiscount = getRewardDiscount();
         
-        // ★ Υπολογισμός Φιλοδωρήματος
         const tipAmount = parseFloat(document.getElementById('tipAmount').value) || 0;
-
         let transactionFee = 0;
         
         const total = subtotal - extraDiscount - rewardDiscount + transactionFee + tipAmount;
@@ -1367,11 +1364,19 @@
         const currentStdPayMethod = document.querySelector('input[name="stdPayMethod"]:checked')?.value;
         const needsPaymentStep = isTreatChecked || (currentStdPayMethod === 'iris' && !isTreatChecked);
 
-        checkoutBtn.disabled = count === 0 || (!isOpen() && !isTreatChecked);
-
-        checkoutBtn.textContent = (isOpen() || isTreatChecked) 
-            ? (needsPaymentStep ? 'Συνέχεια για πληρωμή' : 'Ολοκλήρωση παραγγελίας') 
-            : 'Κλειστά τώρα (06:00–22:00)';
+        // ★ Αν ο χρήστης ΔΕΝ είναι στο Telegram, του αλλάζουμε το κουμπί!
+        if (!isInTelegram) {
+            checkoutBtn.disabled = false;
+            checkoutBtn.textContent = 'Παράγγειλε μέσω Telegram 🚀';
+            checkoutBtn.style.background = '#2AABEE';
+            checkoutBtn.style.color = '#fff';
+        } else {
+            checkoutBtn.disabled = count === 0 || (!isOpen() && !isTreatChecked);
+            checkoutBtn.textContent = (isOpen() || isTreatChecked) 
+                ? (needsPaymentStep ? 'Συνέχεια για πληρωμή' : 'Ολοκλήρωση παραγγελίας') 
+                : 'Κλειστά τώρα (06:00–22:00)';
+            checkoutBtn.style.background = 'var(--mocha)';
+        }
 
         const dLine = document.getElementById('discountLine');
         if (rewardDiscount > 0) {
@@ -1528,6 +1533,13 @@
     document.getElementById('checkout').onclick = async () => {
         if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
             document.activeElement.blur();
+        }
+
+        // ★ Αν πατήσει το checkout εκτός Telegram, τον πάμε στο Bot!
+        if (!isInTelegram) {
+            alert("Για να ολοκληρώσετε την παραγγελία σας με ασφάλεια και να μαζέψετε διαμάντια, παρακαλούμε ανοίξτε την εφαρμογή μας στο Telegram!");
+            window.open('https://t.me/coffeevolta_bot', '_blank');
+            return;
         }
 
         const isTreat = document.getElementById('isTreat').checked;
@@ -1761,7 +1773,6 @@
         }
     })();
 
-    const isInTelegram = !!window.Telegram?.WebApp?.initDataUnsafe?.user;
     if (!isInTelegram) {
         document.getElementById('tgBanner').style.display = 'block';
         document.getElementById('tgNote').style.display = 'block';
