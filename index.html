@@ -244,8 +244,9 @@
         /* ★★★★★ AZIRAM 3D AVATAR & SPEECH BUBBLE ★★★★★ */
         #girl-wrapper {
             position: fixed;
-            top: 55%;
-            left: 78%;
+            top: auto;
+            bottom: 24px;
+            left: 38%;
             z-index: 9999;
             width: 170px;
             height: 170px;
@@ -2445,16 +2446,26 @@
             "Καλώς ήρθατε στο Καφέ Βόλτα! ☕ Είμαι η Aziram, πώς μπορώ να σας εξυπηρετήσω;",
             "Κάθε παραγγελία σου χαρίζει διαμάντια: 1€ = 1💎 και δεν μηδενίζονται ποτέ! 💎",
             "Μάζεψε διαμάντια και εξαργύρωσέ τα σε εκπτώσεις 2,50€ ή 4,00€! Δες τις Προσφορές! 📣",
+            "Οι προσφορές Αυγούστου λήγουν 31 Αυγούστου, μην τις χάσεις! ⏳",
             "3 κρέπες = ΔΩΡΟ 1 ακόμα κρέπα Σοκολάτα-Μπισκότο! 🥞🎁",
             "2 Γρανίτες = η 3η ΔΩΡΕΑΝ! Το ίδιο ισχύει και για τα Milkshake! 🥤",
-            "Οι προσφορές Αυγούστου λήγουν 31 Αυγούστου, μην τις χάσεις! ⏳",
             "Θέλετε να κεράσετε έναν φίλο; Μπείτε στο καλάθι και επιλέξτε 'κέρασμα'! 🎁",
             "Κλείσε παιδικό πάρτυ γενεθλίων σε δικό μας εξωτερικό χώρο με γκαζόν, κούνιες και τραμπολίνο! 🎈",
             "Έχουμε χώρο έως 80+ ατόμων για εκδηλώσεις, ομιλίες και παρουσιάσεις! 🎤",
             "Πατήστε 'Aziram' κάτω αριστερά και δείτε το δικό μου shop με αξεσουάρ για να με ντύσετε! 🎨👗",
-            "Πατήστε με για να μιλήσουμε στο Telegram και να δείτε τον κατάλογό μας! 💬",
+            "Κάνε κλικ επάνω μου για να συζητήσουμε μέσα από το Chat Bot! 💬",
             "Ήπιατε τον ελληνικό σας; Δοκιμάστε την ψηφιακή μας Καφεμαντεία! 🔮"
         ];
+        // Σταθερή σειρά μηνυμάτων μόλις ανοίγει η σελίδα: καλωσόρισμα → προσφορές → Αυγούστου → πάρτυ → κέρασμα → chat bot
+        const INTRO_SEQUENCE = [
+            "Καλώς ήρθατε στο Καφέ Βόλτα! ☕ Είμαι η Aziram, πώς μπορώ να σας εξυπηρετήσω;",
+            "Μάζεψε διαμάντια και εξαργύρωσέ τα σε εκπτώσεις 2,50€ ή 4,00€! Δες τις Προσφορές! 📣",
+            "Οι προσφορές Αυγούστου λήγουν 31 Αυγούστου, μην τις χάσεις! ⏳",
+            "Κλείσε παιδικό πάρτυ γενεθλίων σε δικό μας εξωτερικό χώρο με γκαζόν, κούνιες και τραμπολίνο! 🎈",
+            "Θέλετε να κεράσετε έναν φίλο; Μπείτε στο καλάθι και επιλέξτε 'κέρασμα'! 🎁",
+            "Κάνε κλικ επάνω μου για να συζητήσουμε μέσα από το Chat Bot! 💬"
+        ];
+        const GREET_GAP = 10000; // 10 δευτερόλεπτα ανάμεσα σε κάθε μήνυμα
         let lastGreetIdx = -1;
         function randomGreeting() {
             let i;
@@ -2463,8 +2474,25 @@
             return GREETINGS[i];
         }
         function scheduleGreetings() {
-            setTimeout(function() { showSpeech(GREETINGS[0], 4500); }, 1200);
-            setInterval(function() { showSpeech(randomGreeting(), 5000); }, 26000);
+            INTRO_SEQUENCE.forEach(function(msg, i) {
+                setTimeout(function() { showSpeech(msg, GREET_GAP - 700); }, 600 + i * GREET_GAP);
+            });
+            setTimeout(function() {
+                setInterval(function() { showSpeech(randomGreeting(), GREET_GAP - 700); }, GREET_GAP);
+            }, 600 + INTRO_SEQUENCE.length * GREET_GAP);
+        }
+
+        /* ================= ΑΡΧΙΚΗ ΤΟΠΟΘΕΤΗΣΗ ΣΤΟ ΚΑΤΩ ΜΕΡΟΣ ΤΗΣ ΟΘΟΝΗΣ (ΧΩΡΙΣ ΚΙΝΗΣΗ) ================= */
+        function placeAtBottomInstant() {
+            const w = wrapper.offsetWidth || 170;
+            const h = wrapper.offsetHeight || 170;
+            const fixedTop = Math.max(20, window.innerHeight - h - 24);
+            const startLeft = Math.max(20, Math.round((window.innerWidth - w) / 2));
+            wrapper.style.transition = 'none';
+            wrapper.style.left = startLeft + 'px';
+            wrapper.style.top = fixedTop + 'px';
+            void wrapper.offsetWidth; // force reflow
+            wrapper.style.transition = '';
         }
 
         /* ================= INIT & RENDER LOOP ================= */
@@ -2488,8 +2516,9 @@
             applyOutfit();
             scene.add(girl);
 
+            placeAtBottomInstant();
             scheduleGreetings();
-            setTimeout(scheduleWander, 2000);
+            setTimeout(scheduleWander, 600 + INTRO_SEQUENCE.length * GREET_GAP + 800);
 
             window.addEventListener('resize', function() {
                 const w = canvas.parentElement.clientWidth;
