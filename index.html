@@ -272,7 +272,7 @@
             border-radius: 16px 16px 16px 4px;
             border: 3px solid var(--mocha);
             box-shadow: 3px 3px 0 var(--mocha);
-            transform: translate(-50%, -100%);
+            transform: translate(-50%, -108%);
             opacity: 0;
             transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
             max-width: min(320px, 82vw);
@@ -282,12 +282,12 @@
             text-align: center;
             line-height: 1.35;
             font-family: 'Commissioner', sans-serif;
-            top: 22%;
+            top: 9%;
             left: 50%;
         }
         #speech.visible {
             opacity: 1;
-            transform: translate(-50%, -112%);
+            transform: translate(-50%, -120%);
         }
         #speech::after {
             content: "";
@@ -1094,7 +1094,10 @@
     document.getElementById('openPricelist').onclick = () => { buildPricelist(); openModal('plOverlay'); };
     document.getElementById('openOffers').onclick = () => openModal('offersOverlay');
     document.getElementById('openEvents').onclick = () => openModal('evOverlay');
-    document.getElementById('openCart').onclick = () => openModal('drawer', true);
+    document.getElementById('openCart').onclick = () => {
+        openModal('drawer', true);
+        if (window.azSpeak) window.azSpeak("Μην ξεχάσετε το φιλοδώρημα! 💖", 4500);
+    };
     document.getElementById('openBooking').onclick = () => { closeModal('evOverlay'); openModal('bkOverlay'); };
 
     const openGamesBtn = document.getElementById('openGamesModal');
@@ -1610,6 +1613,7 @@
                     btn.disabled = false;
                     btn.textContent = '✔️ Η παραγγελία επιβεβαιώθηκε!';
                     btn.style.background = '#1b5e20';
+                    if (window.azSpeak) window.azSpeak("Σε ευχαριστώ πολύ! Η παραγγελία σου επιβεβαιώθηκε! ☕💖", 4500);
                     
                     btn.onclick = () => {
                         showToast('Ευχαριστούμε! Η παραγγελία ξεκινάει.');
@@ -1830,6 +1834,7 @@
                         </div>
                         <p style="margin-top:16px; font-size:0.9rem; color:#4d4336;">${receiptNote}</p>
                     </div>`;
+                if (window.azSpeak) window.azSpeak("Σε ευχαριστώ πολύ για την παραγγελία σου! ☕💖", 4500);
             }
             
             document.querySelector('.drawer-body').scrollTop = 0;
@@ -2036,59 +2041,7 @@
                 speechEl.classList.remove("visible");
             }, duration);
         }
-
-        /* ================= ΗΧΟΣ ΒΗΜΑΤΩΝ ================= */
-        let stepAudioCtx = null;
-        let stepIntervalId = null;
-        function getStepAudioCtx() {
-            if (!stepAudioCtx) {
-                try { stepAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-                catch (e) { stepAudioCtx = null; }
-            }
-            return stepAudioCtx;
-        }
-        function playFootstepTap() {
-            const ctx = getStepAudioCtx();
-            if (!ctx) return;
-            if (ctx.state === 'suspended') ctx.resume();
-            const now = ctx.currentTime;
-            const bufferSize = Math.floor(ctx.sampleRate * 0.06);
-            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-            }
-            const noise = ctx.createBufferSource();
-            noise.buffer = buffer;
-            const filter = ctx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.value = 700;
-            const gain = ctx.createGain();
-            gain.gain.setValueAtTime(0.16, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
-            noise.connect(filter).connect(gain).connect(ctx.destination);
-            noise.start(now);
-            noise.stop(now + 0.09);
-        }
-        function startFootsteps(walkDuration) {
-            if (stepIntervalId) { clearInterval(stepIntervalId); stepIntervalId = null; }
-            playFootstepTap();
-            const stepGap = 340;
-            let elapsed = 0;
-            stepIntervalId = setInterval(function() {
-                elapsed += stepGap;
-                if (elapsed >= walkDuration || petState !== 'walk') {
-                    clearInterval(stepIntervalId);
-                    stepIntervalId = null;
-                    return;
-                }
-                playFootstepTap();
-            }, stepGap);
-        }
-        document.addEventListener('pointerdown', function unlockAudioOnce() {
-            getStepAudioCtx();
-            document.removeEventListener('pointerdown', unlockAudioOnce);
-        }, { once: true });
+        window.azSpeak = showSpeech;
 
         /* ================= 3D MODEL ================= */
         function createGirl() {
@@ -2476,7 +2429,6 @@
             const dist = Math.abs(targetLeft - curLeft);
             const walkDuration = Math.min(4200, Math.max(1400, dist * 6));
             wrapper.style.transitionDuration = (walkDuration / 1000) + 's';
-            startFootsteps(walkDuration);
 
             setTimeout(function() {
                 petState = (Math.random() < 0.2) ? 'hop' : 'stand';
@@ -2499,6 +2451,7 @@
             "Θέλετε να κεράσετε έναν φίλο; Μπείτε στο καλάθι και επιλέξτε 'κέρασμα'! 🎁",
             "Κλείσε παιδικό πάρτυ γενεθλίων σε δικό μας εξωτερικό χώρο με γκαζόν, κούνιες και τραμπολίνο! 🎈",
             "Έχουμε χώρο έως 80+ ατόμων για εκδηλώσεις, ομιλίες και παρουσιάσεις! 🎤",
+            "Πατήστε 'Aziram' κάτω αριστερά και δείτε το δικό μου shop με αξεσουάρ για να με ντύσετε! 🎨👗",
             "Πατήστε με για να μιλήσουμε στο Telegram και να δείτε τον κατάλογό μας! 💬",
             "Ήπιατε τον ελληνικό σας; Δοκιμάστε την ψηφιακή μας Καφεμαντεία! 🔮"
         ];
