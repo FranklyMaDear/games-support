@@ -275,7 +275,9 @@
             transform: translate(-50%, -100%);
             opacity: 0;
             transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-            max-width: 220px;
+            max-width: 280px;
+            min-width: 160px;
+            width: max-content;
             white-space: normal;
             text-align: center;
             line-height: 1.3;
@@ -311,7 +313,7 @@
         
         @media (max-width: 560px) {
             #girl-wrapper { width: 120px; height: 120px; }
-            #speech { font-size: 12px; max-width: 140px; padding: 6px 10px; }
+            #speech { font-size: 12px; max-width: 230px; min-width: 130px; padding: 6px 10px; }
         }
 
         /* ★★★ Aziram customize button & panel ★★★ */
@@ -837,7 +839,7 @@
 </aside>
 
 <!-- ★ AZIRAM — 3D AVATAR που τριγυρίζει σε όλη τη σελίδα ★ -->
-<a href="https://t.me/coffeevolta_bot" target="_blank" id="girl-wrapper" aria-label="Μίλησε με τον Aziram στο Telegram">
+<a href="https://t.me/coffeevolta_bot" target="_blank" id="girl-wrapper" aria-label="Μίλησε με την Aziram στο Telegram">
     <canvas id="girl-canvas"></canvas>
     <div id="speech"><span id="speechText">Καλώς ήρθατε!</span></div>
 </a>
@@ -845,7 +847,7 @@
 
 <div id="azPanel">
     <div id="azPanelCard">
-        <h3>🎨 Προσάρμοσε τον Aziram</h3>
+        <h3>🎨 Προσάρμοσε την Aziram</h3>
         <div class="az-tabs" id="azTabs">
             <div class="az-tab active" data-tab="pet_hair">💇 Μαλλιά</div>
             <div class="az-tab" data-tab="pet_clothes">👗 Ρούχα</div>
@@ -2026,6 +2028,59 @@
             }, duration);
         }
 
+        /* ================= ΗΧΟΣ ΒΗΜΑΤΩΝ ================= */
+        let stepAudioCtx = null;
+        let stepIntervalId = null;
+        function getStepAudioCtx() {
+            if (!stepAudioCtx) {
+                try { stepAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+                catch (e) { stepAudioCtx = null; }
+            }
+            return stepAudioCtx;
+        }
+        function playFootstepTap() {
+            const ctx = getStepAudioCtx();
+            if (!ctx) return;
+            if (ctx.state === 'suspended') ctx.resume();
+            const now = ctx.currentTime;
+            const bufferSize = Math.floor(ctx.sampleRate * 0.06);
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+            }
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 700;
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.16, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+            noise.connect(filter).connect(gain).connect(ctx.destination);
+            noise.start(now);
+            noise.stop(now + 0.09);
+        }
+        function startFootsteps(walkDuration) {
+            if (stepIntervalId) { clearInterval(stepIntervalId); stepIntervalId = null; }
+            playFootstepTap();
+            const stepGap = 340;
+            let elapsed = 0;
+            stepIntervalId = setInterval(function() {
+                elapsed += stepGap;
+                if (elapsed >= walkDuration || petState !== 'walk') {
+                    clearInterval(stepIntervalId);
+                    stepIntervalId = null;
+                    return;
+                }
+                playFootstepTap();
+            }, stepGap);
+        }
+        document.addEventListener('pointerdown', function unlockAudioOnce() {
+            getStepAudioCtx();
+            document.removeEventListener('pointerdown', unlockAudioOnce);
+        }, { once: true });
+
         /* ================= 3D MODEL ================= */
         function createGirl() {
             const petGroup = new THREE.Group();
@@ -2078,8 +2133,8 @@
             accessoryGroup = new THREE.Group();
             core.add(accessoryGroup);
 
-            dressMesh = new THREE.Mesh(new THREE.ConeGeometry(0.52, 0.95, 24), new THREE.MeshPhongMaterial({ color: 0xe8639c, shininess: 30 }));
-            dressMesh.position.y = 0.08;
+            dressMesh = new THREE.Mesh(new THREE.ConeGeometry(0.52, 0.72, 24), new THREE.MeshPhongMaterial({ color: 0xe8639c, shininess: 30 }));
+            dressMesh.position.y = 0.195;
             core.add(dressMesh);
             const collar = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.05, 10, 20), new THREE.MeshPhongMaterial({ color: 0xffffff }));
             collar.rotation.x = Math.PI / 2;
@@ -2393,26 +2448,26 @@
             equipProp(outfit.pet_props);
         }
 
-        /* ================= ΠΕΡΙΠΛΑΝΗΣΗ ΣΕ ΟΛΗ ΤΗ ΣΕΛΙΔΑ ================= */
+        /* ================= ΠΕΡΙΠΛΑΝΗΣΗ ΣΤΟ ΚΑΤΩ ΜΕΡΟΣ ΤΗΣ ΟΘΟΝΗΣ (ΟΡΙΖΟΝΤΙΑ) ================= */
         function scheduleWander() {
             const w = wrapper.offsetWidth || 170;
             const h = wrapper.offsetHeight || 170;
             const maxLeft = Math.max(20, window.innerWidth - w - 20);
-            const minTop = 80;
-            const maxTop = Math.max(minTop + 40, Math.min(minTop + 160, window.innerHeight - h - 90));
+            // Σταθερό ύψος κοντά στο κάτω μέρος της ΟΘΟΝΗΣ (viewport, fixed), όχι της σελίδας
+            const fixedTop = Math.max(20, window.innerHeight - h - 24);
             const targetLeft = 10 + Math.random() * (maxLeft - 10);
-            const targetTop = minTop + Math.random() * (maxTop - minTop);
 
             const curLeft = wrapper.offsetLeft;
             faceDir = targetLeft >= curLeft ? 1 : -1;
             petState = 'walk';
 
             wrapper.style.left = targetLeft + 'px';
-            wrapper.style.top = targetTop + 'px';
+            wrapper.style.top = fixedTop + 'px';
 
-            const dist = Math.hypot(targetLeft - curLeft, targetTop - (wrapper.offsetTop || 0));
+            const dist = Math.abs(targetLeft - curLeft);
             const walkDuration = Math.min(4200, Math.max(1400, dist * 6));
             wrapper.style.transitionDuration = (walkDuration / 1000) + 's';
+            startFootsteps(walkDuration);
 
             setTimeout(function() {
                 petState = (Math.random() < 0.2) ? 'hop' : 'stand';
@@ -2426,7 +2481,7 @@
 
         /* ================= ΜΗΝΥΜΑΤΑ ΤΟΥ AZIRAM ================= */
         const GREETINGS = [
-            "Καλώς ήρθατε στο Καφέ Βόλτα! ☕ Είμαι ο Aziram, πώς μπορώ να σας εξυπηρετήσω;",
+            "Καλώς ήρθατε στο Καφέ Βόλτα! ☕ Είμαι η Aziram, πώς μπορώ να σας εξυπηρετήσω;",
             "Κάθε παραγγελία σου χαρίζει διαμάντια: 1€ = 1💎 και δεν μηδενίζονται ποτέ! 💎",
             "Μάζεψε διαμάντια και εξαργύρωσέ τα σε εκπτώσεις 2,50€ ή 4,00€! Δες τις Προσφορές! 📣",
             "Θέλετε να κεράσετε έναν φίλο; Μπείτε στο καλάθι και επιλέξτε 'κέρασμα'! 🎁",
