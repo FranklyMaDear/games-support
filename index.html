@@ -1961,12 +1961,21 @@
     refreshOpenState();
     setInterval(() => { refreshOpenState(); updateCart(); }, 60000);
 
+    // ★ ΕΔΩ ΕΙΝΑΙ Η ΛΟΓΙΚΗ ΠΟΥ ΑΝΟΙΓΕΙ ΤΑ MODALS ΑΠΟ ΤΟ WORKER ★
     (function () {
         const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param
             || new URLSearchParams(location.search).get('tgWebAppStartParam')
             || (location.hash ? location.hash.slice(1) : '');
-        if (['events', 'party', 'ekdiloseis'].includes((startParam || '').toLowerCase())) {
+        const lowerParam = (startParam || '').toLowerCase();
+        
+        if (['events', 'party', 'ekdiloseis'].includes(lowerParam)) {
             openModal('evOverlay');
+        } else if (lowerParam === 'games') {
+            openModal('gamesOverlay');
+        } else if (lowerParam === 'pricelist' || lowerParam === 'menu') {
+            openModal('plOverlay');
+        } else if (lowerParam === 'offers') {
+            openModal('offersOverlay');
         }
     })();
 
