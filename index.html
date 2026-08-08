@@ -250,10 +250,13 @@
             z-index: 9999;
             width: 170px;
             height: 170px;
-            cursor: pointer;
+            cursor: grab;
             text-decoration: none;
             touch-action: none;
             transition: left 2.4s cubic-bezier(0.45,0,0.55,1), top 2.4s cubic-bezier(0.45,0,0.55,1);
+        }
+        #girl-wrapper:active {
+            cursor: grabbing;
         }
         #girl-canvas {
             width: 100% !important;
@@ -840,7 +843,7 @@
 </aside>
 
 <!-- ★ AZIRAM — 3D AVATAR που τριγυρίζει σε όλη τη σελίδα ★ -->
-<a href="https://t.me/coffeevolta_bot" target="_blank" id="girl-wrapper" aria-label="Μίλησε με την Aziram στο Telegram">
+<a id="girl-wrapper" aria-label="Μίλησε με την Aziram στο Telegram">
     <canvas id="girl-canvas"></canvas>
     <div id="speech"><span id="speechText">Καλώς ήρθατε!</span></div>
 </a>
@@ -1817,7 +1820,7 @@
                             ${paymentInfoHtml}
                         </div>
                         <p style="font-size:0.85rem; color:#6b5d4d; margin-bottom:12px;">Αφού κάνεις την πληρωμή και στείλεις το αποδεικτικό, πάτησε το κουμπί για να ολοκληρωθεί η παραγγελία!</p>
-                        <button onclick="confirmTreatPayment('${escName}', '${escPhone}')" id="confirmPayBtn" style="width:100%; background:#2e7d32; color:#fff; border:none; padding:14px; border-radius:999px; font-weight:900; font-size:1rem; cursor:pointer; margin-bottom:10px; box-shadow:0 4px 10px rgba(46,125,50,0.3);">✅ Ολοκλήρωση παραγγελίας</button>
+                        <button onclick="confirmTreatPayment('${escName}', '${escPhone}')" id="confirmPayBtn" style="width:100%; background:#2e7d32; color:#fff; border:none; padding:14px; border-radius:999px; font-weight:900; font-size:1rem; cursor:pointer; margin-bottom:10px; box-shadow:0 4px 10px rgba(46,125,32,0.3);">✅ Ολοκλήρωση παραγγελίας</button>
                         <a href="https://t.me/kafevolta?direct" target="_blank" style="display:block; background:#2AABEE; color:#fff; text-decoration:none; padding:12px; border-radius:999px; font-weight:700; font-size:0.9rem;">💬 Στείλε το αποδεικτικό εδώ</a>
                     </div>`;
             } else {
@@ -1859,6 +1862,91 @@
         t.textContent = msg; t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 1500);
     }
+
+    // === DRAG & DROP ΓΙΑ ΤΟ AZIRAM AVATAR ===
+    (function() {
+        const avatar = document.getElementById('girl-wrapper');
+        if (!avatar) return;
+
+        let isDragging = false;
+        let hasMoved = false;
+        let startX, startY, initialLeft, initialTop;
+
+        function onDragStart(e) {
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            if (clientX == null) return;
+
+            isDragging = false;
+            hasMoved = false;
+            startX = clientX;
+            startY = clientY;
+
+            const rect = avatar.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+
+            avatar.style.transition = 'none';
+
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('mouseup', onDragEnd);
+            document.addEventListener('touchmove', onDragMove, { passive: false });
+            document.addEventListener('touchend', onDragEnd);
+        }
+
+        function onDragMove(e) {
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            if (clientX == null) return;
+
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+            const dragDistance = Math.sqrt(dx*dx + dy*dy);
+
+            if (dragDistance > 5) {
+                isDragging = true;
+                hasMoved = true;
+                e.preventDefault();
+
+                let newLeft = initialLeft + dx;
+                let newTop = initialTop + dy;
+
+                const margin = 10;
+                const maxX = window.innerWidth - avatar.offsetWidth - margin;
+                const maxY = window.innerHeight - avatar.offsetHeight - margin;
+                
+                newLeft = Math.max(margin, Math.min(maxX, newLeft));
+                newTop = Math.max(margin, Math.min(maxY, newTop));
+
+                avatar.style.left = newLeft + 'px';
+                avatar.style.top = newTop + 'px';
+            }
+        }
+
+        function onDragEnd(e) {
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('mouseup', onDragEnd);
+            document.removeEventListener('touchmove', onDragMove);
+            document.removeEventListener('touchend', onDragEnd);
+
+            avatar.style.transition = ''; 
+
+            if (!isDragging) {
+                window.open('https://t.me/coffeevolta_bot', '_blank');
+            }
+        }
+
+        avatar.addEventListener('mousedown', onDragStart);
+        avatar.addEventListener('touchstart', onDragStart, { passive: true });
+
+        avatar.addEventListener('click', function(e) {
+            if (hasMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+                hasMoved = false;
+            }
+        });
+    })();
 
     document.querySelectorAll('.form-group input, .form-group textarea').forEach(el => {
         el.addEventListener('focus', () => {
@@ -2416,7 +2504,6 @@
             const w = wrapper.offsetWidth || 170;
             const h = wrapper.offsetHeight || 170;
             const maxLeft = Math.max(20, window.innerWidth - w - 20);
-            // Σταθερό ύψος κοντά στο κάτω μέρος της ΟΘΟΝΗΣ (viewport, fixed), όχι της σελίδας
             const fixedTop = Math.max(20, window.innerHeight - h - 24);
             const targetLeft = 10 + Math.random() * (maxLeft - 10);
 
@@ -2456,7 +2543,6 @@
             "Κάνε κλικ επάνω μου για να συζητήσουμε μέσα από το Chat Bot! 💬",
             "Ήπιατε τον ελληνικό σας; Δοκιμάστε την ψηφιακή μας Καφεμαντεία! 🔮"
         ];
-        // Σταθερή σειρά μηνυμάτων μόλις ανοίγει η σελίδα: καλωσόρισμα → προσφορές → Αυγούστου → πάρτυ → κέρασμα → chat bot
         const INTRO_SEQUENCE = [
             "Καλώς ήρθατε στο Καφέ Βόλτα! ☕ Είμαι η Aziram, πώς μπορώ να σας εξυπηρετήσω;",
             "Μάζεψε διαμάντια και εξαργύρωσέ τα σε εκπτώσεις 2,50€ ή 4,00€! Δες τις Προσφορές! 📣",
@@ -2465,7 +2551,7 @@
             "Θέλετε να κεράσετε έναν φίλο; Μπείτε στο καλάθι και επιλέξτε 'κέρασμα'! 🎁",
             "Κάνε κλικ επάνω μου για να συζητήσουμε μέσα από το Chat Bot! 💬"
         ];
-        const GREET_GAP = 10000; // 10 δευτερόλεπτα ανάμεσα σε κάθε μήνυμα
+        const GREET_GAP = 10000;
         let lastGreetIdx = -1;
         function randomGreeting() {
             let i;
@@ -2491,7 +2577,7 @@
             wrapper.style.transition = 'none';
             wrapper.style.left = startLeft + 'px';
             wrapper.style.top = fixedTop + 'px';
-            void wrapper.offsetWidth; // force reflow
+            void wrapper.offsetWidth;
             wrapper.style.transition = '';
         }
 
