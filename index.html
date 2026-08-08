@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="el">
 <head>
     <meta charset="UTF-8">
@@ -547,7 +547,7 @@
             <p class="ev-intro">Θέλεις να κάνεις έκπληξη σε ένα αγαπημένο σου πρόσωπο; Η διαδικασία είναι πανεύκολη!</p>
             <div style="margin-top:12px; font-size: 0.85rem; line-height: 1.6; color: var(--mocha-dark);">
                 <p><strong>1. Διάλεξε προϊόντα:</strong> Πρόσθεσε στο καλάθι τα προϊόντα που θέλεις να κεράσεις.</p>
-                <p style="margin-top:8px;"><strong>2. Πάτα το κουτάκι:</strong> Μέσα στο καλάθι, επέλεξε το <em>"🎁 Είναι κέρασμα / δώρο;"</em> και συμπλήρωσε το όνομα και το τηλέφωνο του φίλου σου.</p>
+                <p style="margin-top:8px;"><strong>2. Πάτα στο κουτάκι:</strong> Μέσα στο καλάθι, επέλεξε το <em>"🎁 Είναι κέρασμα / δώρο;"</em> και συμπλήρωσε το όνομα και το τηλέφωνο του φίλου σου.</p>
                 <p style="margin-top:8px;"><strong>3. Ολοκλήρωση & Πληρωμή:</strong> Πάτα "Συνέχεια για πληρωμή". Το σύστημα θα σου εμφανίσει το <strong>IRIS</strong> και τη <strong>Revolut</strong> μας για να κάνεις τη μεταφορά.</p>
                 <p style="margin-top:8px;"><strong>4. Το αναλαμβάνουμε εμείς:</strong> Μόλις λάβουμε την παραγγελία και το αποδεικτικό σου, επικοινωνούμε μαζί του για να του παραδώσουμε το κέρασμα!</p>
             </div>
@@ -1973,6 +1973,7 @@
         } else if (lowerParam === 'games') {
             openModal('gamesOverlay');
         } else if (lowerParam === 'pricelist' || lowerParam === 'menu') {
+            buildPricelist(); // ★ ΠΡΟΣΘΕΣΑ ΑΥΤΗ ΤΗ ΓΡΑΜΜΗ ΓΙΑ ΝΑ ΦΟΡΤΩΝΕΙ ΤΟΝ ΚΑΤΑΛΟΓΟ ★
             openModal('plOverlay');
         } else if (lowerParam === 'offers') {
             openModal('offersOverlay');
