@@ -1005,7 +1005,11 @@
     });
     document.getElementById('overlay').addEventListener('click', () => closeModal('drawer', true));
 
-    document.getElementById('openTreatInfo').onclick = () => openModal('treatOverlay');
+    // --- ΕΔΩ ΕΙΝΑΙ ΟΙ ΑΛΛΑΓΕΣ ΓΙΑ ΤΗΝ AZIRAM ---
+    document.getElementById('openTreatInfo').onclick = () => {
+        openModal('treatOverlay');
+        if (window.azSpeak) window.azSpeak("Κέρασε τους φίλους σου εύκολα και γρήγορα! 🎁", 4000);
+    };
 
     function getFavs() { return JSON.parse(localStorage.getItem(LS_FAVS) || '[]'); }
     function toggleFav(id) {
@@ -1096,17 +1100,39 @@
     }
     
     document.getElementById('openPricelist').onclick = () => { buildPricelist(); openModal('plOverlay'); };
-    document.getElementById('openOffers').onclick = () => openModal('offersOverlay');
-    document.getElementById('openEvents').onclick = () => openModal('evOverlay');
+    
+    // --- ΕΔΩ ΕΙΝΑΙ ΟΙ ΑΛΛΑΓΕΣ ΓΙΑ ΤΗΝ AZIRAM ---
+    document.getElementById('openOffers').onclick = () => {
+        openModal('offersOverlay');
+        if (window.azSpeak) window.azSpeak("Δες τις προσφορές του μήνα και μάζεψε διαμάντια! 📣", 4000);
+    };
+    
+    // --- ΕΔΩ ΕΙΝΑΙ ΟΙ ΑΛΛΑΓΕΣ ΓΙΑ ΤΗΝ AZIRAM ---
+    document.getElementById('openEvents').onclick = () => {
+        openModal('evOverlay');
+        if (window.azSpeak) window.azSpeak("Κλείσε το δικό σου παιδικό πάρτυ ή εκδήλωση! 🎉", 4000);
+    };
+    
+    // --- ΕΔΩ ΕΙΝΑΙ ΟΙ ΑΛΛΑΓΕΣ ΓΙΑ ΤΗΝ AZIRAM ---
     document.getElementById('openCart').onclick = () => {
         openModal('drawer', true);
-        if (window.azSpeak) window.azSpeak("Μην ξεχάσετε το φιλοδώρημα! 💖", 4500);
+        if (window.azSpeak) window.azSpeak("Δες τι έχεις βάλει στο καλάθι! Μην ξεχάσεις το φιλοδώρημα! 💖", 4000);
     };
-    document.getElementById('openBooking').onclick = () => { closeModal('evOverlay'); openModal('bkOverlay'); };
+    
+    // --- ΕΔΩ ΕΙΝΑΙ ΟΙ ΑΛΛΑΓΕΣ ΓΙΑ ΤΗΝ AZIRAM ---
+    document.getElementById('openBooking').onclick = () => { 
+        closeModal('evOverlay'); 
+        openModal('bkOverlay');
+        if (window.azSpeak) window.azSpeak("Συμπλήρωσε τα στοιχεία σου για να κάνουμε την κράτηση! 📝", 4000);
+    };
 
     const openGamesBtn = document.getElementById('openGamesModal');
     if (openGamesBtn) {
-        openGamesBtn.onclick = () => openModal('gamesOverlay');
+        // --- ΕΔΩ ΕΙΝΑΙ ΟΙ ΑΛΛΑΓΕΣ ΓΙΑ ΤΗΝ AZIRAM ---
+        openGamesBtn.onclick = () => {
+            openModal('gamesOverlay');
+            if (window.azSpeak) window.azSpeak("Παίξε δωρεάν παιχνίδια και κέρδισε δώρο κάρτες! 🎮", 4000);
+        };
     }
 
     const openShareBtn = document.getElementById('openShareModalBtn');
@@ -1973,7 +1999,7 @@
         } else if (lowerParam === 'games') {
             openModal('gamesOverlay');
         } else if (lowerParam === 'pricelist' || lowerParam === 'menu') {
-            buildPricelist(); // ★ ΠΡΟΣΘΕΣΑ ΑΥΤΗ ΤΗ ΓΡΑΜΜΗ ΓΙΑ ΝΑ ΦΟΡΤΩΝΕΙ ΤΟΝ ΚΑΤΑΛΟΓΟ ★
+            buildPricelist(); 
             openModal('plOverlay');
         } else if (lowerParam === 'offers') {
             openModal('offersOverlay');
