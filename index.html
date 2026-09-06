@@ -1,10 +1,10 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Καφέ Βόλτα — Online Παραγγελίες</title>
-    <meta name="description" content="Παράγγειλε online & παρέλαβε χωρίς αναμονή! 💎 1€ = 1 διαμάντι · Προσφορές Αυγούστου · 🥞 3 κρέπες = +1 ΔΩΡΟ. Φήκη Τρικάλων · 06:00–22:00">
+    <meta name="description" content="Παράγγειλε online & παρέλαβε χωρίς αναμονή! 💎 1€ = 1 διαμάντι · Crepe Times · 🥞 3 κρέπες = +1 ΔΩΡΟ. Φήκη Τρικάλων · 06:00–22:00">
     <meta property="og:title" content="Καφέ Βόλτα ☕ Online Παραγγελίες & Διαμάντια">
     <meta property="og:description" content="Ο καφές σου έτοιμος πριν φτάσεις! Μάζεψε διαμάντια. Έκπτωση 2,50€ ή 4,00€ · 🥞 3+1 ΔΩΡΟ · 🔮 Καφεμαντεία! Φήκη Τρικάλων · 06:00–22:00">
     <meta property="og:type" content="website">
@@ -484,9 +484,8 @@
 <!-- ★ Φωτογραφικό Banner Προσφορών -->
 <section class="promo-banner">
     <div class="promo-banner-inner">
-        <div class="promo-title">Προσφορές Αυγούστου</div>
+        <div class="promo-title">Crepe Times</div>
         <div class="promo-text">
-            <strong>2+1 ΔΩΡΟ</strong> Γρανίτες & Milkshake <br>
             <strong>3+1 ΔΩΡΟ</strong> Κρέπες (με έξτρα υλικό)
         </div>
     </div>
@@ -598,12 +597,10 @@
             </div>
 
             <div class="ev-sec">
-                <h3 style="color:var(--mocha); font-family:'Literata', serif; font-size:1rem; margin-bottom:6px;">🎁 Προσφορές Αυγούστου</h3>
+                <h3 style="color:var(--mocha); font-family:'Literata', serif; font-size:1rem; margin-bottom:6px;">🎁 Crepe Times</h3>
                 <p class="ev-text">Ισχύουν αυτόματα προσθέτοντας τα προϊόντα στο καλάθι. <em>*Τα προϊόντα των προσφορών δεν αποδίδουν διαμάντια.</em></p>
                 <ul style="font-size: 0.85rem; margin-left: 18px; margin-top: 6px; color: #4d4336; line-height: 1.6;">
                     <li><strong>3+1 Κρέπες:</strong> Στις 3 κρέπες <strong>(που έχουν επιπλέον μπισκότο ή παγωτό)</strong>, ΔΩΡΟ 1 κρέπα Σοκολάτα-Μπισκότο.</li>
-                    <li><strong>2+1 Ροφήματα:</strong> Στις 2 Γρανίτες η 3η δωρεάν.</li>
-                    <li><strong>2+1 Milkshake:</strong> Στα 2 Milkshake το 3ο δωρεάν.</li>
                 </ul>
                 <div style="background:#fff3e0; border:1px dashed #ff9800; padding:10px; border-radius:8px; text-align:center; font-weight:700; font-size:0.85rem; color:#e65100; margin-top:10px;">
                     ⏳ Λήξη προσφορών: 31 Αυγούστου<br>
@@ -1104,7 +1101,7 @@
     // --- ΕΔΩ ΕΙΝΑΙ ΟΙ ΑΛΛΑΓΕΣ ΓΙΑ ΤΗΝ AZIRAM ---
     document.getElementById('openOffers').onclick = () => {
         openModal('offersOverlay');
-        if (window.azSpeak) window.azSpeak("Δες τις προσφορές του μήνα και μάζεψε διαμάντια! 📣", 4000);
+        if (window.azSpeak) window.azSpeak("Δες το Crepe Times και μάζεψε διαμάντια! 📣", 4000);
     };
     
     // --- ΕΔΩ ΕΙΝΑΙ ΟΙ ΑΛΛΑΓΕΣ ΓΙΑ ΤΗΝ AZIRAM ---
@@ -1367,14 +1364,7 @@
     }
     
     function getExtraDiscount() {
-        let countGranita = 0, countMilkshake = 0;
-        cart.forEach(v => {
-            if (v.prod.id === 'granita') countGranita += v.qty;
-            if (v.prod.id === 'milkshake') countMilkshake += v.qty;
-        });
-        const freeGranitas = Math.floor(countGranita / 3);
-        const freeMilkshakes = Math.floor(countMilkshake / 3);
-        return (freeGranitas * 1.50) + (freeMilkshakes * 2.00);
+        return 0; // Προσφορά 2+1 γρανίτες & milkshake αφαιρέθηκε
     }
 
     function getEligibleSubtotal() {
@@ -1450,14 +1440,10 @@
     function updateCart() {
         let count = 0;
         let crepeItems = [];
-        let granitaItems = [];
-        let milkshakeItems = [];
         
         cart.forEach((v, key) => { 
             count += v.qty; 
             if(v.prod.cat === 'crepe' && v.extra > 0) { for(let i=0; i<v.qty; i++) crepeItems.push(itemPrice(v)); }
-            if(v.prod.id === 'granita') { for(let i=0; i<v.qty; i++) granitaItems.push(itemPrice(v)); }
-            if(v.prod.id === 'milkshake') { for(let i=0; i<v.qty; i++) milkshakeItems.push(itemPrice(v)); }
         });
         
         const subtotal = getSubtotal();
@@ -1470,10 +1456,6 @@
         let pointsDeduction = 0;
         let cSets = Math.floor(crepeItems.length / 3);
         for(let i=0; i < cSets * 3; i++) pointsDeduction += crepeItems[i];
-        let gSets = Math.floor(granitaItems.length / 3);
-        for(let i=0; i < gSets * 3; i++) pointsDeduction += granitaItems[i];
-        let mSets = Math.floor(milkshakeItems.length / 3);
-        for(let i=0; i < mSets * 3; i++) pointsDeduction += milkshakeItems[i];
         
         const eligibleForPoints = Math.max(0, subtotal - pointsDeduction - rewardDiscount);
         const earned = Math.round(eligibleForPoints * 10) / 10;
@@ -1554,16 +1536,6 @@
         if (cCount > 0 && cCount < 3) {
             const rem = 3 - cCount;
             hintsHtml += `<div class="cart-hint">💡 Πρόσθεσε ${rem} ακόμα κρέπ${rem===1?'α':'ες'} (με έξτρα) για 1 ΔΩΡΟ!</div>`;
-        }
-        const gCount = granitaItems.length % 3;
-        if (gCount > 0 && gCount < 3) {
-            const rem = 3 - gCount;
-            hintsHtml += `<div class="cart-hint">💡 Πρόσθεσε ${rem} ακόμα γρανίτ${rem===1?'α':'ες'} για 1 ΔΩΡΟ!</div>`;
-        }
-        const mCount = milkshakeItems.length % 3;
-        if (mCount > 0 && mCount < 3) {
-            const rem = 3 - mCount;
-            hintsHtml += `<div class="cart-hint">💡 Πρόσθεσε ${rem} ακόμα milkshake για 1 ΔΩΡΟ!</div>`;
         }
         
         if (hintsHtml) {
@@ -1725,21 +1697,13 @@
         const totalAmount = subtotal - extraDiscount - rewardDiscount + transactionFee + tipAmount;
         
         let crepeItems = [];
-        let granitaItems = [];
-        let milkshakeItems = [];
         cart.forEach((v, key) => { 
             if(v.prod.cat === 'crepe' && v.extra > 0) { for(let i=0; i<v.qty; i++) crepeItems.push(itemPrice(v)); }
-            if(v.prod.id === 'granita') { for(let i=0; i<v.qty; i++) granitaItems.push(itemPrice(v)); }
-            if(v.prod.id === 'milkshake') { for(let i=0; i<v.qty; i++) milkshakeItems.push(itemPrice(v)); }
         });
         
         let pointsDeduction = 0;
         let cSets = Math.floor(crepeItems.length / 3);
         for(let i=0; i < cSets * 3; i++) pointsDeduction += crepeItems[i];
-        let gSets = Math.floor(granitaItems.length / 3);
-        for(let i=0; i < gSets * 3; i++) pointsDeduction += granitaItems[i];
-        let mSets = Math.floor(milkshakeItems.length / 3);
-        for(let i=0; i < mSets * 3; i++) pointsDeduction += milkshakeItems[i];
         
         const eligibleForPoints = Math.max(0, subtotal - pointsDeduction - rewardDiscount);
         const earned = Math.round(eligibleForPoints * 10) / 10;
@@ -2569,9 +2533,8 @@
             "Καλώς ήρθατε στο Καφέ Βόλτα! ☕ Είμαι η Aziram, πώς μπορώ να σας εξυπηρετήσω;",
             "Κάθε παραγγελία σου χαρίζει διαμάντια: 1€ = 1💎 και δεν μηδενίζονται ποτέ! 💎",
             "Μάζεψε διαμάντια και εξαργύρωσέ τα σε εκπτώσεις 2,50€ ή 4,00€! Δες τις Προσφορές! 📣",
-            "Οι προσφορές Αυγούστου λήγουν 31 Αυγούστου, μην τις χάσεις! ⏳",
+            "Το Crepe Times λήγει 31 Αυγούστου, μην το χάσεις! ⏳",
             "3 κρέπες = ΔΩΡΟ 1 ακόμα κρέπα Σοκολάτα-Μπισκότο! 🥞🎁",
-            "2 Γρανίτες = η 3η ΔΩΡΕΑΝ! Το ίδιο ισχύει και για τα Milkshake! 🥤",
             "Θέλετε να κεράσετε έναν φίλο; Μπείτε στο καλάθι και επιλέξτε 'κέρασμα'! 🎁",
             "Κλείσε παιδικό πάρτυ γενεθλίων σε δικό μας εξωτερικό χώρο με γκαζόν, κούνιες και τραμπολίνο! 🎈",
             "Έχουμε χώρο έως 80+ ατόμων για εκδηλώσεις, ομιλίες και παρουσιάσεις! 🎤",
@@ -2582,7 +2545,7 @@
         const INTRO_SEQUENCE = [
             "Καλώς ήρθατε στο Καφέ Βόλτα! ☕ Είμαι η Aziram, πώς μπορώ να σας εξυπηρετήσω;",
             "Μάζεψε διαμάντια και εξαργύρωσέ τα σε εκπτώσεις 2,50€ ή 4,00€! Δες τις Προσφορές! 📣",
-            "Οι προσφορές Αυγούστου λήγουν 31 Αυγούστου, μην τις χάσεις! ⏳",
+            "Το Crepe Times λήγει 31 Αυγούστου, μην το χάσεις! ⏳",
             "Κλείσε παιδικό πάρτυ γενεθλίων σε δικό μας εξωτερικό χώρο με γκαζόν, κούνιες και τραμπολίνο! 🎈",
             "Θέλετε να κεράσετε έναν φίλο; Μπείτε στο καλάθι και επιλέξτε 'κέρασμα'! 🎁",
             "Κάνε κλικ επάνω μου για να συζητήσουμε μέσα από το Chat Bot! 💬"
